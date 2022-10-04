@@ -38,6 +38,7 @@ class ReservationController extends RbacController {
     public $enableCsrfValidation = false;
     
     public function actionCreate() {
+        //echo "testing";
         return $this->render('create/create',[
             'reserveForm' => new ReservationForm]);
     }
