@@ -29,6 +29,8 @@ RUN apt-get update \
     php7.0-soap \
     php7.0-xml \
     libapache2-mod-php \
+    ssl-cert \
+    ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
 RUN adduser --disabled-password --gecos '' meican \
@@ -41,12 +43,13 @@ WORKDIR $MEICAN_DIR
 RUN curl -kO https://getcomposer.org/download/1.9.3/composer.phar \
  && su meican -c "php composer.phar global require "fxp/composer-asset-plugin:~1.4.4"" \
  && ln -s $MEICAN_DIR/web /var/www/meican \
- && a2enmod rewrite
+ && a2enmod rewrite ssl
 
 COPY 000-default.conf /etc/apache2/sites-available/
 
 COPY docker-entrypoint.sh /
 
 EXPOSE 80
+EXPOSE 443
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
