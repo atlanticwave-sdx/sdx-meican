@@ -8,10 +8,15 @@ services:
     tty: true
     ports:
       - "${MEICAN_PORT:-80}:80"
+      - "${MEICAN_PORT_HTTPS:-443}:443"
     depends_on:
       - db
     links:
       - db
+    # Example on how to setup your own SSL Certificate:
+    #volumes:
+    #  - ./mycert.key:/etc/ssl/private/ssl-cert-snakeoil.key:ro
+    #  - ./mycert.pem:/etc/ssl/certs/ssl-cert-snakeoil.pem:ro
 
   db:
     image: mysql:5.7

@@ -28,6 +28,42 @@ class LoginController extends BaseController {
     public $enableCsrfValidation = false;
     
     public function actionIndex() {
+	        $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+      	//echo $actual_link;
+      	if (strpos($actual_link,'code') !== false) {
+          $code=$_GET['code'];
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://orcid.org/oauth/token',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS => 'client_id=APP-6U5WZH9AC4EYDVAD&client_secret=c839f6ee-8991-4b4e-9ae3-aab528adc22c&grant_type=authorization_code&redirect_uri=https%3A%2F%2F67.17.206.206%2Faaa%2Flogin&code='.$code.'',
+        CURLOPT_HTTPHEADER => array(
+          'Accept: application/json',
+          'Content-Type: application/x-www-form-urlencoded',
+          'Cookie: X-Mapping-fjhppofk=C9BF87EDFB3F654BC98D87552A592F57'
+        ),
+      ));
+
+      $response = curl_exec($curl);
+
+      curl_close($curl);
+      //echo $response;
+      $response_arr=json_decode($response,true);
+      //print_r($response_arr);
+      if(!array_key_exists('access_token',$response_arr)){
+      header("Location: https://orcid.org/oauth/authorize?client_id=APP-6U5WZH9AC4EYDVAD&response_type=code&scope=/authenticate&redirect_uri=https://67.17.206.206/aaa/login");
+      }
+      } else {
+          header("Location: https://orcid.org/oauth/authorize?client_id=APP-6U5WZH9AC4EYDVAD&response_type=code&scope=/authenticate&redirect_uri=https://67.17.206.206/aaa/login");
+      }
         if (!\Yii::$app->user->isGuest) {
             return $this->goHome();
         }
