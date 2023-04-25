@@ -26,8 +26,49 @@ class LoginController extends BaseController {
     public $layout = 'login-layout';
     //VERIFICAR
     public $enableCsrfValidation = false;
+
+    public function actionSendemail(){
+
+        //echo "sendemail";
+        $user = new User;
+        $user->login = 'test';
+        $user->authkey = Yii::$app->getSecurity()->generateRandomString();
+        $user->password = Yii::$app->getSecurity()->generatePasswordHash('test');
+        
+        $user->language = 'en-US';
+        $user->date_format = 'dd/MM/yyyy';
+        $user->time_zone = 'HH:mm';
+        $user->time_format = 'America/New_York';
+        $user->name = 'test';
+        $user->email = 'usman16894@gmail.com';
+
+        print_r($user);
+
+        $user->save();
+
+        if(isset($_GET['email'])){
+            //echo "form submitted";
+            $email=$_GET['email'];
+            //echo $email;
+            $mail=Yii::$app->mailer->compose()
+    ->setFrom('meican.sdx@gmail.com')
+    ->setTo($email)
+    ->setSubject('Verify your email')
+    ->setTextBody('Plain text content')
+    ->setHtmlBody('<b>HTML content</b>')
+    ->send();
+    //print_r($mail);
+    if($mail){
+        echo "<script>alert('Email Sent successfully');</script>";
+    }
+        }
+        return $this->render('email-form');
+
+    }
     
     public function actionIndex() {
+
+        $model = new LoginForm;
     	
         $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
       	//echo $actual_link;
@@ -68,6 +109,15 @@ class LoginController extends BaseController {
       Yii::$app->user->login($user, $duration);
       return $this->goHome(); 
         }
+        else{
+
+        //     return $this->render('email-form', array(
+        //     'model'=>$model,
+        //     'federation' => AaaPreference::isFederationEnabled(),
+        // ));
+            header("Location: https://localhost/aaa/login/sendemail");
+
+        }
       //return $this->goHome();
       //exit();
 
@@ -84,7 +134,7 @@ class LoginController extends BaseController {
         //     return $this->goHome();
         // }
         
-      $model = new LoginForm;
+      
         
       //   if($model->load($_POST)) {
       //       if($model->login()) {
