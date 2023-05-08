@@ -56,6 +56,7 @@ class LoginController extends BaseController {
         
         if(isset($_GET['id'])){
         $orcid_id=$_GET['id'];
+        $orcid_name=$_GET['name'];
         
        if(isset($_GET['email'])){
         
@@ -68,7 +69,7 @@ class LoginController extends BaseController {
         $user->date_format = 'dd/MM/yyyy';
         $user->time_zone = 'HH:mm';
         $user->time_format = 'New_York';
-        $user->name = 'new-user';
+        $user->name = $orcid_name;
         $user->email = $email;
         $registration_token=Yii::$app->getSecurity()->generateRandomString();
         $user->registration_token=$registration_token;
@@ -96,7 +97,7 @@ class LoginController extends BaseController {
         }
        
         }
-        return $this->render('email-form',array('orcid_id'=>$orcid_id));
+        return $this->render('email-form',array('orcid_id'=>$orcid_id,'orcid_name'=>$orcid_name));
 
     }
     }
@@ -134,6 +135,7 @@ class LoginController extends BaseController {
       curl_close($curl);
       $response_arr=json_decode($response,true);
       $orcid_id=$response_arr['orcid'];
+      $name=$response_arr['name'];
       $user=User::findByUsername($orcid_id);
       if(!empty($user)&&$user->is_active==1){
       $duration = 3600*24; // one day
@@ -145,7 +147,8 @@ class LoginController extends BaseController {
         }
         else{
 
-        header("Location: https://$base_url/aaa/login/sendemail?id=$orcid_id");
+        header("Location: https://$base_url/aaa/login/sendemail?id=$orcid_id&name=$name");
+        exit();
 
         }
       
@@ -153,6 +156,7 @@ class LoginController extends BaseController {
 
       else {
           header("Location: https://orcid.org/oauth/authorize?client_id=APP-6U5WZH9AC4EYDVAD&response_type=code&scope=/authenticate&redirect_uri=https://$base_url/aaa/login");
+          exit();
        }
 
         

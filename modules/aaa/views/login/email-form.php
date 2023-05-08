@@ -24,6 +24,7 @@ use yii\bootstrap\Html;
 
 <input type="text" id="loginform-login" class="form-control" name="email" placeholder="Email" required>
 <input type="hidden" name="id" value="<?php echo $orcid_id; ?>">
+<input type="hidden" name="name" value="<?php echo $orcid_name; ?>">
 
 <p class="help-block help-block-error"></p>
 </div>          <span class="fa fa-user form-control-feedback"></span>
