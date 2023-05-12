@@ -27,6 +27,17 @@ echo Menu::widget([
             ]
         ],
         [
+            'label'=>Yii::t('circuits','SDX Circuits'),
+            'url' => '#',
+            'icon' => 'fa fa-wifi',
+            'items'=>[
+                    ['label'=>Yii::t('circuits','Create'), 'url'=>['/circuits/nodes/show'], 'visible'=>(RbacController::can('sdxCircuit/create'))],
+                    ['label'=>Yii::t('circuits','View'), 'url'=>['/aaa/group'], 'visible'=>RbacController::can('sdxCircuit/read')],
+                    ['label'=>Yii::t('circuits','Update'), 'url'=>['/aaa/config'], 'visible'=>RbacController::can('sdxCircuit/update')],
+                    ['label'=>Yii::t('circuits','Delete'), 'url'=>['/aaa/config'], 'visible'=>RbacController::can('sdxCircuit/delete')],
+            ],
+        ],
+        [
             'label'=>Yii::t('bpm','Workflows'),
             'url' => '#',
             'icon' => 'fa fa-random',

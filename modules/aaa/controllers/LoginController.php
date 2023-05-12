@@ -27,6 +27,25 @@ class LoginController extends BaseController {
     //VERIFICAR
     public $enableCsrfValidation = false;
 
+    public function actionAdmin() {
+        if (!\Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+        
+        $model = new LoginForm;
+        
+        if($model->load($_POST)) {
+            if($model->login()) {
+                return $this->goHome();
+            }
+        }
+            
+        return $this->render('index', array(
+            'model'=>$model,
+            'federation' => AaaPreference::isFederationEnabled(),
+        ));
+    }
+
     public function actionVerifyemail(){
 
         $registration_token = $_GET['token'];

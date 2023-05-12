@@ -39,6 +39,10 @@ class NodesController extends RbacController {
     
     public function actionShow() {
    
+    if(!self::can("sdxCircuit/create")){
+            return $this->goHome();
+        }
+
 	$response='{
     "id": "urn:sdx:topology:amlight.net",
     "name": "AmLight-OXP",
