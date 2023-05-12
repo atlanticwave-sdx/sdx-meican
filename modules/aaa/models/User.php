@@ -109,6 +109,10 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public static function findByUsername($username) {
         return static::findOne(['login' => $username]);
     }
+
+    public static function findByRegistrationToken($registration_token) {
+        return static::findOne(['registration_token' => $registration_token]);
+    }
     
     public static function findIdentity($id) {
         return static::findOne($id);

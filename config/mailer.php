@@ -8,9 +8,9 @@ return [
     'class' => 'yii\swiftmailer\Mailer',
     'transport' => [
         'class' => 'Swift_SmtpTransport',
-        'host' => '',
-        'username' => '',
-        'password' => '',
+        'host' => 'smtp.gmail.com',
+        'username' => 'meican.sdx@gmail.com',
+        'password' => 'hfnpjukwikpltiks',
         'port' => '465',
         'encryption' => 'ssl',
     ],
