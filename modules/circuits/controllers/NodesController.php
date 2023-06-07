@@ -36,6 +36,34 @@ use meican\topology\models\Service;
 class NodesController extends RbacController {
 
     public $enableCsrfValidation = false;
+
+    public function actionCreate(){
+
+        $request = Yii::$app->request->getRawBody();
+        $request=stripslashes($request);
+        $api_url=API_URL;
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $api_url.'conection',
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'POST',
+          CURLOPT_POSTFIELDS =>$request,
+          CURLOPT_HTTPHEADER => array(
+            'Content-Type: application/json'
+          ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        echo $response;
+    }
     
     public function actionShow() {
    
@@ -45,6 +73,7 @@ class NodesController extends RbacController {
 
     //calling API for topology
     $api_url=API_URL;
+    $meican_url=MEICAN_URL;
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
@@ -166,8 +195,8 @@ class NodesController extends RbacController {
       }
       
     }
-    
-        return $this->render('nodes/nodes',['nodes_array'=>$nodes_array,'latlng_array'=>$latlng_array,'links_array'=>$links_array]);
+        
+        return $this->render('nodes/nodes',['nodes_array'=>$nodes_array,'latlng_array'=>$latlng_array,'links_array'=>$links_array,'meican_url'=>$meican_url]);
     }
 
 

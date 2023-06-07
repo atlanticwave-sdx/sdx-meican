@@ -50,61 +50,59 @@
     <div class="col-sm-3">
     <form id="filtersform">
     <h4>Add connection</h4>
+ 
   <div class="form-group">
-    <label for="exampleInputEmail1">Source</label>
-    <input type="text" class="form-control" id="Source" aria-describedby="emailHelp" placeholder="Enter Source">
-    
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">Destination</label>
-    <input type="text" class="form-control" id="Destination" placeholder="Enter destination">
+    <label for="exampleInputPassword1">Name</label>
+    <input type="text" class="form-control" id="name" name="name" placeholder="Name">
   </div>
 
 <div class="form-group">
-    <label for="exampleInputPassword1">Desired links</label>
-    <textarea class="form-control" id="Desired" placeholder="Desired links"></textarea>
+    <label for="exampleInputPassword1">Quantity</label>
+    <input type="text" class="form-control" id="quantity" name="quantity" placeholder="Quantity">
   </div>
 
   <div class="form-group">
-    <label for="exampleInputPassword1">Undesired links</label>
-    <textarea class="form-control" id="Undesired" placeholder="Undesired links"></textarea>
+    <label for="exampleInputPassword1">Start time</label>
+    <input type="date" class="form-control" id="start_time" name="start_time" placeholder="Start time">
   </div>
 
 
 
 
    <div class="form-group">
-    <label for="exampleInputPassword1">Type</label>
-    <input type="text" class="form-control" id="Type" placeholder="Type">
+    <label for="exampleInputPassword1">End time</label>
+    <input type="date" class="form-control" id="end_time" name="end_time" placeholder="End time">
   </div>
 
    <div class="form-group">
-    <label for="exampleInputPassword1">Bandwidth</label>
-    <input type="text" class="form-control" id="Bandwidth" placeholder="Bandwidth">
+    <label for="exampleInputPassword1">Source port</label>
+    <select class="form-control" id="egress_port" name="egress_port" placeholder="Egress port">
+      <?php foreach ($nodes_array as $key => $value) {
+              foreach ($value['sub_nodes'] as $key2 => $value2) {
+                foreach ($value2['ports'] as $key3 => $value3) {
+                  unset($value3['label_range']);
+                  unset($value3['private_attributes']);
+                  echo "<option value='".json_encode($value3)."'>".$value3['id']."</option>";
+                }
+              }
+      }
+        ?>
+    </select>
   </div>
    <div class="form-group">
-    <label for="exampleInputPassword1">Residual Bandwidth</label>
-    <input type="text" class="form-control" id="Residual_Bandwidth" placeholder="Residual Bandwidth">
-  </div>
-   <div class="form-group">
-    <label for="exampleInputPassword1">Latency</label>
-    <input type="text" class="form-control" id="Latency" placeholder="Latency">
-  </div>
-   <div class="form-group">
-    <label for="exampleInputPassword1">Packet loss</label>
-    <input type="text" class="form-control" id="Packet_loss" placeholder="Packet loss">
-  </div>
-   <div class="form-group">
-    <label for="exampleInputPassword1">Availability</label>
-    <input type="text" class="form-control" id="Availability" placeholder="Availability">
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">Status</label>
-    <input type="text" class="form-control" id="Status" placeholder="Status">
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">State</label>
-    <input type="text" class="form-control" id="State" placeholder="State">
+    <label for="exampleInputPassword1">Destination port</label>
+    <select class="form-control" id="ingress_port" name="ingress_port" placeholder="Ingress port">
+       <?php foreach ($nodes_array as $key => $value) {
+              foreach ($value['sub_nodes'] as $key2 => $value2) {
+                foreach ($value2['ports'] as $key3 => $value3) {
+                  unset($value3['label_range']);
+                  unset($value3['private_attributes']);
+                  echo "<option value='".json_encode($value3)."'>".$value3['id']."</option>";
+                }
+              }
+      }
+        ?>
+    </select>
   </div>
  
   <button type="submit" class="btn btn-primary">Submit</button>
@@ -236,131 +234,62 @@ for (let [key, value] of Object.entries(latlngs)){
 
 }
 
+function generate_uuidv4() {
+   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+   function(c) {
+      var uuid = Math.random() * 16 | 0, v = c == 'x' ? uuid : (uuid & 0x3 | 0x8);
+      return uuid.toString(16);
+   });
+}
+
 $( "#filtersform" ).submit(function( event ) {
   
-  event.preventDefault();
-    var Source=$('#Source').val();
-    var Destination=$('#Destination').val();
-    var Type=$('#Type').val();
-    var Bandwidth=$('#Bandwidth').val();
-    var Residual_Bandwidth=$('#Residual_Bandwidth').val();
-    var Latency=$('#Latency').val();
-    var Packet_loss=$('#Packet_loss').val();
-    var Availability=$('#Availability').val();
-    var Status=$('#Status').val();
-    var State=$('#State').val();
-    var temp_key=Source+'-'+Destination;
-    var links_array=<?php echo json_encode($links_array); ?>;
-    var desired_links=[];
-    var undesired_links=[];
-    for (let [key3, value3] of Object.entries(links_array)){
-        
-        if(key3==temp_key){
-            var filters_flag=0;
-            for(var k=0; k<value3.length;k++){
-                var match_flag=1;
-                if(Type){
-                  filters_flag=1;
-                  if(Type==value3[k].type){
-                      
-                  }
-                  else{
-                    match_flag=0;
-                  }  
-                }
+    event.preventDefault();
+    var id=generate_uuidv4();
+    var name=$('#name').val();
+    var quantity=$('#quantity').val();
+    var start_time=$('#start_time').val();
+    var end_time=$('#end_time').val();
+    var egress_port=$('#egress_port').val();
+    var ingress_port=$('#ingress_port').val();
+    let time_stamp = new Date().toJSON();
+    var meican_url="<?php echo $meican_url;?>";
 
-                if(Bandwidth){
-                  filters_flag=1;
-                  if(Bandwidth==value3[k].bandwidth){
-                      
-                  }
-                  else{
-                    match_flag=0;
-                  }  
-                }
+    egress_port=JSON.parse(egress_port);
+    ingress_port=JSON.parse(ingress_port);
+    quantity_int=parseInt(quantity);
 
-                if(Residual_Bandwidth){
-                  filters_flag=1;
-                  if(Residual_Bandwidth==value3[k].residual_bandwidth){
-                      
-                  }
-                  else{
-                    match_flag=0;
-                  }  
-                }
 
-                if(Latency){
-                  filters_flag=1;
-                  if(Latency==value3[k].latency){
-                      
-                  }
-                  else{
-                    match_flag=0;
-                  }  
-                }
+    console.log(id);
+    console.log(name);
+    console.log(quantity_int);
+    console.log(start_time);
+    console.log(end_time);
+    console.log(egress_port);
+    console.log(ingress_port);
+    console.log(time_stamp)
 
-                if(Packet_loss){
-                  filters_flag=1;
-                  if(Packet_loss==value3[k].packet_loss){
-                      
-                  }
-                  else{
-                    match_flag=0;
-                  }  
-                }
+    var request={"complete": false,"id":id,"name":name,"quantity":quantity_int,"start_time":start_time,"end_time":end_time,"status": "success","time_stamp":time_stamp,"version": 1,egress_port:egress_port,ingress_port:ingress_port};
 
-                if(Availability){
-                  filters_flag=1;
-                  if(Availability==value3[k].availability){
-                      
-                  }
-                  else{
-                    match_flag=0;
-                  }  
-                }
+    console.log(request);
 
-                if(Status){
-                  filters_flag=1;
-                  if(Status==value3[k].status){
-                      
-                  }
-                  else{
-                    match_flag=0;
-                  }  
-                }
-
-                if(State){
-                  filters_flag=1;
-                  if(State==value3[k].state){
-                      
-                  }
-                  else{
-                    match_flag=0;
-                  }  
-                }
-
-                if(filters_flag==0)
-                {
-                    match_flag=0;
-                    }
-                
-                if(match_flag==1){
-                    var link=[value3[k]];
-                    desired_links.push(link);
-                    
-                }
-                    
-                // }
-                else{
-                    var link=[value3[k]];
-                    undesired_links.push(link);
-                    
-                }
-            }
-        }
+    $.ajax({
+    type: "POST",
+    url: "https://"+meican_url+"/circuits/nodes/create",
+    data: JSON.stringify(request),
+    contentType: "application/json; charset=utf-8",
+    success: function(data){alert(data);},
+    error: function(errMsg) {
+        alert(errMsg);
     }
-    $('#Desired').val(JSON.stringify(desired_links));
-    $('#Undesired').val(JSON.stringify(undesired_links));
+});
+    
+
+    
+
+
+    
+    
     
 });
 
