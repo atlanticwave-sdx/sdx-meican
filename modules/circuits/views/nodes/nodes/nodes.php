@@ -253,6 +253,7 @@ $( "#filtersform" ).submit(function( event ) {
     var egress_port=$('#egress_port').val();
     var ingress_port=$('#ingress_port').val();
     let time_stamp = new Date().toJSON();
+    var meican_url="<?php echo $meican_url;?>";
 
     egress_port=JSON.parse(egress_port);
     ingress_port=JSON.parse(ingress_port);
@@ -274,7 +275,7 @@ $( "#filtersform" ).submit(function( event ) {
 
     $.ajax({
     type: "POST",
-    url: "https://localhost/circuits/nodes/create",
+    url: "https://"+meican_url+"/circuits/nodes/create",
     data: JSON.stringify(request),
     contentType: "application/json; charset=utf-8",
     success: function(data){alert(data);},

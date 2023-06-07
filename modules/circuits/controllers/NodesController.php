@@ -73,6 +73,7 @@ class NodesController extends RbacController {
 
     //calling API for topology
     $api_url=API_URL;
+    $meican_url=MEICAN_URL;
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
@@ -195,7 +196,7 @@ class NodesController extends RbacController {
       
     }
         
-        return $this->render('nodes/nodes',['nodes_array'=>$nodes_array,'latlng_array'=>$latlng_array,'links_array'=>$links_array]);
+        return $this->render('nodes/nodes',['nodes_array'=>$nodes_array,'latlng_array'=>$latlng_array,'links_array'=>$links_array,'meican_url'=>$meican_url]);
     }
 
 
