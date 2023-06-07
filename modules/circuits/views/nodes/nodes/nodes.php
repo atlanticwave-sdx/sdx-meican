@@ -75,7 +75,7 @@
   </div>
 
    <div class="form-group">
-    <label for="exampleInputPassword1">Egress port</label>
+    <label for="exampleInputPassword1">Source port</label>
     <select class="form-control" id="egress_port" name="egress_port" placeholder="Egress port">
       <?php foreach ($nodes_array as $key => $value) {
               foreach ($value['sub_nodes'] as $key2 => $value2) {
@@ -90,7 +90,7 @@
     </select>
   </div>
    <div class="form-group">
-    <label for="exampleInputPassword1">Ingress port</label>
+    <label for="exampleInputPassword1">Destination port</label>
     <select class="form-control" id="ingress_port" name="ingress_port" placeholder="Ingress port">
        <?php foreach ($nodes_array as $key => $value) {
               foreach ($value['sub_nodes'] as $key2 => $value2) {
