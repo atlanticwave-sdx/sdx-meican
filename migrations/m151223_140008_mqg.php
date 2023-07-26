@@ -30,6 +30,12 @@ class m151223_140008_mqg extends Migration
             ALTER TABLE `meican_user` ADD `time_format` VARCHAR(10) NOT NULL AFTER `date_format`;
             ");
         $this->execute("
+            ALTER TABLE `meican_user` ADD `is_active` int(11) DEFAULT 0 AFTER `name`;
+            ");
+        $this->execute("
+            ALTER TABLE `meican_user` ADD `registration_token` VARCHAR(500) DEFAULT NULL AFTER `name`;
+            ");
+        $this->execute("
             UPDATE `meican_user` SET `email`=(SELECT `email` FROM `meican_user_settings` WHERE `id`=`meican_user`.`id`) WHERE 1
             ");
         $this->execute("
