@@ -65,6 +65,7 @@ class m150901_152747_diego extends Migration
     		('g7', 1, NULL, NULL, NULL, 1418403087, 1418403088),
     		('g8', 1, NULL, NULL, NULL, 1418403088, 1418403087),
     		('g9', 1, NULL, NULL, NULL, 1418403089, 1418403089),
+    		('g10', 1, NULL, NULL, NULL, 1683900354, 1683900354),
 	    	('readConfiguration', 2, NULL, NULL, NULL, 1439229046, 1439229046),
 	    	('readDomain', 2, NULL, NULL, NULL, 1439482402, 1439482402),
 	    	('readDomainTopology', 2, NULL, NULL, NULL, 1439482385, 1439482385),
@@ -100,7 +101,8 @@ class m150901_152747_diego extends Migration
 			(6, 'Workflows Editor', 'g6', 'DOMAIN'),
 			(7, 'Topology Editor', 'g7', 'DOMAIN'),
 			(8, 'Automated Tests Editor', 'g8', 'DOMAIN'),
-			(9, 'Roles Editor', 'g9', 'DOMAIN');
+			(9, 'Roles Editor', 'g9', 'DOMAIN'),
+			(10, 'SDX Circuit', 'g10', 'DOMAIN');
 		");
     	
     	$this->execute("
@@ -114,6 +116,7 @@ class m150901_152747_diego extends Migration
 			('g5', 'createReservation'),
 			('g4', 'createReservation'),
 			('g9', 'createRole'),
+			('g10', 'createSdxCircuit'),
 			('g2', 'createRole'),
 			('g1', 'createSynchronizer'),
 			('g2', 'createTest'),
