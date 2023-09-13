@@ -6,6 +6,8 @@ cp $MEICAN_DIR/docker_for_build/db.php $MEICAN_DIR/config/ \
  && sed -i "s/MYSQL_USER/$MYSQL_USER/" $MEICAN_DIR/config/db.php \
  && sed -i "s/MYSQL_PASSWORD/$MYSQL_PASSWORD/" $MEICAN_DIR/config/db.php \
  && chown meican:meican $MEICAN_DIR/config/db.php  \
+ && mkdir $MEICAN_DIR/vendor \
+ && chmod 777 $MEICAN_DIR/vendor $MEICAN_DIR/web/assets $MEICAN_DIR/runtime \
  && su meican -c "php composer.phar install" \
  && service apache2 start \
  && /bin/bash

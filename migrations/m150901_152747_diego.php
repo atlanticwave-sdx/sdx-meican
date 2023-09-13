@@ -43,6 +43,7 @@ class m150901_152747_diego extends Migration
 	    	('createReservation', 2, NULL, NULL, NULL, 1417799563, 1417799563),
 	    	('createRole', 2, NULL, NULL, NULL, 1439221347, 1439221347),
 	    	('createSynchronizer', 2, NULL, NULL, NULL, 1439491351, 1439491351),
+                ('createSdxCircuit', 2, NULL, NULL, NULL, 1683900354, 1683900354),
 	    	('createTest', 2, NULL, NULL, NULL, 1439482385, 1439482385),
 	    	('createUser', 2, NULL, NULL, NULL, 1417799563, 1417799563),
 	    	('createWorkflow', 2, NULL, NULL, NULL, 1431101273, 1431101273),
