@@ -66,6 +66,47 @@ class NodesController extends RbacController {
     }
     
     public function actionShow() {
+
+      $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+      if (strpos($actual_link,'code') !== false) {
+          $code=$_GET['code'];
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=authorization_code&client_id=cilogon%3A%2Fclient_id%2F25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https%3A%2F%2Flocalhost%2Fcircuits%2Fnodes%2Fshow&client_secret=Vib4sbOGQXI8tt9s-uQ16hQnJlNUxUsAvAMISiCJBPFlLf2c82ZyUDKBYpv-eNX6qV-wW-OzRzoAaVslxCsozQ&code='.$code.'',
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $response_arr=json_decode($response,true);
+        if(array_key_exists('access_token',$response_arr)){
+          $access_token=$response_arr['access_token'];
+        }
+        else{
+          header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://localhost/circuits/nodes/show&scope=openid+profile+email");
+          exit();
+        } 
+        
+        
+
+        }
+
+        else {
+          header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://localhost/circuits/nodes/show&scope=openid+profile+email");
+          exit();
+       }
+
+      
    
     if(!self::can("sdxCircuit/create")){
             return $this->goHome();
@@ -74,6 +115,11 @@ class NodesController extends RbacController {
     //calling API for topology
     $api_url=API_URL;
     $meican_url=MEICAN_URL;
+    $username=API_USER;
+    $password=API_PASS;
+
+
+
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
@@ -85,6 +131,9 @@ class NodesController extends RbacController {
       CURLOPT_FOLLOWLOCATION => true,
       CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
       CURLOPT_CUSTOMREQUEST => 'GET',
+      CURLOPT_HTTPHEADER => array(
+        'Authorization: Basic '. base64_encode($username.':'.$password)
+      ),
     ));
 
     $response = curl_exec($curl);
