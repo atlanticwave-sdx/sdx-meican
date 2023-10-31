@@ -53,17 +53,17 @@
  
   <div class="form-group">
     <label for="exampleInputPassword1">Name</label>
-    <input type="text" class="form-control" id="name" name="name" placeholder="Name">
+    <input type="text" class="form-control" id="name" name="name" placeholder="Name" required>
   </div>
 
 <div class="form-group">
     <label for="exampleInputPassword1">Quantity</label>
-    <input type="text" class="form-control" id="quantity" name="quantity" placeholder="Quantity">
+    <input type="text" class="form-control" id="quantity" name="quantity" placeholder="Quantity" required>
   </div>
 
   <div class="form-group">
     <label for="exampleInputPassword1">Start time</label>
-    <input type="date" class="form-control" id="start_time" name="start_time" placeholder="Start time">
+    <input type="date" class="form-control" id="start_time" name="start_time" placeholder="Start time" required>
   </div>
 
 
@@ -71,12 +71,12 @@
 
    <div class="form-group">
     <label for="exampleInputPassword1">End time</label>
-    <input type="date" class="form-control" id="end_time" name="end_time" placeholder="End time">
+    <input type="date" class="form-control" id="end_time" name="end_time" placeholder="End time" required>
   </div>
 
    <div class="form-group">
     <label for="exampleInputPassword1">Source port</label>
-    <select class="form-control" id="egress_port" name="egress_port" placeholder="Egress port">
+    <select class="form-control" id="egress_port" name="egress_port" placeholder="Egress port" required>
       <?php foreach ($nodes_array as $key => $value) {
               foreach ($value['sub_nodes'] as $key2 => $value2) {
                 foreach ($value2['ports'] as $key3 => $value3) {
@@ -89,9 +89,15 @@
         ?>
     </select>
   </div>
+
+  <div class="form-group">
+    <label for="exampleInputPassword1">Source VLAN</label>
+    <input type="number" maxlength="4" class="form-control" id="source_vlan" name="source_vlan" placeholder="0-4096" required>
+  </div>
+
    <div class="form-group">
     <label for="exampleInputPassword1">Destination port</label>
-    <select class="form-control" id="ingress_port" name="ingress_port" placeholder="Ingress port">
+    <select class="form-control" id="ingress_port" name="ingress_port" placeholder="Ingress port" required>
        <?php foreach ($nodes_array as $key => $value) {
               foreach ($value['sub_nodes'] as $key2 => $value2) {
                 foreach ($value2['ports'] as $key3 => $value3) {
@@ -103,6 +109,11 @@
       }
         ?>
     </select>
+  </div>
+
+  <div class="form-group">
+    <label for="exampleInputPassword1">Destination VLAN</label>
+    <input type="number" maxlength="4" class="form-control" id="destination_vlan" name="destination_vlan" placeholder="0-4096" required>
   </div>
  
   <button type="submit" class="btn btn-primary">Submit</button>
@@ -254,6 +265,18 @@ $( "#filtersform" ).submit(function( event ) {
     var ingress_port=$('#ingress_port').val();
     let time_stamp = new Date().toJSON();
     var meican_url="<?php echo $meican_url;?>";
+    var source_vlan=$('#source_vlan').val();
+    var destination_vlan=$('#destination_vlan').val();
+
+    if(source_vlan>4096||source_vlan<0){
+      alert("source vlan should be between 0-4096");
+      return;
+    }
+
+    else if(destination_vlan>4096||destination_vlan<0){
+      alert("destination vlan should be between 0-4096");
+      return;
+    }
 
     egress_port=JSON.parse(egress_port);
     ingress_port=JSON.parse(ingress_port);
