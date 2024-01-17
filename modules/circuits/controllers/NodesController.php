@@ -33,16 +33,20 @@ use meican\topology\models\Service;
 /**
  * @author Maurício Quatrin Guerreiros
  */
+
+/* This is the controller for handling SDX-topology and creating connection requests to SDX-Controller */
 class NodesController extends RbacController {
 
     public $enableCsrfValidation = false;
 
-    public function actionCreate(){
+    public function actionCreate(){ // this route manages the view and backend logic for creating a circuit request
 
-        $request = Yii::$app->request->getRawBody();
+        $request = Yii::$app->request->getRawBody(); // getting the JSON request body from the create connection form through MEICAN dashboard
         $request=stripslashes($request);
         $api_url=API_URL;
         $curl = curl_init();
+
+        /* CURL request to SDX-Controller endpoint for creating a circuit request*/
 
         curl_setopt_array($curl, array(
           CURLOPT_URL => $api_url.'conection',
@@ -65,7 +69,7 @@ class NodesController extends RbacController {
         echo $response;
     }
     
-    public function actionShow() {
+    public function actionShow() {   // this function manages the mapping of SDX-topology and displays on the MEICAN UI
    
     if(!self::can("sdxCircuit/create")){
             return $this->goHome();
@@ -75,6 +79,8 @@ class NodesController extends RbacController {
     $api_url=API_URL;
     $meican_url=MEICAN_URL;
     $curl = curl_init();
+
+    /* CURL request to SDX-Controller endpoint for getting topology and mapping on the MEICAN UI */
 
     curl_setopt_array($curl, array(
       CURLOPT_URL => $api_url.'topology',
@@ -91,7 +97,7 @@ class NodesController extends RbacController {
 
     curl_close($curl);
 
-
+    /* Processing topology JSON */
     function find_subnode($nodes_array,$location){
 
       
