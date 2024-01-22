@@ -21,13 +21,15 @@ use meican\aaa\models\AaaPreference;
 /**
  * @author Maurício Quatrin Guerreiro @mqgmaster
  */
+
+/* Controller for managing Authentication and ORCID auhtorization in MEICAN*/
 class LoginController extends BaseController {
     
     public $layout = 'login-layout';
     //VERIFICAR
     public $enableCsrfValidation = false;
 
-    public function actionAdmin() {
+    public function actionAdmin() { // route for controlling MEICAN Admin authentication
         if (!\Yii::$app->user->isGuest) {
             return $this->goHome();
         }
@@ -46,7 +48,7 @@ class LoginController extends BaseController {
         ));
     }
 
-    public function actionVerifyemail(){
+    public function actionVerifyemail(){ //route for verifying emails new ORCID user signups on MEICAN
 
         $registration_token = $_GET['token'];
     
@@ -68,7 +70,7 @@ class LoginController extends BaseController {
 
     }
 
-    public function actionSendemail(){
+    public function actionSendemail(){ //route for sending verification emails to new ORCID user signups on MEICAN
 
         
         $base_url=MEICAN_URL;
@@ -121,7 +123,7 @@ class LoginController extends BaseController {
     }
     }
     
-    public function actionIndex() {
+    public function actionIndex() { //redirect users to ORCID login if they are not logged in with their ORCID credentials
 
         $model = new LoginForm;
         $base_url=MEICAN_URL;
