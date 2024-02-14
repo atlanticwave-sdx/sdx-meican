@@ -49,7 +49,7 @@ class NodesController extends RbacController {
         /* CURL request to SDX-Controller endpoint for creating a circuit request*/
 
         curl_setopt_array($curl, array(
-          CURLOPT_URL => $api_url.'conection',
+          CURLOPT_URL => $api_url.'connection',
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => '',
           CURLOPT_MAXREDIRS => 10,
@@ -98,7 +98,7 @@ class NodesController extends RbacController {
     curl_close($curl);
 
     /* Processing topology JSON */
-    function find_subnode($nodes_array,$location){
+    function find_subnode_by_id($nodes_array,$node_id){
 
       
       $temp=array();
@@ -108,8 +108,7 @@ class NodesController extends RbacController {
 
         foreach ($sub_nodes as $key2 => $value2) {
           // code...
-          $sub_node_name = explode(',', $value2['sub_node_name']);
-          if($sub_node_name[0]==$location){
+          if($value2['id']==$node_id){
 
             $temp2=array();
             array_push($temp2,$value['latitude']);
@@ -140,18 +139,18 @@ class NodesController extends RbacController {
         $location = json_decode(json_encode($value->location), true);
         $ports = json_decode(json_encode($value->ports), true);
         
-        if (!array_key_exists($location['ISO3166-2-lvl4'],$nodes_array)){
+        if (!array_key_exists($location['iso3166_2_lvl4'],$nodes_array)){
 
-            $nodes_array[$location['ISO3166-2-lvl4']]['sub_nodes']=array();
-            $nodes_array[$location['ISO3166-2-lvl4']]['latitude']=$location['latitude'];
-            $nodes_array[$location['ISO3166-2-lvl4']]['longitude']=$location['longitude'];
+            $nodes_array[$location['iso3166_2_lvl4']]['sub_nodes']=array();
+            $nodes_array[$location['iso3166_2_lvl4']]['latitude']=$location['latitude'];
+            $nodes_array[$location['iso3166_2_lvl4']]['longitude']=$location['longitude'];
             $temp_arr=array(
             'sub_node_name'=>$location['address'],
             'ports'=>$ports,
             'name'=>$value->name,
             'id'=>$value->id
             );
-            array_push($nodes_array[$location['ISO3166-2-lvl4']]['sub_nodes'],$temp_arr);
+            array_push($nodes_array[$location['iso3166_2_lvl4']]['sub_nodes'],$temp_arr);
 
         }
         else{
@@ -161,7 +160,7 @@ class NodesController extends RbacController {
             'name'=>$value->name,
             'id'=>$value->id
             );
-            array_push($nodes_array[$location['ISO3166-2-lvl4']]['sub_nodes'],$temp_arr);
+            array_push($nodes_array[$location['iso3166_2_lvl4']]['sub_nodes'],$temp_arr);
         }
     }
     
@@ -170,17 +169,15 @@ class NodesController extends RbacController {
 
     foreach ($links as $key => $value) {
       // code...
-      $explode=explode('-',$value->short_name);
-      $latlng=find_subnode($nodes_array,$explode[0]);
-      $latlng2=find_subnode($nodes_array,$explode[1]);
+      $latlng=find_subnode_by_id($nodes_array,$value->ports[0]->node);
+      $latlng2=find_subnode_by_id($nodes_array,$value->ports[1]->node);
       if(!empty($latlng)&&!empty($latlng2)){
         $temp_node=array();
-       $temp_node['link']=$latlng['node']."-".$latlng2['node'];
-       $temp_node['latlngs']=array();
+        $temp_node['link']=$latlng['node']."-".$latlng2['node'];
+        $temp_node['latlngs']=array(
+          $value->id => array($latlng['latlngs'],$latlng2['latlngs'])
+        );
        
-       array_push($temp_node['latlngs'],$latlng['latlngs']);
-       array_push($temp_node['latlngs'],$latlng2['latlngs']);
-
        array_push($latlng_array,$temp_node);
 
        $link_temp = json_decode(json_encode($value), true);
