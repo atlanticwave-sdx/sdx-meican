@@ -134,18 +134,18 @@ class NodesController extends RbacController {
         $location = json_decode(json_encode($value->location), true);
         $ports = json_decode(json_encode($value->ports), true);
         
-        if (!array_key_exists($location['ISO3166-2-lvl4'],$nodes_array)){
+        if (!array_key_exists($location['iso3166_2_lvl4'],$nodes_array)){
 
-            $nodes_array[$location['ISO3166-2-lvl4']]['sub_nodes']=array();
-            $nodes_array[$location['ISO3166-2-lvl4']]['latitude']=$location['latitude'];
-            $nodes_array[$location['ISO3166-2-lvl4']]['longitude']=$location['longitude'];
+            $nodes_array[$location['iso3166_2_lvl4']]['sub_nodes']=array();
+            $nodes_array[$location['iso3166_2_lvl4']]['latitude']=$location['latitude'];
+            $nodes_array[$location['iso3166_2_lvl4']]['longitude']=$location['longitude'];
             $temp_arr=array(
             'sub_node_name'=>$location['address'],
             'ports'=>$ports,
             'name'=>$value->name,
             'id'=>$value->id
             );
-            array_push($nodes_array[$location['ISO3166-2-lvl4']]['sub_nodes'],$temp_arr);
+            array_push($nodes_array[$location['iso3166_2_lvl4']]['sub_nodes'],$temp_arr);
 
         }
         else{
@@ -155,7 +155,7 @@ class NodesController extends RbacController {
             'name'=>$value->name,
             'id'=>$value->id
             );
-            array_push($nodes_array[$location['ISO3166-2-lvl4']]['sub_nodes'],$temp_arr);
+            array_push($nodes_array[$location['iso3166_2_lvl4']]['sub_nodes'],$temp_arr);
         }
     }
     
