@@ -58,12 +58,12 @@
 
 <div class="form-group">
     <label for="exampleInputPassword1">Quantity</label>
-    <input type="text" class="form-control" id="quantity" name="quantity" placeholder="Quantity" required>
+    <input type="text" class="form-control" id="quantity" name="quantity" placeholder="Quantity" >
   </div>
 
   <div class="form-group">
     <label for="exampleInputPassword1">Start time</label>
-    <input type="date" class="form-control" id="start_time" name="start_time" placeholder="Start time" required>
+    <input type="date" class="form-control" id="start_time" name="start_time" placeholder="Start time" >
   </div>
 
 
@@ -71,7 +71,7 @@
 
    <div class="form-group">
     <label for="exampleInputPassword1">End time</label>
-    <input type="date" class="form-control" id="end_time" name="end_time" placeholder="End time" required>
+    <input type="date" class="form-control" id="end_time" name="end_time" placeholder="End time" >
   </div>
 
    <div class="form-group">
@@ -90,10 +90,12 @@
     </select>
   </div>
 
+<!--
   <div class="form-group">
     <label for="exampleInputPassword1">Source VLAN</label>
-    <input type="number" maxlength="4" class="form-control" id="source_vlan" name="source_vlan" placeholder="0-4096" required>
+    <input type="number" maxlength="4" class="form-control" id="source_vlan" name="source_vlan" placeholder="0-4096" >
   </div>
+-->
 
    <div class="form-group">
     <label for="exampleInputPassword1">Destination port</label>
@@ -111,9 +113,21 @@
     </select>
   </div>
 
+  <!--
   <div class="form-group">
     <label for="exampleInputPassword1">Destination VLAN</label>
-    <input type="number" maxlength="4" class="form-control" id="destination_vlan" name="destination_vlan" placeholder="0-4096" required>
+    <input type="number" maxlength="4" class="form-control" id="destination_vlan" name="destination_vlan" placeholder="0-4096" >
+  </div>
+  -->
+
+  <div class="form-group">
+    <label for="inputLatencyRequired">Maximum Latency</label>
+    <input type="number" maxlength="4" class="form-control" id="latency_required" name="latency_required" >
+  </div>
+
+  <div class="form-group">
+    <label for="inputBandwidthRequired">Minimum Bandwidth</label>
+    <input type="number" maxlength="4" class="form-control" id="bandwidth_required" name="bandwidth_required" >
   </div>
  
   <button type="submit" class="btn btn-primary">Submit</button>
@@ -265,34 +279,51 @@ $( "#filtersform" ).submit(function( event ) {
     var ingress_port=$('#ingress_port').val();
     let time_stamp = new Date().toJSON();
     var meican_url="<?php echo $meican_url;?>";
-    var source_vlan=$('#source_vlan').val();
-    var destination_vlan=$('#destination_vlan').val();
+    //var source_vlan=$('#source_vlan').val();
+    //var destination_vlan=$('#destination_vlan').val();
+    var latency_required=$('#latency_required').val();
+    var bandwidth_required=$('#bandwidth_required').val();
 
-    if(source_vlan>4096||source_vlan<0){
-      alert("source vlan should be between 0-4096");
-      return;
-    }
+    //if(source_vlan>4096||source_vlan<0){
+    //  alert("source vlan should be between 0-4096");
+    //  return;
+    //}
 
-    else if(destination_vlan>4096||destination_vlan<0){
-      alert("destination vlan should be between 0-4096");
-      return;
-    }
+    //else if(destination_vlan>4096||destination_vlan<0){
+    //  alert("destination vlan should be between 0-4096");
+    //  return;
+    //}
 
     egress_port=JSON.parse(egress_port);
     ingress_port=JSON.parse(ingress_port);
-    quantity_int=parseInt(quantity);
 
 
     console.log(id);
     console.log(name);
-    console.log(quantity_int);
+    console.log(quantity);
     console.log(start_time);
     console.log(end_time);
     console.log(egress_port);
     console.log(ingress_port);
-    console.log(time_stamp)
+    console.log(time_stamp);
 
-    var request={"complete": false,"id":id,"name":name,"quantity":quantity_int,"start_time":start_time,"end_time":end_time,"status": "success","time_stamp":time_stamp,"version": 1,egress_port:egress_port,ingress_port:ingress_port};
+    var request={"id":id,"name":name,"time_stamp":time_stamp,"version": 1,"egress_port":egress_port,"ingress_port":ingress_port};
+
+    if (quantity) {
+      request["quantity"] = parseInt(quantity);
+    }
+    if (start_time) {
+      request["start_time"] = start_time;
+    }
+    if (end_time) {
+      request["end_time"] = end_time;
+    }
+    if (latency_required) {
+      request["latency_required"] = parseInt(latency_required);
+    }
+    if (bandwidth_required) {
+      request["bandwidth_required"] = parseInt(bandwidth_required);
+    }
 
     console.log(request);
 

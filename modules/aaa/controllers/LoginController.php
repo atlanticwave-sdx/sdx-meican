@@ -143,7 +143,7 @@ class LoginController extends BaseController {
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => 'client_id=APP-6U5WZH9AC4EYDVAD&client_secret=c839f6ee-8991-4b4e-9ae3-aab528adc22c&grant_type=authorization_code&redirect_uri=https%3A%2F%2F'.$base_url.'%2Faaa%2Flogin&code='.$code.'',
+        CURLOPT_POSTFIELDS => 'client_id='.ORCID_CLIENT_ID.'&client_secret='.ORCID_CLIENT_SECRET.'&grant_type=authorization_code&redirect_uri=https%3A%2F%2F'.$base_url.'%2Faaa%2Flogin&code='.$code.'',
         CURLOPT_HTTPHEADER => array(
           'Accept: application/json',
           'Content-Type: application/x-www-form-urlencoded',
@@ -176,7 +176,7 @@ class LoginController extends BaseController {
       } 
 
       else {
-          header("Location: https://orcid.org/oauth/authorize?client_id=APP-6U5WZH9AC4EYDVAD&response_type=code&scope=/authenticate&redirect_uri=https://$base_url/aaa/login");
+          header("Location: https://orcid.org/oauth/authorize?client_id=".ORCID_CLIENT_ID."&response_type=code&scope=/authenticate&redirect_uri=https://$base_url/aaa/login");
           exit();
        }
 
