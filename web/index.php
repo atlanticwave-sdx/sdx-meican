@@ -4,13 +4,10 @@
  * @license http://github.com/ufrgs-hyman/meican#license
  */
 
-// comment out the following two lines when deployed to production
-//defined('YII_DEBUG') or define('YII_DEBUG', true);
-//defined('YII_ENV') or define('YII_ENV', 'dev');
-defined('MEICAN_URL') or define('MEICAN_URL', 'XXX_MEICAN_URL_XXX');
-defined('API_URL') or define('API_URL', 'XXX_SDX_CONTROLLER_URL_XXX');
-defined('ORCID_CLIENT_ID') or define('ORCID_CLIENT_ID', 'XXX_ORCID_CLIENT_ID_XXX');
-defined('ORCID_CLIENT_SECRET') or define('ORCID_CLIENT_SECRET', 'XXX_ORCID_CLIENT_SECRET_XXX');
+ defined('MEICAN_URL') or define('MEICAN_URL', 'localhost');
+ defined('API_URL') or define('API_URL', 'http://aw-sdx-controller.renci.org:8080/SDX-Controller/1.0.0/');
+ defined('ORCID_CLIENT_ID') or define('ORCID_CLIENT_ID', 'APP-6U5WZH9AC4EYDVAD');
+ defined('ORCID_CLIENT_SECRET') or define('ORCID_CLIENT_SECRET', 'c839f6ee-8991-4b4e-9ae3-aab528adc22c');
 
 require(__DIR__ . '/../vendor/autoload.php');
 require(__DIR__ . '/../vendor/yiisoft/yii2/Yii.php');

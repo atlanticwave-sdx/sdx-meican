@@ -8,6 +8,7 @@ namespace meican\circuits\controllers;
 
 use Yii;
 use yii\helpers\Url;
+use DateTime;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Json;
 
@@ -29,6 +30,8 @@ use meican\topology\models\Port;
 use meican\topology\models\Domain;
 use meican\topology\models\Network;
 use meican\topology\models\Service;
+
+include(__DIR__ . '/../../../config/db.php');
 
 /**
  * @author Maurício Quatrin Guerreiros
@@ -74,44 +77,146 @@ class NodesController extends RbacController {
       $api_url=API_URL;
       $meican_url=MEICAN_URL;
 
-      $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+      $userId = Yii::$app->user->id;
+      $rows = (new \yii\db\Query())
+          ->select(['token', 'expiration'])
+          ->from('meican_cilogon_auth')
+          ->where(['user_id' => $userId])
+          ->all();
+      
+      date_default_timezone_set('America/New_York');
+      $token_date = isset($rows[0]['expiration']) ? $rows[0]['expiration'] : null;
+      $token = isset($rows[0]['token']) ? $rows[0]['token'] : null;
+      if ($token_date !== null && $token !== null) {
 
-      if (strpos($actual_link,'code') !== false) {
-          $code=$_GET['code'];
+        $token_date_parsed = DateTime::createFromFormat('Y-m-d H:i:s', $token_date);
+        $curr_datetime = new DateTime();
+        print_r($token_date_parsed);
+        print_r($curr_datetime);
 
-        $curl = curl_init();
+        if ($token_date_parsed !== null && $curr_datetime !== null) {
+            $diff = $token_date_parsed->diff($curr_datetime);
+            print_r($diff);
 
-        curl_setopt_array($curl, array(
-          CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=authorization_code&client_id=cilogon%3A%2Fclient_id%2F25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Fshow&client_secret=Vib4sbOGQXI8tt9s-uQ16hQnJlNUxUsAvAMISiCJBPFlLf2c82ZyUDKBYpv-eNX6qV-wW-OzRzoAaVslxCsozQ&code='.$code.'',
-          CURLOPT_RETURNTRANSFER => true,
-          CURLOPT_ENCODING => '',
-          CURLOPT_MAXREDIRS => 10,
-          CURLOPT_TIMEOUT => 0,
-          CURLOPT_FOLLOWLOCATION => true,
-          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
+            // $total_days = $diff->days; // Total days
+            $total_seconds = $diff->days * 24 * 60 * 60 + $diff->h * 60 * 60 + $diff->i * 60 + $diff->s;
+            // $total_hours = $total_days * 24 + $diff->h; // Total hours including days
 
-        $response = curl_exec($curl);
-
-        curl_close($curl);
-        $response_arr=json_decode($response,true);
-        if(array_key_exists('access_token',$response_arr)){
-          $access_token=$response_arr['access_token'];
+            print_r($total_seconds);
+            if ($total_seconds < 172800) {
+                echo "The difference is less than 2 days.";
+            } else {
+                echo "The difference is 2 days or more.";
+            }
+        } else {
+          // should I create the curl here?
+            echo "Error: Unable to parse datetime strings.";
         }
-        else{
-          header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
-          exit();
-        } 
-        
-        
 
+        if (!empty($rows[0]['token']) && isset($total_seconds) && $total_seconds <= 172800){
+          print_r("Entered IF");
+          header("Location: https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
         }
+        else {
+          print_r("Entered ELSE");
+          $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
+          if (strpos($actual_link,'code') !== false) {
+              $code=$_GET['code'];
+  
+            $curl = curl_init();
+  
+            curl_setopt_array($curl, array(
+              CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=authorization_code&client_id=cilogon%3A%2Fclient_id%2F25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Fshow&client_secret=Vib4sbOGQXI8tt9s-uQ16hQnJlNUxUsAvAMISiCJBPFlLf2c82ZyUDKBYpv-eNX6qV-wW-OzRzoAaVslxCsozQ&code='.$code.'',
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_ENCODING => '',
+              CURLOPT_MAXREDIRS => 10,
+              CURLOPT_TIMEOUT => 0,
+              CURLOPT_FOLLOWLOCATION => true,
+              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+              CURLOPT_CUSTOMREQUEST => 'GET',
+            ));
+  
+            $response = curl_exec($curl);
+  
+            curl_close($curl);
+            $response_arr=json_decode($response,true);
+            if(array_key_exists('access_token',$response_arr)){
+              $access_token=$response_arr['access_token'];
+              
+              $result = Yii::$app->db->createCommand()->update(
+                'meican_cilogon_auth',
+                ['token' => $access_token, 'expiration' => (new DateTime())->format('Y-m-d H:i:s')],
+                'user_id = ' .$userId
+              )->execute();
+  
+              if ($result) {
+                  print_r('Update Success');
+              } else {
+                  print_r('Update Failed');
+              }
+            }
+            else{
+              header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
+              exit();
+            } 
+          }
+          else {
+            header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
+            exit();
+          }
+        }
+        
+      }
+      else {
+        print_r("Entered ELSE");
+        $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+        if (strpos($actual_link,'code') !== false) {
+            $code=$_GET['code'];
+
+          $curl = curl_init();
+
+          curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=authorization_code&client_id=cilogon%3A%2Fclient_id%2F25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Fshow&client_secret=Vib4sbOGQXI8tt9s-uQ16hQnJlNUxUsAvAMISiCJBPFlLf2c82ZyUDKBYpv-eNX6qV-wW-OzRzoAaVslxCsozQ&code='.$code.'',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+          ));
+
+          $response = curl_exec($curl);
+
+          curl_close($curl);
+          $response_arr=json_decode($response,true);
+          if(array_key_exists('access_token',$response_arr)){
+            $access_token=$response_arr['access_token'];
+
+            $result = Yii::$app->db->createCommand()->insert('meican_cilogon_auth', [
+              'user_id' => $userId,
+              'token' => $access_token,
+              'expiration' => (new DateTime())->format('Y-m-d H:i:s')
+              ])->execute();
+
+            if ($result) {
+                print_r('Insert Success');
+            } else {
+                print_r('Insert Failed');
+            }
+          }
+          else{
+            header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
+            exit();
+          } 
+        }
         else {
           header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
           exit();
-       }
+        }
+      }
 
     if(!self::can("sdxCircuit/create")){
             return $this->goHome();
