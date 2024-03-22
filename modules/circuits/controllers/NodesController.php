@@ -31,7 +31,7 @@ use meican\topology\models\Domain;
 use meican\topology\models\Network;
 use meican\topology\models\Service;
 
-include(__DIR__ . '/../../../config/db.php');
+// include(__DIR__ . '/../../../config/db.php');
 
 /**
  * @author Maurício Quatrin Guerreiros
@@ -91,18 +91,18 @@ class NodesController extends RbacController {
 
         $token_date_parsed = DateTime::createFromFormat('Y-m-d H:i:s', $token_date);
         $curr_datetime = new DateTime();
-        print_r($token_date_parsed);
-        print_r($curr_datetime);
+        // print_r($token_date_parsed);
+        // print_r($curr_datetime);
 
         if ($token_date_parsed !== null && $curr_datetime !== null) {
             $diff = $token_date_parsed->diff($curr_datetime);
-            print_r($diff);
+            // print_r($diff);
 
             // $total_days = $diff->days; // Total days
             $total_seconds = $diff->days * 24 * 60 * 60 + $diff->h * 60 * 60 + $diff->i * 60 + $diff->s;
             // $total_hours = $total_days * 24 + $diff->h; // Total hours including days
 
-            print_r($total_seconds);
+            // print_r($total_seconds);
             if ($total_seconds < 172800) {
                 echo "The difference is less than 2 days.";
             } else {
