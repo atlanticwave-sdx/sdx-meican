@@ -89,36 +89,25 @@ class NodesController extends RbacController {
       $token = isset($rows[0]['token']) ? $rows[0]['token'] : null;
       if ($token_date !== null && $token !== null) {
 
-        $token_date_parsed = DateTime::createFromFormat('Y-m-d H:i:s', $token_date);
+        $expiration_datetime = DateTime::createFromFormat('Y-m-d H:i:s', $token_date);
         $curr_datetime = new DateTime();
-        // print_r($token_date_parsed);
-        // print_r($curr_datetime);
 
-        if ($token_date_parsed !== null && $curr_datetime !== null) {
-            $diff = $token_date_parsed->diff($curr_datetime);
-            // print_r($diff);
+        if ($expiration_datetime !== null && $curr_datetime !== null) {
+            $diff = $curr_datetime->diff($expiration_datetime);
 
             // $total_days = $diff->days; // Total days
             $total_seconds = $diff->days * 24 * 60 * 60 + $diff->h * 60 * 60 + $diff->i * 60 + $diff->s;
             // $total_hours = $total_days * 24 + $diff->h; // Total hours including days
 
-            // print_r($total_seconds);
-            if ($total_seconds < 172800) {
-                echo "The difference is less than 2 days.";
-            } else {
-                echo "The difference is 2 days or more.";
-            }
         } else {
-          // should I create the curl here?
-            echo "Error: Unable to parse datetime strings.";
+            header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
+            exit();
         }
 
         if (!empty($rows[0]['token']) && isset($total_seconds) && $total_seconds <= 172800){
-          print_r("Entered IF");
-          header("Location: https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
+          header("Location: https://".$meican_url."/circuits/nodes/show");
         }
-        else {
-          print_r("Entered ELSE");
+        else if (!empty($rows[0]['token']) && isset($total_seconds) && $total_seconds > 172800) {
           $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
           if (strpos($actual_link,'code') !== false) {
@@ -144,17 +133,13 @@ class NodesController extends RbacController {
             if(array_key_exists('access_token',$response_arr)){
               $access_token=$response_arr['access_token'];
               
+              $expiration_datetime = new DateTime();
+              $expiration_datetime->modify('+2 days');
               $result = Yii::$app->db->createCommand()->update(
                 'meican_cilogon_auth',
-                ['token' => $access_token, 'expiration' => (new DateTime())->format('Y-m-d H:i:s')],
+                ['token' => $access_token, 'expiration' => $expiration_datetime->format('Y-m-d H:i:s')],
                 'user_id = ' .$userId
               )->execute();
-  
-              if ($result) {
-                  print_r('Update Success');
-              } else {
-                  print_r('Update Failed');
-              }
             }
             else{
               header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
@@ -166,10 +151,13 @@ class NodesController extends RbacController {
             exit();
           }
         }
+        else {
+          header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
+            exit();
+        }
         
       }
       else {
-        print_r("Entered ELSE");
         $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
         if (strpos($actual_link,'code') !== false) {
@@ -195,17 +183,14 @@ class NodesController extends RbacController {
           if(array_key_exists('access_token',$response_arr)){
             $access_token=$response_arr['access_token'];
 
+            $expiration_datetime = new DateTime();
+            $expiration_datetime->modify('+2 days');
+
             $result = Yii::$app->db->createCommand()->insert('meican_cilogon_auth', [
               'user_id' => $userId,
               'token' => $access_token,
-              'expiration' => (new DateTime())->format('Y-m-d H:i:s')
+              'expiration' => $expiration_datetime->format('Y-m-d H:i:s')
               ])->execute();
-
-            if ($result) {
-                print_r('Insert Success');
-            } else {
-                print_r('Insert Failed');
-            }
           }
           else{
             header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
