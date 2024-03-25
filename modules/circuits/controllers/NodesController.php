@@ -94,20 +94,17 @@ class NodesController extends RbacController {
 
         if ($expiration_datetime !== null && $curr_datetime !== null) {
             $diff = $curr_datetime->diff($expiration_datetime);
-
-            // $total_days = $diff->days; // Total days
-            $total_seconds = $diff->days * 24 * 60 * 60 + $diff->h * 60 * 60 + $diff->i * 60 + $diff->s;
-            // $total_hours = $total_days * 24 + $diff->h; // Total hours including days
+            $total_seconds = $expiration_datetime->getTimestamp() - $curr_datetime->getTimestamp();
 
         } else {
             header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
             exit();
         }
 
-        if (!empty($rows[0]['token']) && isset($total_seconds) && $total_seconds <= 172800){
+        if (!empty($rows[0]['token']) && isset($total_seconds) && in_array($total_seconds, range(1,172800))){
           header("Location: https://".$meican_url."/circuits/nodes/show");
         }
-        else if (!empty($rows[0]['token']) && isset($total_seconds) && $total_seconds > 172800) {
+        else if (!empty($rows[0]['token']) && isset($total_seconds) && ($total_seconds > 172800 || $total_seconds <= 0 )) {
           $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
           if (strpos($actual_link,'code') !== false) {
