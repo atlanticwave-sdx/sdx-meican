@@ -77,6 +77,7 @@ class NodesController extends RbacController {
       $api_url=API_URL;
       $meican_url=MEICAN_URL;
 
+      // Checks for the user entry in the meican_cilogon_auth table
       $userId = Yii::$app->user->id;
       $rows = (new \yii\db\Query())
           ->select(['token', 'expiration'])
@@ -87,11 +88,12 @@ class NodesController extends RbacController {
       date_default_timezone_set('America/New_York');
       $token_date = isset($rows[0]['expiration']) ? $rows[0]['expiration'] : null;
       $token = isset($rows[0]['token']) ? $rows[0]['token'] : null;
-      if ($token_date !== null && $token !== null) {
+      if ($token_date !== null && $token !== null) { // If Record Present
 
         $expiration_datetime = DateTime::createFromFormat('Y-m-d H:i:s', $token_date);
         $curr_datetime = new DateTime();
 
+        // token expiration check (2 days)
         if ($expiration_datetime !== null && $curr_datetime !== null) {
             $diff = $curr_datetime->diff($expiration_datetime);
             $total_seconds = $expiration_datetime->getTimestamp() - $curr_datetime->getTimestamp();
@@ -101,10 +103,10 @@ class NodesController extends RbacController {
             exit();
         }
 
-        if (!empty($rows[0]['token']) && isset($total_seconds) && in_array($total_seconds, range(1,172800))){
+        if (!empty($rows[0]['token']) && isset($total_seconds) && in_array($total_seconds, range(1,172800))){ // token is not expired
           header("Location: https://".$meican_url."/circuits/nodes/show");
         }
-        else if (!empty($rows[0]['token']) && isset($total_seconds) && ($total_seconds > 172800 || $total_seconds <= 0 )) {
+        else if (!empty($rows[0]['token']) && isset($total_seconds) && ($total_seconds > 172800 || $total_seconds <= 0 )) { // token expired
           $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
           if (strpos($actual_link,'code') !== false) {
@@ -130,6 +132,7 @@ class NodesController extends RbacController {
             if(array_key_exists('access_token',$response_arr)){
               $access_token=$response_arr['access_token'];
               
+              // updating the token and expiration date in meican_cilogon_auth table for the respective user
               $expiration_datetime = new DateTime();
               $expiration_datetime->modify('+2 days');
               $result = Yii::$app->db->createCommand()->update(
@@ -154,7 +157,7 @@ class NodesController extends RbacController {
         }
         
       }
-      else {
+      else { // Generate the new token and insert in meican_cilogon_auth table
         $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
         if (strpos($actual_link,'code') !== false) {
@@ -180,9 +183,11 @@ class NodesController extends RbacController {
           if(array_key_exists('access_token',$response_arr)){
             $access_token=$response_arr['access_token'];
 
+            // setting expiration date for 2 days 
             $expiration_datetime = new DateTime();
             $expiration_datetime->modify('+2 days');
 
+            // Inserting the token expiration date in meican_cilogon_auth table
             $result = Yii::$app->db->createCommand()->insert('meican_cilogon_auth', [
               'user_id' => $userId,
               'token' => $access_token,
