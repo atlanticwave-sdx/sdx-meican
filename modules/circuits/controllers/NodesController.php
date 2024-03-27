@@ -31,8 +31,6 @@ use meican\topology\models\Domain;
 use meican\topology\models\Network;
 use meican\topology\models\Service;
 
-// include(__DIR__ . '/../../../config/db.php');
-
 /**
  * @author Maurício Quatrin Guerreiros
  */
@@ -73,7 +71,11 @@ class NodesController extends RbacController {
     }
     
     public function actionShow() {   // this function manages the mapping of SDX-topology and displays on the MEICAN UI
-      
+      /*
+        Token Expiration WorkFlow
+
+        When the user logs in with CI-Logon, the code generates a new token and inserts it to the meican_cilogon_auth table, along with the expiration date (which is +2 days from the current timestamp) and user ID. If the same user logs in within the next 2 days, it will not ask for the CI-Logon page again. If the user logs in after 2 days, it will ask for the CI-Logon login.
+      */
       $api_url=API_URL;
       $meican_url=MEICAN_URL;
 
