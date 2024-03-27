@@ -36,7 +36,7 @@ class m240326_200556_create_meican_cilogon_auth_table extends Migration
 
     public function down()
     {
-        echo "m190702_183938_create_location_table cannot be reverted.\n";
+        echo "m240326_200556_create_meican_cilogon_auth_table cannot be reverted.\n";
 
         return false;
     }
