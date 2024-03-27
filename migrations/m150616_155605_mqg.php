@@ -308,14 +308,6 @@ CREATE TABLE IF NOT EXISTS `meican_user` (
             'password' => '$2y$13$HlKOEje1Mtckn79tYjdLAOmzSC7unR/RJg6O9mz42hggMuX.3TuPq',
             'authkey' => 'YWuulnFca89gxqSYdUfCRi-vUN7QYO-G',
         ]);
-// 		$this->execute("
-// CREATE TABLE `meican_cilogon_auth` (
-// 	`id` int(11) NOT NULL,
-// 	`user_id` int(11) NOT NULL,
-// 	`token` varchar(2000) NOT NULL,
-// 	`expiration` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
-// 	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-// 		");
    		$this->execute("
 CREATE TABLE IF NOT EXISTS `meican_user_domain` (
 `id` int(11) NOT NULL,
@@ -609,20 +601,6 @@ ADD CONSTRAINT `fk_user_setttings` FOREIGN KEY (`id`) REFERENCES `meican_user` (
 ALTER TABLE `meican_vlan_range`
 ADD CONSTRAINT `urn_vlan` FOREIGN KEY (`urn_id`) REFERENCES `meican_urn` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
     	");
-// 		$this->execute("
-// ALTER TABLE `meican_cilogon_auth`
-// ADD PRIMARY KEY (`id`),
-// ADD KEY `user_id` (`user_id`);
-//     	");
-// 		$this->execute("
-// ALTER TABLE `meican_cilogon_auth`
-// MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
-//     	");
-// 		$this->execute("
-// ALTER TABLE `meican_cilogon_auth`
-// ADD CONSTRAINT `meican_cilogon_auth_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `meican_user` (`id`);
-//     	");
-
     }
     
     public function down() {
