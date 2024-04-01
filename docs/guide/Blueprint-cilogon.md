@@ -12,5 +12,5 @@ CILogon adds a second layer of protection for Meican, providing an additional le
 - New table creation (`meican_cilogon_auth`) for storing the user token, expiration dates, and user IDs.
 - Generate and insert a new token with a two-day expiration into the table upon successful login with CILogon.
 - Allow access without prompting for CILogon login if the user logs in within the two-day window.
-- Prompt for CILogon login again if the user attempts to log in after the expiration period (2 days).
+- Prompt for CILogon login again if the user attempts to log in after the expiration period (2 days) and update the token and expiration in the table.
 
