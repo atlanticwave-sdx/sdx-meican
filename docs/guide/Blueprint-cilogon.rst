@@ -36,4 +36,4 @@ Requirements
 Token Expiration WorkFlow
 =========================
 
-When the user logs in with CI-Logon, the code generates a new token and inserts it to the meican_cilogon_auth table, along with the expiration date (which is +2 days from the current timestamp) and user ID. If the same user logs in within the next 2 days, it will not ask for the CI-Logon page again. If the user logs in after 2 days, it will ask for the CI-Logon login.
+When the user logs in with CI-Logon, the code generates a new token and inserts it to the meican_cilogon_auth table, along with the expiration date (which is +2 days from the current timestamp) and user ID. If the same user logs in within the next 2 days, it will not ask for the CI-Logon page again. If the same user logs in after 2 days, it will ask for the CI-Logon login.
