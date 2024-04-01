@@ -37,11 +37,11 @@ Generate and insert a new token with a two-day expiration into the table upon su
 Allow access without prompting for CILogon login if the user logs in within the two-day window.
 Prompt for CILogon login again if the user attempts to log in after the expiration period (2 days).
 
-.. code-block::
-   :caption: A cool example
+def my_function(my_arg, my_other_arg):
+    """A function just for me.
 
-       The output of this line starts with four spaces.
+    :param my_arg: The first of my arguments.
+    :param my_other_arg: The second of my arguments.
 
-.. code-block::
-
-       The output of this line has no spaces at the beginning.
+    :returns: A message (just for me, of course).
+    """
