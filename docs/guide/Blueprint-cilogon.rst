@@ -4,7 +4,7 @@ CILogon Implementation
 Authors
 -------
 
-- Usman
+- Usman Aziz
 - Mahidhar
 
 Issued Date: to be defined
