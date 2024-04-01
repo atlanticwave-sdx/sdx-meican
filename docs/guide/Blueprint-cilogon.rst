@@ -16,7 +16,7 @@ Type: Standards Track
 Abstract
 =============
 
-> This blueprint details how CILogon is integrated with Meican.
+This blueprint details how CILogon is integrated with Meican.
 
 =============
 Motivation
