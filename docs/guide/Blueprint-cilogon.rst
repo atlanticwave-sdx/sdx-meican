@@ -1,3 +1,11 @@
+Title: CILogon Implementation
+Authors:
+- Usman;
+- Mahidhar;
+Issued Date: to be defined
+Status: Pending
+Type: Standards Track
+
 =============
 Abstract
 =============
