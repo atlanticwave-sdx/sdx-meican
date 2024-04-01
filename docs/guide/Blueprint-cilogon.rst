@@ -31,3 +31,4 @@ Requirements
 - Generate and insert a new token with a two-day expiration into the table upon successful login with CILogon.
 - Allow access without prompting for CILogon login if the user logs in within the two-day window.
 - Prompt for CILogon login again if the user attempts to log in after the expiration period (2 days).
+- Creating a migration file for the table `meican_cilogon_auth`.
