@@ -24,8 +24,6 @@ Motivation
 
 CILogon adds a second layer of protection for Meican, providing an additional level of security beyond traditional username and password logins. By requiring users to verify their identity through additional means, such as two-factor authentication or digital certificates, CILogon significantly reduces the risk of unauthorized access and data breaches.
 
-This added layer of protection is especially critical in Meican where sensitive data and intellectual property are at stake. Additionally, CILogon's robust security measures instill confidence among users, ensuring that their credentials and research assets remain safeguarded against potential cyber threats.
-
 =============
 Requirements
 =============
