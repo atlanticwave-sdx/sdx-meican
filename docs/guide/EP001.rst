@@ -34,7 +34,7 @@ Justification for Design Choices
 
 Consideration of Alternatives
 ------------------------------
-   - **Authentication Methods**: Should we write something like this? (Evaluated OAuth, LDAP, and SAML; CILogon was chosen for security and integration).
+   - **Authentication Methods**: Should we write something like this? (Evaluated OAuth, OAuth, and OAuth; CILogon was chosen for security and integration).
    - **Token Expiration**: Considered dynamic expiration but opted for a fixed two-day period for simplicity and security.
 
 Related Work and Industry Standards
