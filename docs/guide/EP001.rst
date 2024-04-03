@@ -3,9 +3,9 @@
 :Authors:
     - Usman Aziz
     - Mahidhar
-:Reviewers:
+:Reviewers: to be defined
 :Created: to be defined
-:Kytos-Version: to be defined
+:Meican-Version: to be defined
 :Status: Draft
 :Type: Standards Track
 
@@ -16,27 +16,40 @@ EP001 - CILogon Implementation
 ########
 Abstract
 ########
-This blueprint details how CILogon is integrated with Meican and the workflow of token authorization.
+The focus of this blueprint is solely on integrating CILogon with Meican and implementing the associated security measures, such as token generation, storage, and expiration management within the 'meican_cilogon_auth' table.
 
 ##########
 Motivation
 ##########
-CILogon adds a second layer of protection for Meican, providing an additional level of security beyond traditional username and password logins. By requiring users to verify their identity through additional means, such as two-factor authentication or digital certificates, CILogon significantly reduces the risk of unauthorized access and data breaches.
+CILogon integration with Meican aims to enhance security measures by introducing an additional layer of protection beyond traditional username and password logins. This extra security is achieved through methods like two-factor authentication or digital certificates. By implementing CILogon, Meican can mitigate the risks associated with unauthorized access and potential data breaches.
 
 #############
 Specification
 #############
-This blueprint provides the following specifications for integrating CILogon with Meican:
 
-1. **Outline the subject**
-    - Integration of CILogon with Meican.
-    
-2. **Submitting a blueprint**
-    - Creation of a new table (`meican_cilogon_auth`) for storing user tokens, expiration dates, and user IDs.
-    - Generation and insertion of a new token with a two-day expiration into the `meican_cilogon_auth` table upon successful login with CILogon.
-    - Allow access without prompting for CILogon login if the user logs in within the two-day window.
-    - Prompt for CILogon login again if the user attempts to log in after the expiration period (2 days) and update the token and expiration date in the `meican_cilogon_auth` table.
-    - Creation of a migration file for the `meican_cilogon_auth` table.
+By concentrating on the specific task of enhancing security through CILogon integration and outlining detailed steps for implementation, this blueprint ensures clarity and facilitates successful execution. The delineation of requirements and workflow provides a clear path for development, minimizing the risk of scope creep and maximizing the likelihood of achieving the desired security enhancements.
+
+**The Idea:**
+
+CILogon integration with Meican to enhance security measures beyond traditional username and password logins. This involves implementing a second layer of protection through additional identity verification methods like two-factor authentication or digital certificates provided by CILogon.
+
+**Specification:**
+
+1. **CILogon Integration:** Integrate CILogon authentication with Meican's existing login system.
+2. **Database Table Creation:** Create a new table named "meican_cilogon_auth" to store essential data such as user tokens, expiration dates, and user IDs.
+3. **Token Generation and Insertion:** Upon successful login with CILogon, generate a new token with a two-day expiration period and insert it into the "meican_cilogon_auth" table.
+4. **Access Management:** Allow users to access Meican without prompting for CILogon login if they login within the two-day validity period of the token.
+5. **Expiration Handling:** If a user attempts to log in after the token expiration period (two days), prompt for CILogon login again. Update the token and expiration date in the "meican_cilogon_auth" table accordingly.
+6. **Migration File Creation:** Create a migration file to establish the structure of the "meican_cilogon_auth" table within the Meican database.
+
+**Token Expiration Workflow:**
+
+1. When a user logs in with CILogon, the system generates a new token and stores it in the "meican_cilogon_auth" table, along with the user's ID and an expiration date set to two days from the current timestamp.
+2. If the same user logs in within the two-day window, they won't be prompted for CILogon authentication again.
+3. However, if the user attempts to log in after the expiration period (two days), the system will require them to go through the CILogon authentication process again.
+
+
+This comprehensive approach ensures that Meican effectively implements CILogon integration while managing token expiration and user authentication seamlessly.
 
 #######################
 Backward Compatibility
