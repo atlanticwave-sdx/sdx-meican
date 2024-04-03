@@ -1,0 +1,66 @@
+:EP: 1
+:Title: CILogon Implementation
+:Authors:
+    - Usman Aziz
+    - Mahidhar
+:Reviewers:
+:Created: to be defined
+:Kytos-Version: to be defined
+:Status: Draft
+:Type: Standards Track
+
+*****************************
+EP001 - CILogon Implementation
+*****************************
+
+########
+Abstract
+########
+This blueprint details how CILogon is integrated with Meican and the workflow of token authorization.
+
+##########
+Motivation
+##########
+CILogon adds a second layer of protection for Meican, providing an additional level of security beyond traditional username and password logins. By requiring users to verify their identity through additional means, such as two-factor authentication or digital certificates, CILogon significantly reduces the risk of unauthorized access and data breaches.
+
+#############
+Specification
+#############
+This blueprint provides the following specifications for integrating CILogon with Meican:
+
+1. **Outline the subject**
+    - Integration of CILogon with Meican.
+    
+2. **Submitting a blueprint**
+    - Creation of a new table (`meican_cilogon_auth`) for storing user tokens, expiration dates, and user IDs.
+    - Generation and insertion of a new token with a two-day expiration into the `meican_cilogon_auth` table upon successful login with CILogon.
+    - Allow access without prompting for CILogon login if the user logs in within the two-day window.
+    - Prompt for CILogon login again if the user attempts to log in after the expiration period (2 days) and update the token and expiration date in the `meican_cilogon_auth` table.
+    - Creation of a migration file for the `meican_cilogon_auth` table.
+
+#######################
+Backward Compatibility
+#######################
+N/A
+
+#####################
+Security Implications
+#####################
+N/A
+
+##############
+Rejected Ideas
+##############
+N/A
+
+##########
+References
+##########
+N/A
+
+#########
+Copyright
+#########
+This document is placed in the public domain or under the CC0-1.0-Universal license, whichever is more permissive.
+
+Leave all the fields that you don't understand.
