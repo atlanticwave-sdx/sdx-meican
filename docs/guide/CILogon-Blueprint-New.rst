@@ -1,15 +1,12 @@
 :EP: 0
-:Title: Enhancement Proposals
+:Title: CILogon Implementation
 :Authors:
-    - José Mauro Ribeiro <zemauror@gmail.com>
+    - Usman Aziz <>
+    - Mahidhar <mgand024@fiu.edu>
 :Reviewers:
-    - Antonio Francisco <ajoaoff@gmail.com>
-    - Beraldo Leal <beraldo@gmail.com>
-    - Carlos Magno <cmagnobarbosa@gmail.com>
-    - Gleyberson Andrade <gleybersonandrade@gmail.com>
-    - Humberto Diógenes <hdiogenes@gmail.com>
-    - Rogério Motitsuki <rogerio@ansp.br>
-:Created: 2020-05-14
+    - 
+    -
+:Created: 2024-04-01
 :Kytos-Version: 2020.1
 :Status: Draft
 :Type: Standards Track
@@ -21,15 +18,13 @@ EP000 - Enhancement Proposals
 ########
 Abstract
 ########
-This blueprint is proposed to clarify what blueprints are, their purpose, list the types of blueprints, explain which sections should be included in a blueprint, the information that should be included in each topic and the workflow involving a blueprint proposal. Therefore, this blueprint is intended to work as a meta blueprint.
+This blueprint details how CILogon is integrated with Meican and the workflow of token authorization.
 
 ##########
 Motivation
 ##########
 
-The Kytos Project uses the word 'blueprint' to refer to a specific type of document that plays a very important role in the development process. Anyone who is not familiar with the concept should be able to understand and start a draft blueprint using the EP0 (blueprint 0).
-A blueprint is a document used to specify the details of any process, features and anything else that is desirable to be implemented in Kytos Project and cannot be reduced to a GitHub issue or a meeting to be outlined, although a blueprint could start as an issue and become a blueprint after some discussion.
-This blueprint is intended to help anyone who wants to start a new blueprint. Besides that, the standard proposed here could save time for the author of a blueprint who doesn't have to think about the structure of the project and avoid that different authors write blueprints in a very different way. Separate blueprints with common sections between them could help even the readers who are familiar with the structure once they could search for specific sections in it.
+CILogon adds a second layer of protection for Meican, providing an additional level of security beyond traditional username and password logins. By requiring users to verify their identity through additional means, such as two-factor authentication or digital certificates, CILogon significantly reduces the risk of unauthorized access and data breaches.
 
 #########
 Rationale
@@ -63,73 +58,6 @@ After creating a first blueprint by adding every necessary section (check the se
 Blueprint review
 ================
 In the following days after you submit your pull request, the Kytos team will review the document adding comments and suggestions. So the author of the pull request must pay attention to the Kytos team feedback to make the review a quick process.
-
-
-Sections that a blueprint should have
-*************************************
-
-Header
-======
-Every blueprint proposal should use this template to build their own header:
-
-:EP: <\*EP number>
-:Title: <EP title>
-:Authors: <list of authors' names and email addrs>
-:Reviewers: <list of reviewers' names and email addrs>
-:Created: <date created on, in yyyy-mm-dd format>
-:Kytos-Version: <kytos version, in yyyy.v>
-:Status: <Draft | Accepted | Rejected | Final | Superseded>
-:Type: <Standards Track | Informational | Process>
-:\**Replaces: <EP number>
-
-\*EP number: should be fixed by Kytos team after the author submit the PR.
-
-\**Optional field.
-
-
-Abstract
-========
-A short (~200 word) description of the technical issue being addressed.
-
-Motivation
-==========
-It should clearly explain why the blueprint is being proposed describing any technical issue that is intended to be covered by the proposal.
-
-Rationale
-=========
-The rationale fleshes out the specification by describing why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other environments or scenarios.
-
-Specification
-=============
-The technical specification should describe the aspects of what is being proposed.
-
-Backwards Compatibility
-=======================
-All EPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EP must explain how the author proposes to deal with these incompatibilities.
-
-Security Implications
-=====================
-If there are security concerns in relation to the EP, those concerns should be explicitly written out to make sure reviewers of the EP are aware of them.
-
-Rejected Ideas
-==============
-Throughout the discussion of an EP, various proposed ideas end up not being accepted. Those rejected ideas should be recorded along with the reasoning as to why they were rejected. This both helps record the thought process behind the final version of the EP as well as preventing people from bringing up the same rejected ideas again in subsequent discussions.
- 
-References
-==========
-References -- A collection of URLs used as references through the EP.
-
-Copyright/license
-=================
-
-Types of blueprints
-*******************
-
-Standard: Describes a new feature and its implementation.
-
-Process: Guidelines or information for the community and developers, but does not propose a new feature.
-
-Epic: Describes a problem and its solution.  
 
 #######################
 Backwards Compatibility
