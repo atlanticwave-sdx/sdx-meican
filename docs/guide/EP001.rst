@@ -60,6 +60,8 @@ CILogon integration with Meican to enhance security measures beyond traditional 
 
 **Specification:**
 
+![Alt text](/docs/CILogonFlow.png)
+
 1. **CILogon Integration:** Integrate CILogon authentication with Meican's topology mapping system.
 2. **Database Table Creation:** Create a new table named "meican_cilogon_auth" to store essential data such as user tokens, expiration dates, and user IDs.
 3. **Token Generation and Insertion:** Upon successful login with CILogon, generate a new token with a two-day expiration period and insert it into the "meican_cilogon_auth" table.
