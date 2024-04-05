@@ -52,15 +52,14 @@ Consideration of Future Scalability and Maintainability
 Specification
 #############
 
-By concentrating on the specific task of enhancing security through CILogon integration and outlining detailed steps for implementation, this blueprint ensures clarity and facilitates successful execution. The delineation of requirements and workflow provides a clear path for development, minimizing the risk of scope creep and maximizing the likelihood of achieving the desired security enhancements.
-
 **The Idea:**
 
 CILogon integration with Meican to enhance security measures beyond traditional username and password logins. This involves implementing a second layer of protection through additional identity verification methods like two-factor authentication or digital certificates provided by CILogon.
 
-**Specification:**
+.. image:: /docs/CILogonFlow.png
+   :alt: Alternative Text
 
-![Alt text](/docs/CILogonFlow.png)
+**Specification:**
 
 1. **CILogon Integration:** Integrate CILogon authentication with Meican's topology mapping system.
 2. **Database Table Creation:** Create a new table named "meican_cilogon_auth" to store essential data such as user tokens, expiration dates, and user IDs.
