@@ -21,7 +21,7 @@ The focus of this blueprint is solely on integrating CILogon with Meican and imp
 ##########
 Motivation
 ##########
-CILogon integration with Meican aims to enhance security measures by introducing an additional layer of protection beyond traditional username and password logins. This extra security is achieved through methods like two-factor authentication or digital certificates. By implementing CILogon, Meican can mitigate the risks associated with unauthorized access and potential data breaches.
+CILogon integration with Meican aims to enhance security measures by introducing an additional layer of protection beyond traditional username and password logins. This extra security is achieved through methods like two-factor authentication. By implementing CILogon, Meican can mitigate the risks associated with unauthorized access and potential data breaches.
 
 #########
 Rationale
@@ -54,8 +54,6 @@ Specification
 
 **The Idea:**
 
-CILogon integration with Meican to enhance security measures beyond traditional username and password logins. This involves implementing a second layer of protection through additional identity verification methods like two-factor authentication or digital certificates provided by CILogon.
-
 .. image:: /docs/CILogonFlow.png
    :alt: Alternative Text
 
@@ -65,7 +63,7 @@ CILogon integration with Meican to enhance security measures beyond traditional 
 2. **Database Table Creation:** Create a new table named "meican_cilogon_auth" to store essential data such as user tokens, expiration dates, and user IDs.
 3. **Token Generation and Insertion:** Upon successful login with CILogon, generate a new token with a two-day expiration period and insert it into the "meican_cilogon_auth" table.
 4. **Access Management:** Allow users to access Meican without prompting for CILogon login if they login within the two-day validity period of the token.
-5. **Expiration Handling:** If a user attempts to log in after the token expiration period (two days), prompt for CILogon login again. Update the token and expiration date in the "meican_cilogon_auth" table accordingly.
+5. **Expiration Handling:** If a user attempts to log in after the token expiration period (two days), prompt for CILogon login again. Next, update the token and expiration date in the "meican_cilogon_auth" table accordingly.
 6. **Migration File Creation:** Created a migration file for the "meican_cilogon_auth" table.
 
 **Token Expiration Workflow:**
@@ -75,7 +73,7 @@ CILogon integration with Meican to enhance security measures beyond traditional 
 3. However, if the user attempts to log in after the expiration period (two days), the system will require them to go through the CILogon authentication process again.
 
 
-This comprehensive approach ensures that Meican effectively implements CILogon integration while managing token expiration and user authentication seamlessly.
+This comprehensive approach ensures the CILogon integration with Meican effectively while managing token expiration and user authentication seamlessly.
 
 #######################
 Backward Compatibility
