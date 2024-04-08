@@ -16,12 +16,16 @@ EP001 - CILogon Implementation
 ########
 Abstract
 ########
-The focus of this blueprint is solely on integrating CILogon with Meican and implementing the associated security measures, such as token generation, storage, and expiration management within the 'meican_cilogon_auth' table.
+The focus of this blueprint is solely on integrating CILogon with Meican and implementing the associated security measures, such as token generation, storage, and expiration management within Meican authentication subsystem.
 
 ##########
 Motivation
 ##########
-CILogon integration with Meican aims to enhance security measures by introducing an additional layer of protection beyond traditional username and password logins. This extra security is achieved through methods like two-factor authentication. By implementing CILogon, Meican can mitigate the risks associated with unauthorized access and potential data breaches.
+The integration of CILogon with Meican serves a primary objective: to streamline authentication processes by enabling Federated Authentication. This means users of SDX/Meican can seamlessly access the system using their existing credentials from their respective organizations, eliminating the need to create new username/password accounts. Moreover, this integration offers the added advantage of leveraging CILogon's robust multi-factor authentication capabilities, thereby fortifying security measures. By emphasizing the core goal of Federated Authentication and highlighting the supplementary benefit of two-factor authentication, Meican ensures heightened security and user convenience.
+
+#######################################################
+Requirements for Integration between Meican and CILogon
+#######################################################
 
 #########
 Rationale
@@ -77,19 +81,32 @@ Specification
 This comprehensive approach ensures the CILogon integration with Meican effectively while managing token expiration and user authentication seamlessly.
 
 #######################
+CILogon Workflow
+#######################
+.. image:: /docs/CILogonFlow.png
+   :alt: Alternative Text
+
+#######################
 Backward Compatibility
 #######################
-N/A
+Not applicable here
 
 #####################
 Security Implications
 #####################
-N/A
+In the event of a data breach on the Identity Provider (CILogon), Meican takes proactive measures to mitigate potential risks:
+
+1. **Non-collection of Personal Information:**
+   Meican prioritizes user privacy by refraining from collecting personal information. This practice minimizes the impact of external breaches on user data integrity.
+2. **Implementation of Security Measures:**
+   Meican implements robust security measures to safeguard user accounts and data by adhering to industry standards. Theis ensure robust protection of user data against unauthorized access and breaches.
+3. **Preventive Suspension of Compromised Accounts:**
+   Upon identification of a compromised account, Meican promptly suspends the account to prevent further unauthorized activity. This proactive measure helps safeguard the Meican platform and its users from potential security threats arising from compromised accounts.
 
 ##############
 Rejected Ideas
 ##############
-N/A
+Not applicable here
 
 ##########
 References
@@ -99,5 +116,5 @@ References
 #########
 Copyright
 #########
-Copyright (c) 2012-2021 by [RNP](http://www.rnp.br).
-All rights reserved. MEICAN is released under of the BSD2 License. For more information see [LICENSE](https://github.com/ufrgs-hyman/meican/blob/master/LICENSE.md).
+Copyright (c) 2012-2021 by RNP(http://www.rnp.br).
+All rights reserved. MEICAN is released under the BSD2 License. For more information see LICENSE(https://github.com/ufrgs-hyman/meican/blob/master/LICENSE.md).
