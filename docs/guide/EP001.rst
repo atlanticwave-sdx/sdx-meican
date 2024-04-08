@@ -23,6 +23,27 @@ Motivation
 ##########
 The integration of CILogon with Meican serves a primary objective: to streamline authentication processes by enabling Federated Authentication. This means users of SDX/Meican can seamlessly access the system using their existing credentials from their respective organizations, eliminating the need to create new username/password accounts. Moreover, this integration offers the added advantage of leveraging CILogon's robust multi-factor authentication capabilities, thereby fortifying security measures. By emphasizing the core goal of Federated Authentication and highlighting the supplementary benefit of two-factor authentication, Meican ensures heightened security and user convenience.
 
+#####################################
+Concepts of Federated Authentication:
+#####################################
+
+Federated authentication is a mechanism that allows users to access multiple services or applications using their credentials from a trusted identity provider (IdP). This approach offers several benefits, including enhanced user convenience, simplified access management, and improved security.
+
+1. **Identity Providers (IdP):**
+   Identity providers are trusted entities responsible for authenticating users and providing them with access to various services and applications. IdPs verify user identities based on their established credentials, such as usernames and passwords, and issue authentication tokens or assertions to grant access to service providers.
+
+2. **Service Providers (SP):**
+   Service providers are entities that offer services or applications to users. SPs rely on identity providers for user authentication and authorization. Once a user is authenticated by the IdP, the SP grants access to the requested service or application based on the provided authentication token or assertion.
+
+3. **Federations:**
+   Federations are collaborative networks of organizations that establish trust relationships to enable federated authentication. Federations define standards and protocols for identity and attribute exchange, allowing users from member organizations to access services seamlessly across the federation. This approach promotes interoperability and facilitates secure access to resources across organizational boundaries.
+
+4. **Examples of Federations:**
+   - **CILogon:** CILogon is a federated identity management service specifically designed for the research and education community. It provides a secure and streamlined authentication process, allowing users to access a wide range of research and collaboration services using their existing credentials from participating organizations.
+   - **EduGain:** EduGain is a global interfederation service that enables identity federation among academic and research institutions worldwide. It promotes collaboration and resource sharing by allowing users to access educational resources and services across international boundaries using their institutional credentials.
+
+By leveraging federated authentication like **CILogon** in our case, enhances user access management, improves collaboration, and strengthens security overall.
+
 #######################################################
 Requirements for Integration between Meican and CILogon
 #######################################################
@@ -83,7 +104,10 @@ This comprehensive approach ensures the CILogon integration with Meican effectiv
 #######################
 CILogon Workflow
 #######################
-.. image:: /docs/CILogonFlow.png
+
+The below image shows the actual Authentication process workflow.
+
+.. image:: /docs/ActualCILogonFlow.png
    :alt: Alternative Text
 
 #######################
