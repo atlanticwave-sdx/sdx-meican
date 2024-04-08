@@ -21,7 +21,7 @@ The focus of this blueprint is solely on integrating CILogon with Meican and imp
 ##########
 Motivation
 ##########
-The integration of CILogon with Meican serves a primary objective: to streamline authentication processes by enabling Federated Authentication. This means users of SDX/Meican can seamlessly access the system using their existing credentials from their respective organizations, eliminating the need to create new username/password accounts. Moreover, this integration offers the added advantage of leveraging CILogon's robust multi-factor authentication capabilities, thereby fortifying security measures. By emphasizing the core goal of Federated Authentication and highlighting the supplementary benefit of two-factor authentication, Meican ensures heightened security and user convenience.
+The integration of CILogon with Meican serves a primary objective: to streamline authentication processes by enabling Federated Authentication. This means users of Meican can seamlessly access the system using their existing credentials from their respective organizations, eliminating the need to create new (username/password) accounts. Moreover, this integration offers the added advantage of leveraging CILogon's robust multi-factor authentication capabilities, thereby fortifying security measures. By emphasizing the core goal of Federated Authentication and highlighting the supplementary benefit of two-factor authentication, Meican ensures heightened security and user convenience.
 
 #####################################
 Concepts of Federated Authentication:
