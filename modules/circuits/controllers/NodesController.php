@@ -31,8 +31,6 @@ use meican\topology\models\Domain;
 use meican\topology\models\Network;
 use meican\topology\models\Service;
 
-// include(__DIR__ . '/../../../config/db.php');
-
 /**
  * @author Maurício Quatrin Guerreiros
  */
