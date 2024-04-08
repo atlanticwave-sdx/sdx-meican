@@ -65,6 +65,7 @@ Specification
 4. **Access Management:** Allow users to access Meican without prompting for CILogon login if they login within the two-day validity period of the token.
 5. **Expiration Handling:** If a user attempts to log in after the token expiration period (two days), prompt for CILogon login again. Next, update the token and expiration date in the "meican_cilogon_auth" table accordingly.
 6. **Migration File Creation:** Created a migration file for the "meican_cilogon_auth" table.
+7. **Removing CILogon for Master User:** We made sure that CI-Logon will not get prompted for the master user explicitly, and similarly we can do the same for any other criteria based on the requirements.
 
 **Token Expiration Workflow:**
 
