@@ -23,6 +23,16 @@ Motivation
 ##########
 The integration of CILogon with Meican serves a primary objective: to streamline authentication processes by enabling Federated Authentication. This means users of Meican can seamlessly access the system using their existing credentials from their respective organizations, eliminating the need to create new (username/password) accounts. Moreover, this integration offers the added advantage of leveraging CILogon's robust multi-factor authentication capabilities, thereby fortifying security measures. By emphasizing the core goal of Federated Authentication and highlighting the supplementary benefit of two-factor authentication, Meican ensures heightened security and user convenience.
 
+#######################################################
+Requirements for Integration between Meican and CILogon
+#######################################################
+
+- **Configuration Management:** enable/disable CILogon.
+- **User Interface:** choose between CILogon authentication and Meican's local authentication database.
+- **Secure Storage:** 
+- **Troubleshooting:**
+
+
 #####################################
 Concepts of Federated Authentication:
 #####################################
@@ -43,10 +53,6 @@ Federated authentication is a mechanism that allows users to access multiple ser
    - **EduGain:** EduGain is a global interfederation service that enables identity federation among academic and research institutions worldwide. It promotes collaboration and resource sharing by allowing users to access educational resources and services across international boundaries using their institutional credentials.
 
 By leveraging federated authentication like **CILogon** in our case, enhances user access management, improves collaboration, and strengthens security overall.
-
-#######################################################
-Requirements for Integration between Meican and CILogon
-#######################################################
 
 #########
 Rationale
