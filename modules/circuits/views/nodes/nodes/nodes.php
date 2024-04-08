@@ -297,6 +297,19 @@ $( "#filtersform" ).submit(function( event ) {
     egress_port=JSON.parse(egress_port);
     ingress_port=JSON.parse(ingress_port);
 
+    if(egress_port.state==null){
+      egress_port.state='null';
+    }
+    if(egress_port.status==null){
+      egress_port.status='null';
+    }
+    if(ingress_port.state==null){
+      ingress_port.state='null';
+    }
+    if(ingress_port.status==null){
+      ingress_port.status='null';
+    }
+
 
     console.log(id);
     console.log(name);
