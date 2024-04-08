@@ -83,7 +83,7 @@ class NodesController extends RbacController {
           ->where(['user_id' => $userId])
           ->all();
       
-      if ($userId != 1) {
+      if($userId != 1) {
         date_default_timezone_set('America/New_York');
         $token_date = isset($rows[0]['expiration']) ? $rows[0]['expiration'] : null;
         $token = isset($rows[0]['token']) ? $rows[0]['token'] : null;
