@@ -132,12 +132,6 @@ To enable or disable the CILogon page within the Meican application, we have imp
 This approach offers a simple and effective means of configuring the availability of the CILogon authentication option, providing administrators with flexibility in managing authentication settings within the Meican application.
 
 ##############
-User Interface
-##############
-
-Choose between CILogon authentication and Meican's local authentication database.
-
-##############
 Secure Storage
 ##############
 
