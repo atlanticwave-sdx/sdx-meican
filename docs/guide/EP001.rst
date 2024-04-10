@@ -23,11 +23,13 @@ Motivation
 ##########
 The integration of CILogon with Meican serves a primary objective: to streamline authentication processes by enabling Federated Authentication. This means users of Meican can seamlessly access the system using their existing credentials from their respective organizations, eliminating the need to create new (username/password) accounts. Moreover, this integration offers the added advantage of leveraging CILogon's robust multi-factor authentication capabilities, thereby fortifying security measures. By emphasizing the core goal of Federated Authentication and highlighting the supplementary benefit of two-factor authentication, Meican ensures heightened security and user convenience.
 
-#######################################################
-Requirements for Integration between Meican and CILogon
-#######################################################
+############
+Requirements
+############
 
-
+1. **CILogon Integration:** Integrate CILogon authentication with Meican's topology mapping system [1].
+2. **Token Expiration:** Create a token expiration system for 2 days for a user so that CILogon will not be prompted within the two-day validity period of the token.
+3. **Access Management:** The CILogon page should be disabled for Admin users, and an additional feature to enable/disable the CILogon page by admin.
 
 #####################################
 Concepts of Federated Authentication:
@@ -92,8 +94,9 @@ Specification
 3. **Token Generation and Insertion:** Upon successful login with CILogon, generate a new token with a two-day expiration period and insert it into the "meican_cilogon_auth" table.
 4. **Access Management:** Allow users to access Meican without prompting for CILogon login if they login within the two-day validity period of the token.
 5. **Expiration Handling:** If a user attempts to log in after the token expiration period (two days), prompt for CILogon login again. Next, update the token and expiration date in the "meican_cilogon_auth" table accordingly.
-6. **Migration File Creation:** Created a migration file for the "meican_cilogon_auth" table.
-7. **Removing CILogon for Master User:** We made sure that CI-Logon will not get prompted for the master user explicitly, and similarly we can do the same for any other criteria based on the requirements.
+6. **Migration File Creation:** Migration file creation for the "meican_cilogon_auth" table.
+7. **Removing CILogon for Master User:** Make sure that CI-Logon will not get prompted for the Admin (master) user.
+8. **Adding Enable/Disable CILogon Feature:** A small feature to enable or disable the CILogon page within the Meican application by admin.
 
 **Token Expiration Workflow:**
 
@@ -135,11 +138,18 @@ This approach offers a simple and effective means of configuring the availabilit
 Secure Storage
 ##############
 
-    - Implement encryption techniques: Encrypt sensitive information before storing it in databases or configuration files. This adds an extra layer of protection against unauthorized access.
-    - Utilize secure storage mechanisms: Store secrets in secure, encrypted databases or key management systems that are designed to safeguard sensitive data.
-    - Follow best practices for access control: Implement strict access control policies to restrict access to sensitive information only to authorized personnel or systems.
-    - Regularly update and rotate secrets: Periodically update passwords and cryptographic keys, and rotate API keys to mitigate the risk of compromise due to prolonged exposure.
-    - Conduct security audits and assessments: Regularly audit and assess the security of storage systems and access controls to identify and address any vulnerabilities or weaknesses.
+Meican CI Logon integration must provide mechanisms and measurements to store information in a secure manner and protect sensitive data. Some of the minimal requirements include:
+
+- Meican CI Logon integration must store Tokens/Security Keys in a secure and protected way according to the best current practices. Examples of security practices from OWASP (TODO: [2]) include:
+
+    - Do not hard-code keys into the application source code.
+    - Do not check keys into version control systems.
+    - Protect the configuration files containing the keys with restrictive permissions.
+    - Avoid storing keys in environment variables, as these can be accidentally exposed through API functions or filesystem devices.
+
+- Meican should log interactions. Meican CI Logon authentication system should record API calls made to the Authentication Provider and responses received. This is necessary for security incident handling later on and for troubleshooting.
+
+- Meican should provide generic error messages and a support contact when an interaction does not go as expected. Errors should be logged on the server side to help troubleshooting later on.
 
 #####################################
 Troubleshooting Authentication Issues
@@ -174,6 +184,8 @@ Not applicable here
 References
 ##########
 [1] https://www.cilogon.org/oidc
+
+[2] https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#key-storage
 
 #########
 Copyright
