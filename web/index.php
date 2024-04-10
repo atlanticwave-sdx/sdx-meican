@@ -11,6 +11,7 @@ defined('MEICAN_URL') or define('MEICAN_URL', 'XXX_MEICAN_URL_XXX');
 defined('API_URL') or define('API_URL', 'XXX_SDX_CONTROLLER_URL_XXX');
 defined('ORCID_CLIENT_ID') or define('ORCID_CLIENT_ID', 'XXX_ORCID_CLIENT_ID_XXX');
 defined('ORCID_CLIENT_SECRET') or define('ORCID_CLIENT_SECRET', 'XXX_ORCID_CLIENT_SECRET_XXX');
+defined('ENABLE_CILOGON_PAGE') or define('ENABLE_CILOGON_PAGE', true); // Cilogon environment variable for enabling/disabling cilogon
 
 require(__DIR__ . '/../vendor/autoload.php');
 require(__DIR__ . '/../vendor/yiisoft/yii2/Yii.php');
