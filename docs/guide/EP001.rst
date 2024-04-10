@@ -27,7 +27,7 @@ The integration of CILogon with Meican serves a primary objective: to streamline
 Requirements for Integration between Meican and CILogon
 #######################################################
 
-- **Configuration Management:** To enable or disable the CILogon page within the Meican application, we have implemented a straightforward approach using environment variables.
+**Configuration Management:** To enable or disable the CILogon page within the Meican application, we have implemented a straightforward approach using environment variables.
 
   - **Implementation:** Within the `index.php` file, we have introduced a new environment variable named 'ENABLE_CILOGON_PAGE' for         managing the visibility of the CILogon page.
   - **Usage:** By simply commenting out or uncommenting the line defining this environment variable, administrators can control            whether the CILogon page is accessible to users.
@@ -36,9 +36,25 @@ Requirements for Integration between Meican and CILogon
     - To disable the CILogon page: Comment out the line `defined('ENABLE_CILOGON_PAGE') or define('ENABLE_CILOGON_PAGE', true);` in          the `index.php` file.
 This approach offers a simple and effective means of configuring the availability of the CILogon authentication option, providing administrators with flexibility in managing authentication settings within the Meican application.
 
-- **User Interface:** choose between CILogon authentication and Meican's local authentication database.
-- **Secure Storage:** 
-- **Troubleshooting:**
+**User Interface:** Choose between CILogon authentication and Meican's local authentication database.
+
+**Secure Storage:** 
+
+    - Implement encryption techniques: Encrypt sensitive information before storing it in databases or configuration files. This adds an extra layer of protection against unauthorized access.
+    - Utilize secure storage mechanisms: Store secrets in secure, encrypted databases or key management systems that are designed to safeguard sensitive data.
+    - Follow best practices for access control: Implement strict access control policies to restrict access to sensitive information only to authorized personnel or systems.
+    - Regularly update and rotate secrets: Periodically update passwords and cryptographic keys, and rotate API keys to mitigate the risk of compromise due to prolonged exposure.
+    - Conduct security audits and assessments: Regularly audit and assess the security of storage systems and access controls to identify and address any vulnerabilities or weaknesses.
+
+
+**Troubleshooting Authentication Issues:** Here are some tips and recommendations for resolving common authentication issues that users may encounter while accessing the Meican platform.
+
+  - **Ensure Correct Credentials:** Verify the credentials for accuracy before attempting to log in.
+  - **Clear Browser Cache and Cookies:** Clear browser cache and cookies to resolve any potential interference with authentication.
+  - **Try Different Browser or Device:** Try using an alternative browser or device to identify and isolate browser-specific issues.
+  - **Attempt Access from Different Network:** Try accessing Meican from a different network or location to troubleshoot potential network-related issues.
+  - **Consult Technical Support or Documentation:** Seek assistance from technical support or consult documentation for guidance on configuring settings correctly.
+
 
 
 #####################################
