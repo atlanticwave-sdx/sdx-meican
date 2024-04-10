@@ -131,9 +131,15 @@ To enable or disable the CILogon page within the Meican application, we have imp
     - To disable the CILogon page: Comment out the line `defined('ENABLE_CILOGON_PAGE') or define('ENABLE_CILOGON_PAGE', true);` in          the `index.php` file.
 This approach offers a simple and effective means of configuring the availability of the CILogon authentication option, providing administrators with flexibility in managing authentication settings within the Meican application.
 
-**User Interface:** Choose between CILogon authentication and Meican's local authentication database.
+##############
+User Interface
+##############
 
-**Secure Storage:** 
+Choose between CILogon authentication and Meican's local authentication database.
+
+##############
+Secure Storage
+##############
 
     - Implement encryption techniques: Encrypt sensitive information before storing it in databases or configuration files. This adds an extra layer of protection against unauthorized access.
     - Utilize secure storage mechanisms: Store secrets in secure, encrypted databases or key management systems that are designed to safeguard sensitive data.
@@ -141,8 +147,11 @@ This approach offers a simple and effective means of configuring the availabilit
     - Regularly update and rotate secrets: Periodically update passwords and cryptographic keys, and rotate API keys to mitigate the risk of compromise due to prolonged exposure.
     - Conduct security audits and assessments: Regularly audit and assess the security of storage systems and access controls to identify and address any vulnerabilities or weaknesses.
 
+#####################################
+Troubleshooting Authentication Issues
+#####################################
 
-**Troubleshooting Authentication Issues:** Here are some tips and recommendations for resolving common authentication issues that users may encounter while accessing the Meican platform.
+Here are some tips and recommendations for resolving common authentication issues that users may encounter while accessing the Meican platform.
 
   - **Ensure Correct Credentials:** Verify the credentials for accuracy before attempting to log in.
   - **Clear Browser Cache and Cookies:** Clear browser cache and cookies to resolve any potential interference with authentication.
