@@ -90,12 +90,12 @@
     </select>
   </div>
 
-<!--
+
   <div class="form-group">
     <label for="exampleInputPassword1">Source VLAN</label>
     <input type="number" maxlength="4" class="form-control" id="source_vlan" name="source_vlan" placeholder="0-4096" >
   </div>
--->
+
 
    <div class="form-group">
     <label for="exampleInputPassword1">Destination port</label>
@@ -113,12 +113,12 @@
     </select>
   </div>
 
-  <!--
+  
   <div class="form-group">
     <label for="exampleInputPassword1">Destination VLAN</label>
     <input type="number" maxlength="4" class="form-control" id="destination_vlan" name="destination_vlan" placeholder="0-4096" >
   </div>
-  -->
+  
 
   <div class="form-group">
     <label for="inputLatencyRequired">Maximum Latency</label>
@@ -279,20 +279,20 @@ $( "#filtersform" ).submit(function( event ) {
     var ingress_port=$('#ingress_port').val();
     let time_stamp = new Date().toJSON();
     var meican_url="<?php echo $meican_url;?>";
-    //var source_vlan=$('#source_vlan').val();
-    //var destination_vlan=$('#destination_vlan').val();
+    var source_vlan=$('#source_vlan').val();
+    var destination_vlan=$('#destination_vlan').val();
     var latency_required=$('#latency_required').val();
     var bandwidth_required=$('#bandwidth_required').val();
 
-    //if(source_vlan>4096||source_vlan<0){
-    //  alert("source vlan should be between 0-4096");
-    //  return;
-    //}
+    if(source_vlan>4096||source_vlan<0){
+     alert("source vlan should be between 0-4096");
+     return;
+    }
 
-    //else if(destination_vlan>4096||destination_vlan<0){
-    //  alert("destination vlan should be between 0-4096");
-    //  return;
-    //}
+    else if(destination_vlan>4096||destination_vlan<0){
+     alert("destination vlan should be between 0-4096");
+     return;
+    }
 
     egress_port=JSON.parse(egress_port);
     ingress_port=JSON.parse(ingress_port);
