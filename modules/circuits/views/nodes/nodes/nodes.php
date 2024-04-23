@@ -93,7 +93,7 @@
 
   <div class="form-group">
     <label for="exampleInputPassword1">Source VLAN</label>
-    <input type="number" maxlength="4" class="form-control" id="source_vlan" name="source_vlan" placeholder="0-4096" >
+    <input type="number" maxlength="4" class="form-control" id="source_vlan" name="source_vlan" placeholder="1-4095" >
   </div>
 
 
@@ -116,7 +116,7 @@
   
   <div class="form-group">
     <label for="exampleInputPassword1">Destination VLAN</label>
-    <input type="number" maxlength="4" class="form-control" id="destination_vlan" name="destination_vlan" placeholder="0-4096" >
+    <input type="number" maxlength="4" class="form-control" id="destination_vlan" name="destination_vlan" placeholder="1-4095" >
   </div>
   
 
@@ -284,13 +284,13 @@ $( "#filtersform" ).submit(function( event ) {
     var latency_required=$('#latency_required').val();
     var bandwidth_required=$('#bandwidth_required').val();
 
-    if(source_vlan>4096||source_vlan<0){
-     alert("source vlan should be between 0-4096");
+    if(source_vlan>4095||source_vlan<1){
+     alert("source vlan should be between 1-4095");
      return;
     }
 
-    else if(destination_vlan>4096||destination_vlan<0){
-     alert("destination vlan should be between 0-4096");
+    else if(destination_vlan>4095||destination_vlan<1){
+     alert("destination vlan should be between 1-4095");
      return;
     }
 
