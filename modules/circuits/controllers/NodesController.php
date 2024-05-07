@@ -40,6 +40,11 @@ class NodesController extends RbacController {
 
     public $enableCsrfValidation = false;
 
+    public function actionList(){
+
+      return $this->render('nodes/list-connections');
+    }
+
     public function actionCreate(){ // this route manages the view and backend logic for creating a circuit request
 
         $request = Yii::$app->request->getRawBody(); // getting the JSON request body from the create connection form through MEICAN dashboard
