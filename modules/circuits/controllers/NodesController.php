@@ -46,7 +46,7 @@ class NodesController extends RbacController {
       $curl = curl_init();
 
       curl_setopt_array($curl, array(
-        CURLOPT_URL => $api_url,
+        CURLOPT_URL => $api_url.'connections',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,

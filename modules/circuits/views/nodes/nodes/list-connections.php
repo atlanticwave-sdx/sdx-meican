@@ -130,18 +130,6 @@
                                     <th style="width: 10%;"><a href="/circuits/reservation/status?ReservationSearch%5Bsrc_domain%5D=&amp;ReservationSearch%5Bdst_domain%5D=&amp;ReservationSearch%5Bdataplane_status%5D=ACTIVE&amp;_pjax=%23circuits-pjax&amp;sort=bandwidth" data-sort="bandwidth">Bandwidth <img style="width: 7px; height:11px;" src="/images/sort_image.png" alt="Order by:"></a></th>
                                     
                                  </tr>
-                                 <tr id="circuits-gridcurrent-filters" class="filters">
-                                    <td>new-connection2</td>
-                                     <td>1</td>
-                                     <td>2000-01-23T04:56:07+00:00</td>
-                                     <td>2000-01-23T04:56:07+00:00</td>
-                                     <td>urn:sdx:port:amlight.net:Novi06:9</td>
-                                     <td>urn:sdx:port:amlight.net:Novi06:9</td>
-                                     <td>100</td>
-                                     <td><button type="submit" class="btn btn-primary">Edit</button></td>
-                                     <td><button type="submit" class="btn btn-primary" style="background-color:red;">Delete</button></td>
-                                   
-                                 </tr>
                               </thead>
                               <tbody>
                                  <!-- <tr>
