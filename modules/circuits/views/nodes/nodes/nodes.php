@@ -284,6 +284,9 @@ $( "#filtersform" ).submit(function( event ) {
     var latency_required=$('#latency_required').val();
     var bandwidth_required=$('#bandwidth_required').val();
 
+    start_time=new Date(start_time).toISOString();
+    end_time=new Date(end_time).toISOString();
+
     //if(source_vlan>4096||source_vlan<0){
     //  alert("source vlan should be between 0-4096");
     //  return;
