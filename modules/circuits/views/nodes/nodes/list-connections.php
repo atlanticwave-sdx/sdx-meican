@@ -79,61 +79,28 @@
                                     <th style="width: 10%;"><a href="/circuits/reservation/status?ReservationSearch%5Bsrc_domain%5D=&amp;ReservationSearch%5Bdst_domain%5D=&amp;ReservationSearch%5Bdataplane_status%5D=ACTIVE&amp;_pjax=%23circuits-pjax&amp;sort=bandwidth" data-sort="bandwidth">Bandwidth <img style="width: 7px; height:11px;" src="/images/sort_image.png" alt="Order by:"></a></th>
                                     
                                  </tr>
-                                 <tr id="circuits-gridcurrent-filters" class="filters">
-                                    <td>new-connection1</td>
-                                     <td>1</td>
-                                     <td>2000-01-23T04:56:07+00:00</td>
-                                     <td>2000-01-23T04:56:07+00:00</td>
-                                     <td>urn:sdx:port:amlight.net:Novi06:9</td>
-                                     <td>urn:sdx:port:amlight.net:Novi06:9</td>
-                                     <td>100</td>
-                                     <td><button type="submit" class="btn btn-primary" style="background-color:red;">Delete</button></td>
-                                   
-                                 </tr>
-                                 <tr id="circuits-gridcurrent-filters" class="filters">
-                                    <td>new-connection1</td>
-                                     <td>1</td>
-                                     <td>2000-01-23T04:56:07+00:00</td>
-                                     <td>2000-01-23T04:56:07+00:00</td>
-                                     <td>urn:sdx:port:amlight.net:Novi06:9</td>
-                                     <td>urn:sdx:port:amlight.net:Novi06:9</td>
-                                     <td>100</td>
-                                     <td><button type="submit" class="btn btn-primary" style="background-color:red;">Delete</button></td>
-                                   
-                                 </tr>
-                                 <tr id="circuits-gridcurrent-filters" class="filters">
-                                    <td>new-connection1</td>
-                                     <td>1</td>
-                                     <td>2000-01-23T04:56:07+00:00</td>
-                                     <td>2000-01-23T04:56:07+00:00</td>
-                                     <td>urn:sdx:port:amlight.net:Novi06:9</td>
-                                     <td>urn:sdx:port:amlight.net:Novi06:9</td>
-                                     <td>100</td>
-                                     <td><button type="submit" class="btn btn-primary" style="background-color:red;">Delete</button></td>
-                                   
-                                 </tr>
-                                 <tr id="circuits-gridcurrent-filters" class="filters">
-                                    <td>new-connection1</td>
-                                     <td>1</td>
-                                     <td>2000-01-23T04:56:07+00:00</td>
-                                     <td>2000-01-23T04:56:07+00:00</td>
-                                     <td>urn:sdx:port:amlight.net:Novi06:9</td>
-                                     <td>urn:sdx:port:amlight.net:Novi06:9</td>
-                                     <td>100</td>
-                                     <td><button type="submit" class="btn btn-primary" style="background-color:red;">Delete</button></td>
-                                   
-                                 </tr>
-                                 <tr id="circuits-gridcurrent-filters" class="filters">
-                                    <td>new-connection1</td>
-                                     <td>1</td>
-                                     <td>2000-01-23T04:56:07+00:00</td>
-                                     <td>2000-01-23T04:56:07+00:00</td>
-                                     <td>urn:sdx:port:amlight.net:Novi06:9</td>
-                                     <td>urn:sdx:port:amlight.net:Novi06:9</td>
-                                     <td>100</td>
-                                     <td><button type="submit" class="btn btn-primary" style="background-color:red;">Delete</button></td>
-                                   
-                                 </tr>
+                                 
+                                 <?php
+                                 if (!empty($connectionsData)) {
+                                    foreach ($connectionsData as $row) {
+                                       $jsonString = reset($row);
+                                       $connectionInfo = json_decode($jsonString, true);
+                                       ?>
+                                       <tr id="circuits-gridcurrent-filters" class="filters">
+                                             <td><?php echo $connectionInfo['name']; ?></td>
+                                             <td><?php echo $connectionInfo['quantity']; ?></td>
+                                             <td><?php echo $connectionInfo['start_time']; ?></td>
+                                             <td><?php echo $connectionInfo['end_time']; ?></td>
+                                             <td><?php echo $connectionInfo['egress_port']['id']; ?></td>
+                                             <td><?php echo $connectionInfo['ingress_port']['id']; ?></td>
+                                             <td><?php echo $connectionInfo['bandwidth_required']; ?></td>
+                                             <td><button type="submit" class="btn btn-primary" style="background-color:red;">Delete</button></td>
+                                       </tr>
+                                    <?php
+                                    }
+                                 }
+                                 ?>
+                                 
                               </thead>
                               <tbody>
                                  <!-- <tr>
