@@ -81,22 +81,31 @@
                                  </tr>
                                  
                                  <?php
-                                 if (!empty($connectionsData)) {
+                                 if (is_array($connectionsData)) {
                                     foreach ($connectionsData as $row) {
-                                       $jsonString = reset($row);
-                                       $connectionInfo = json_decode($jsonString, true);
-                                       ?>
-                                       <tr id="circuits-gridcurrent-filters" class="filters">
-                                             <td><?php echo $connectionInfo['name']; ?></td>
-                                             <td><?php echo $connectionInfo['quantity']; ?></td>
-                                             <td><?php echo $connectionInfo['start_time']; ?></td>
-                                             <td><?php echo $connectionInfo['end_time']; ?></td>
-                                             <td><?php echo $connectionInfo['egress_port']['id']; ?></td>
-                                             <td><?php echo $connectionInfo['ingress_port']['id']; ?></td>
-                                             <td><?php echo $connectionInfo['bandwidth_required']; ?></td>
-                                             <td><button type="submit" class="btn btn-primary" style="background-color:red;">Delete</button></td>
-                                       </tr>
-                                    <?php
+
+                                       if (is_array($row)) {
+                                          $jsonString = reset($row);
+
+                                          if (!empty($jsonString)) {
+                                             $connectionInfo = json_decode($jsonString, true);
+
+                                             if (is_array($connectionInfo) && json_last_error() === JSON_ERROR_NONE) {
+                                                ?>
+                                                   <tr id="circuits-gridcurrent-filters" class="filters">
+                                                      <td><?php echo isset($connectionInfo['name']) ? $connectionInfo['name'] : ''; ?></td>
+                                                      <td><?php echo isset($connectionInfo['quantity']) ? $connectionInfo['quantity'] : ''; ?></td>
+                                                      <td><?php echo isset($connectionInfo['start_time']) ? $connectionInfo['start_time'] : ''; ?></td>
+                                                      <td><?php echo isset($connectionInfo['end_time']) ? $connectionInfo['end_time'] : ''; ?></td>
+                                                      <td><?php echo isset($connectionInfo['egress_port']['id']) ? $connectionInfo['egress_port']['id'] : ''; ?></td>
+                                                      <td><?php echo isset($connectionInfo['ingress_port']['id']) ? $connectionInfo['ingress_port']['id'] : ''; ?></td>
+                                                      <td><?php echo isset($connectionInfo['bandwidth_required']) ? $connectionInfo['bandwidth_required'] : ''; ?></td>
+                                                      <td><button type="submit" class="btn btn-primary" style="background-color:red;">Delete</button></td>
+                                                   </tr>
+                                                <?php
+                                             }
+                                          }
+                                       }
                                     }
                                  }
                                  ?>
