@@ -56,11 +56,10 @@ class NodesController extends RbacController {
         CURLOPT_CUSTOMREQUEST => 'GET',
       ));
 
-      $response = curl_exec($curl);
+      $str_response = curl_exec($curl);
       curl_close($curl);
-      $connectionsData = json_decode($response, true);
 
-      return $this->render('nodes/list-connections', ['connectionsData' => $connectionsData]);
+      return $this->render('nodes/list-connections', ['str_response' => $str_response]);
     }
   
 
