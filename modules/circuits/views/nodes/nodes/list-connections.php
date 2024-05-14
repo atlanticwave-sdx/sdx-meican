@@ -31,9 +31,18 @@
       overflow-y: initial !important
 }
 .modal-body{
-  height: 250px;
-  overflow-y: auto;
+   height: 555px;
+   overflow-y: auto;
+   font-family: "Helvetica Neue";
+   font-size: 16px;
 }
+
+.modal-title {
+  font-weight: bold;
+  font-size: 24px;
+  font-family: Arial, sans-serif;
+}
+
       
    </style>
    
@@ -95,6 +104,7 @@
                                                    <td><?php echo isset($connectionInfo['egress_port']['id']) ? $connectionInfo['egress_port']['id'] : ''; ?></td>
                                                    <td><?php echo isset($connectionInfo['ingress_port']['id']) ? $connectionInfo['ingress_port']['id'] : ''; ?></td>
                                                    <td><?php echo isset($connectionInfo['bandwidth_required']) ? $connectionInfo['bandwidth_required'] : ''; ?></td>
+                                                   <td><button type="button" class="btn btn-primary view-connection" data-connection='<?php echo json_encode($connectionInfo); ?>'>View</button></td>
                                                    <td><button type="submit" class="btn btn-primary" style="background-color:red;">Delete</button></td>
                                                 </tr>
                                              <?php
@@ -153,8 +163,93 @@
 
     
   </div>
+    <!-- Modal Structure -->
+    <div id="jsonModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Connection Details</h4>
+        </div>
+        <div class="modal-body">
+          <div id="jsonContent"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+   <script>
+      document.addEventListener('DOMContentLoaded', function () {
+         // Function to open the modal and display JSON data
+         function openModal(jsonData) {
+            const modal = $('#jsonModal');
+            const content = $('#jsonContent');
+            content.html(formatJsonData(jsonData));
+            modal.modal('show'); // Show the modal
+         }
+
+         // Function to format JSON data
+         function formatJsonData(data) {
+            let formattedData = '';
+            const fieldsToDisplay = [
+            { key: 'id', label: 'Id', value: data.id || ''},
+            { key: 'name', label: 'Name', value: data.name || ''},
+            { key: 'quantity', label: 'Quantity', value: data.quantity || ''},
+            { key: 'start_time', label: 'Start Time', value: data.start_time || ''},
+            { key: 'end_time', label: 'End Time', value: data.end_time || ''},
+            { key: 'bandwidth_required', label: 'Bandwidth Required', value: data.bandwidth_required || ''},
+            { key: 'latency_required', label: 'Latency Required', value: data.latency_required || ''},
+            { key: 'time_stamp', label: 'Time Stamp', value: data.time_stamp || ''},
+            { key: 'version', label: 'Version', value: data.version || ''},
+            ];
+
+            fieldsToDisplay.forEach(field => {
+            formattedData += `<strong>${field.label}:</strong> ${field.value}<br>`;
+            });
+
+            // Formating egress and ingress ports and respective fields
+            formattedData += `<strong>Egress Port:</strong><br>`;
+            formattedData += `<div style="padding-left: 20px;">${formatNestedPortData(data.egress_port || '')}</div>`;
+            formattedData += `<strong>Ingress Port:</strong><br>`;
+            formattedData += `<div style="padding-left: 20px;">${formatNestedPortData(data.ingress_port || '')}</div>`;
+
+            return formattedData;
+         }
+
+         // Function for formating egress and ingress fields
+         function formatNestedPortData(portData) {
+            let formattedData = '';
+            const portFields = [
+            { key: 'id', label: 'Id:', value: portData.id || ''},
+            { key: 'name', label: 'Name:', value: portData.name || ''},
+            { key: 'node', label: 'Node:', value: portData.node },
+            { key: 'short_name', label: 'Short Name:', value: portData.short_name || ''},
+            { key: 'state', label: 'State:', value: portData.state || ''},
+            { key: 'status', label: 'Status:', value: portData.status || ''},
+            ];
+
+            portFields.forEach(field => {
+            formattedData += `<strong>${field.label}</strong> ${field.value}<br>`;
+            });
+
+            return formattedData;
+         }
+
+         $(document).on('click', '.view-connection', function () {
+            const jsonData = JSON.parse($(this).attr('data-connection'));
+            openModal(jsonData);
+         });
+      });
+   </script>
+
+
 
 </body>
+
+
 
 
 <script type="text/javascript">
@@ -162,6 +257,5 @@
 </script>
 
 </html>
-
 
 
