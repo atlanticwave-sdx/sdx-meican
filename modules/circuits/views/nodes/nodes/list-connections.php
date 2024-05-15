@@ -225,7 +225,7 @@
             const portFields = [
             { key: 'id', label: 'Id:', value: portData.id || ''},
             { key: 'name', label: 'Name:', value: portData.name || ''},
-            { key: 'node', label: 'Node:', value: portData.node },
+            { key: 'node', label: 'Node:', value: portData.node || ''},
             { key: 'short_name', label: 'Short Name:', value: portData.short_name || ''},
             { key: 'state', label: 'State:', value: portData.state || ''},
             { key: 'status', label: 'Status:', value: portData.status || ''},
