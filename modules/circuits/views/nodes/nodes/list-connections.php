@@ -31,7 +31,7 @@
       overflow-y: initial !important
 }
 .modal-body{
-   height: 555px;
+   height: 560px;
    overflow-y: auto;
    font-family: "Helvetica Neue";
    font-size: 16px;
@@ -182,67 +182,53 @@
   </div>
 
    <script>
-      document.addEventListener('DOMContentLoaded', function () {
-         // Function to open the modal and display JSON data
-         function openModal(jsonData) {
-            const modal = $('#jsonModal');
-            const content = $('#jsonContent');
-            content.html(formatJsonData(jsonData));
-            modal.modal('show'); // Show the modal
+      function openModal(jsonData) {
+        const modal = $('#jsonModal');
+        const content = $('#jsonContent');
+        content.html(formatJsonData(jsonData));
+        modal.modal('show');
+      }
+
+      function formatJsonData(data) {
+         let formattedData = '';
+
+         formattedData += `<strong>Id:</strong> ${data.id || ''}<br>`;
+         formattedData += `<strong>Name:</strong> ${data.name || ''}<br>`;
+         formattedData += `<strong>Quantity:</strong> ${data.quantity || ''}<br>`;
+         formattedData += `<strong>Start Time:</strong> ${data.start_time || ''}<br>`;
+         formattedData += `<strong>End Time:</strong> ${data.end_time || ''}<br>`;
+         formattedData += `<strong>Bandwidth Required:</strong> ${data.bandwidth_required || ''}<br>`;
+         formattedData += `<strong>Latency Required:</strong> ${data.latency_required || ''}<br>`;
+         formattedData += `<strong>Time Stamp:</strong> ${data.time_stamp || ''}<br>`;
+         formattedData += `<strong>Version:</strong> ${data.version || ''}<br>`;
+
+         formattedData += `<strong>Egress Port:</strong><br>`;
+         formattedData += `<div style="padding-left: 20px;">${formatNestedPortData(data.egress_port || {})}</div>`;
+         formattedData += `<strong>Ingress Port:</strong><br>`;
+         formattedData += `<div style="padding-left: 20px;">${formatNestedPortData(data.ingress_port || {})}</div>`;
+
+         return formattedData;
+      }
+
+      // Function to format egress and ingress fields
+      function formatNestedPortData(portData) {
+         if (portData && Object.keys(portData).length > 0) {
+            let formattedPortData = '';
+            formattedPortData += `<strong>Id:</strong> ${portData.id || ''}<br>`;
+            formattedPortData += `<strong>Name:</strong> ${portData.name || ''}<br>`;
+            formattedPortData += `<strong>Node:</strong> ${portData.node || ''}<br>`;
+            formattedPortData += `<strong>Short Name:</strong> ${portData.short_name || ''}<br>`;
+            formattedPortData += `<strong>State:</strong> ${portData.state || ''}<br>`;
+            formattedPortData += `<strong>Status:</strong> ${portData.status || ''}<br>`;
+            return formattedPortData;
          }
+      }
 
-         // Function to format JSON data
-         function formatJsonData(data) {
-            let formattedData = '';
-            const fieldsToDisplay = [
-            { key: 'id', label: 'Id', value: data.id || ''},
-            { key: 'name', label: 'Name', value: data.name || ''},
-            { key: 'quantity', label: 'Quantity', value: data.quantity || ''},
-            { key: 'start_time', label: 'Start Time', value: data.start_time || ''},
-            { key: 'end_time', label: 'End Time', value: data.end_time || ''},
-            { key: 'bandwidth_required', label: 'Bandwidth Required', value: data.bandwidth_required || ''},
-            { key: 'latency_required', label: 'Latency Required', value: data.latency_required || ''},
-            { key: 'time_stamp', label: 'Time Stamp', value: data.time_stamp || ''},
-            { key: 'version', label: 'Version', value: data.version || ''},
-            ];
-
-            fieldsToDisplay.forEach(field => {
-            formattedData += `<strong>${field.label}:</strong> ${field.value}<br>`;
-            });
-
-            // Formating egress and ingress ports and respective fields
-            formattedData += `<strong>Egress Port:</strong><br>`;
-            formattedData += `<div style="padding-left: 20px;">${formatNestedPortData(data.egress_port || '')}</div>`;
-            formattedData += `<strong>Ingress Port:</strong><br>`;
-            formattedData += `<div style="padding-left: 20px;">${formatNestedPortData(data.ingress_port || '')}</div>`;
-
-            return formattedData;
-         }
-
-         // Function for formating egress and ingress fields
-         function formatNestedPortData(portData) {
-            let formattedData = '';
-            const portFields = [
-            { key: 'id', label: 'Id:', value: portData.id || ''},
-            { key: 'name', label: 'Name:', value: portData.name || ''},
-            { key: 'node', label: 'Node:', value: portData.node || ''},
-            { key: 'short_name', label: 'Short Name:', value: portData.short_name || ''},
-            { key: 'state', label: 'State:', value: portData.state || ''},
-            { key: 'status', label: 'Status:', value: portData.status || ''},
-            ];
-
-            portFields.forEach(field => {
-            formattedData += `<strong>${field.label}</strong> ${field.value}<br>`;
-            });
-
-            return formattedData;
-         }
-
-         $(document).on('click', '.view-connection', function () {
-            const jsonData = JSON.parse($(this).attr('data-connection'));
-            openModal(jsonData);
-         });
+      $(document).on('click', '.view-connection', function () {
+         const jsonData = JSON.parse($(this).attr('data-connection'));
+         openModal(jsonData);
       });
+
    </script>
 
 
