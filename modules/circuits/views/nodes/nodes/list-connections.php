@@ -31,9 +31,18 @@
       overflow-y: initial !important
 }
 .modal-body{
-  height: 250px;
-  overflow-y: auto;
+   height: 560px;
+   overflow-y: auto;
+   font-family: "Helvetica Neue";
+   font-size: 16px;
 }
+
+.modal-title {
+  font-weight: bold;
+  font-size: 24px;
+  font-family: Arial, sans-serif;
+}
+
       
    </style>
    
@@ -81,33 +90,27 @@
                                  </tr>
                                  
                                  <?php
-                                 if (is_array($connectionsData)) {
-                                    foreach ($connectionsData as $row) {
+                                    if (!empty($str_response)) {
+                                       $connectionsData = json_decode($str_response, true);
 
-                                       if (is_array($row)) {
-                                          $jsonString = reset($row);
-
-                                          if (!empty($jsonString)) {
-                                             $connectionInfo = json_decode($jsonString, true);
-
-                                             if (is_array($connectionInfo) && json_last_error() === JSON_ERROR_NONE) {
-                                                ?>
-                                                   <tr id="circuits-gridcurrent-filters" class="filters">
-                                                      <td><?php echo isset($connectionInfo['name']) ? $connectionInfo['name'] : ''; ?></td>
-                                                      <td><?php echo isset($connectionInfo['quantity']) ? $connectionInfo['quantity'] : ''; ?></td>
-                                                      <td><?php echo isset($connectionInfo['start_time']) ? $connectionInfo['start_time'] : ''; ?></td>
-                                                      <td><?php echo isset($connectionInfo['end_time']) ? $connectionInfo['end_time'] : ''; ?></td>
-                                                      <td><?php echo isset($connectionInfo['egress_port']['id']) ? $connectionInfo['egress_port']['id'] : ''; ?></td>
-                                                      <td><?php echo isset($connectionInfo['ingress_port']['id']) ? $connectionInfo['ingress_port']['id'] : ''; ?></td>
-                                                      <td><?php echo isset($connectionInfo['bandwidth_required']) ? $connectionInfo['bandwidth_required'] : ''; ?></td>
-                                                      <td><button type="submit" class="btn btn-primary" style="background-color:red;">Delete</button></td>
-                                                   </tr>
-                                                <?php
-                                             }
+                                       if (is_array($connectionsData) && json_last_error() === JSON_ERROR_NONE) {
+                                          foreach ($connectionsData as $connectionId => $connectionInfo) {
+                                             ?>
+                                                <tr id="circuits-gridcurrent-filters" class="filters">
+                                                   <td><?php echo isset($connectionInfo['name']) ? $connectionInfo['name'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['quantity']) ? $connectionInfo['quantity'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['start_time']) ? $connectionInfo['start_time'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['end_time']) ? $connectionInfo['end_time'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['egress_port']['id']) ? $connectionInfo['egress_port']['id'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['ingress_port']['id']) ? $connectionInfo['ingress_port']['id'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['bandwidth_required']) ? $connectionInfo['bandwidth_required'] : ''; ?></td>
+                                                   <td><button type="button" class="btn btn-primary view-connection" data-connection='<?php echo json_encode($connectionInfo); ?>'>View</button></td>
+                                                   <td><button type="submit" class="btn btn-primary" style="background-color:red;">Delete</button></td>
+                                                </tr>
+                                             <?php
                                           }
                                        }
                                     }
-                                 }
                                  ?>
                                  
                               </thead>
@@ -160,8 +163,79 @@
 
     
   </div>
+    <!-- Modal Structure -->
+    <div id="jsonModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Connection Details</h4>
+        </div>
+        <div class="modal-body">
+          <div id="jsonContent"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+   <script>
+      function openModal(jsonData) {
+        const modal = $('#jsonModal');
+        const content = $('#jsonContent');
+        content.html(formatJsonData(jsonData));
+        modal.modal('show');
+      }
+
+      function formatJsonData(data) {
+         let formattedData = '';
+
+         formattedData += `<strong>Id:</strong> ${data.id || ''}<br>`;
+         formattedData += `<strong>Name:</strong> ${data.name || ''}<br>`;
+         formattedData += `<strong>Quantity:</strong> ${data.quantity || ''}<br>`;
+         formattedData += `<strong>Start Time:</strong> ${data.start_time || ''}<br>`;
+         formattedData += `<strong>End Time:</strong> ${data.end_time || ''}<br>`;
+         formattedData += `<strong>Bandwidth Required:</strong> ${data.bandwidth_required || ''}<br>`;
+         formattedData += `<strong>Latency Required:</strong> ${data.latency_required || ''}<br>`;
+         formattedData += `<strong>Time Stamp:</strong> ${data.time_stamp || ''}<br>`;
+         formattedData += `<strong>Version:</strong> ${data.version || ''}<br>`;
+
+         formattedData += `<strong>Egress Port:</strong><br>`;
+         formattedData += `<div style="padding-left: 20px;">${formatNestedPortData(data.egress_port || {})}</div>`;
+         formattedData += `<strong>Ingress Port:</strong><br>`;
+         formattedData += `<div style="padding-left: 20px;">${formatNestedPortData(data.ingress_port || {})}</div>`;
+
+         return formattedData;
+      }
+
+      // Function to format egress and ingress fields
+      function formatNestedPortData(portData) {
+         if (portData && Object.keys(portData).length > 0) {
+            let formattedPortData = '';
+            formattedPortData += `<strong>Id:</strong> ${portData.id || ''}<br>`;
+            formattedPortData += `<strong>Name:</strong> ${portData.name || ''}<br>`;
+            formattedPortData += `<strong>Node:</strong> ${portData.node || ''}<br>`;
+            formattedPortData += `<strong>Short Name:</strong> ${portData.short_name || ''}<br>`;
+            formattedPortData += `<strong>State:</strong> ${portData.state || ''}<br>`;
+            formattedPortData += `<strong>Status:</strong> ${portData.status || ''}<br>`;
+            return formattedPortData;
+         }
+      }
+
+      $(document).on('click', '.view-connection', function () {
+         const jsonData = JSON.parse($(this).attr('data-connection'));
+         openModal(jsonData);
+      });
+
+   </script>
+
+
 
 </body>
+
+
 
 
 <script type="text/javascript">
@@ -169,6 +243,5 @@
 </script>
 
 </html>
-
 
 
