@@ -14,6 +14,7 @@
  <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
    integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
    crossorigin=""></script>
+
    
  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -90,6 +91,7 @@
                                  </tr>
                                  
                                  <?php
+                                    // $api_url = API_URL;
                                     if (!empty($str_response)) {
                                        $connectionsData = json_decode($str_response, true);
 
@@ -182,10 +184,10 @@
   </div>
 
    <script>
-      function openModal(jsonData) {
+      function openModal(data) {
         const modal = $('#jsonModal');
         const content = $('#jsonContent');
-        content.html(formatJsonData(jsonData));
+        content.html(formatJsonData(data));
         modal.modal('show');
       }
 
@@ -225,8 +227,21 @@
       }
 
       $(document).on('click', '.view-connection', function () {
-         const jsonData = JSON.parse($(this).attr('data-connection'));
-         openModal(jsonData);
+         const connectionData = $(this).attr('data-connection');
+         const parsedData = JSON.parse(connectionData);
+         const connectionId = parsedData.id;
+         const apiUrl = "<?php echo API_URL; ?>" + "connection/" + connectionId;
+
+         console.log("API URL:", apiUrl);
+
+         $.ajax({
+         type: 'GET',
+         url: apiUrl,
+         success: function (data) {
+            console.log("Data received:", data);
+            openModal(data);
+         }
+         });
       });
 
    </script>
