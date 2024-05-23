@@ -14,6 +14,7 @@
  <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
    integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
    crossorigin=""></script>
+
    
  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -223,12 +224,23 @@
             return formattedPortData;
          }
       }
-
+      
       $(document).on('click', '.view-connection', function () {
-         const jsonData = JSON.parse($(this).attr('data-connection'));
-         openModal(jsonData);
-      });
+         const connectionData = $(this).attr('data-connection');
+         const parsedData = JSON.parse(connectionData);
+         const connectionId = parsedData.id;
+         const meican_url="<?php echo MEICAN_URL;?>";
 
+         $.ajax({
+            url: "https://"+meican_url+"/circuits/nodes/connection",
+            type: "GET",
+            data: { connectionId: connectionId },
+            contentType: "application/json; charset=utf-8",
+            success: function(data){
+               openModal(JSON.parse(data));
+            }
+         });
+      });
    </script>
 
 
@@ -243,5 +255,4 @@
 </script>
 
 </html>
-
 
