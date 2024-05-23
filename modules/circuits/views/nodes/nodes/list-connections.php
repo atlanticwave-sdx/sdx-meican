@@ -91,7 +91,6 @@
                                  </tr>
                                  
                                  <?php
-                                    // $api_url = API_URL;
                                     if (!empty($str_response)) {
                                        $connectionsData = json_decode($str_response, true);
 
@@ -184,10 +183,10 @@
   </div>
 
    <script>
-      function openModal(data) {
+      function openModal(jsonData) {
         const modal = $('#jsonModal');
         const content = $('#jsonContent');
-        content.html(formatJsonData(data));
+        content.html(formatJsonData(jsonData));
         modal.modal('show');
       }
 
@@ -225,25 +224,23 @@
             return formattedPortData;
          }
       }
-
+      
       $(document).on('click', '.view-connection', function () {
          const connectionData = $(this).attr('data-connection');
          const parsedData = JSON.parse(connectionData);
          const connectionId = parsedData.id;
-         const apiUrl = "<?php echo API_URL; ?>" + "connection/" + connectionId;
-
-         console.log("API URL:", apiUrl);
+         const meican_url="<?php echo MEICAN_URL;?>";
 
          $.ajax({
-         type: 'GET',
-         url: apiUrl,
-         success: function (data) {
-            console.log("Data received:", data);
-            openModal(data);
-         }
+            url: "https://"+meican_url+"/circuits/nodes/connection",
+            type: "GET",
+            data: { connectionId: connectionId },
+            contentType: "application/json; charset=utf-8",
+            success: function(data){
+               openModal(JSON.parse(data));
+            }
          });
       });
-
    </script>
 
 
