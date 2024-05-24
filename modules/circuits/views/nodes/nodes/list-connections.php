@@ -106,7 +106,7 @@
                                                    <td><?php echo isset($connectionInfo['ingress_port']['id']) ? $connectionInfo['ingress_port']['id'] : ''; ?></td>
                                                    <td><?php echo isset($connectionInfo['bandwidth_required']) ? $connectionInfo['bandwidth_required'] : ''; ?></td>
                                                    <td><button type="button" class="btn btn-primary view-connection" data-connection='<?php echo json_encode($connectionInfo); ?>'>View</button></td>
-                                                   <td><button type="submit" class="btn btn-primary" style="background-color:red;">Delete</button></td>
+                                                   <td><button type="submit" class="btn btn-primary delete-connection" delete-connection='<?php echo json_encode($connectionInfo); ?>' style="background-color:red;">Delete</button></td>
                                                 </tr>
                                              <?php
                                           }
@@ -241,6 +241,25 @@
             }
          });
       });
+
+      $(document).on('click', '.delete-connection', function () {
+         const connectionData = $(this).attr('delete-connection');
+         const parsedData = JSON.parse(connectionData);
+         const connectionId = parsedData.id;
+         const meican_url="<?php echo MEICAN_URL;?>";
+         const row = $(this).closest('tr');
+
+         $.ajax({
+            url: "https://"+meican_url+"/circuits/nodes/delete",
+            type: "GET",
+            data: { connectionId: connectionId },
+            contentType: "application/json; charset=utf-8",
+            success: function(data){
+               row.remove();
+            }
+         });
+      });
+
    </script>
 
 
