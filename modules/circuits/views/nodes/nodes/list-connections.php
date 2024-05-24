@@ -260,6 +260,16 @@
          });
       });
 
+         $.ajax({
+            url: "https://"+meican_url+"/circuits/nodes/connection",
+            type: "GET",
+            data: { connectionId: connectionId },
+            contentType: "application/json; charset=utf-8",
+            success: function(data){
+               openModal(JSON.parse(data));
+            }
+         });
+      });
    </script>
 
 

@@ -82,7 +82,7 @@ class NodesController extends RbacController {
       curl_close($curl);
       return $connection_response;
     }
-
+    
     public function actionDelete($connectionId) {
 
       $api_url = API_URL;
@@ -102,7 +102,6 @@ class NodesController extends RbacController {
       $connection_response = curl_exec($curl);
       curl_close($curl);
     }
-  
 
     public function actionCreate(){ // this route manages the view and backend logic for creating a circuit request
 
