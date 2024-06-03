@@ -62,30 +62,27 @@ web/                	web accessible files, e.g., assets cache, wsdl files and im
 - MySQL 5+ 
 - PHP 5.5+
 - cURL
-- [OSCARS Bridge](https://github.com/ufrgs-hyman/oscars-bridge) (local or remote instance required by Monitoring Module)
-- [ESnet Monitoring Daemon (Esmond)](https://github.com/esnet/esmond) (local or remote instance required by Monitoring Module)
+- Docker
 
 ## GUIDES
 
 ### Installation
 
-Installation can be done using [Docker Compose](https://github.com/ufrgs-hyman/meican/blob/master/docker/README.md) or manually on [CentOS](https://github.com/ufrgs-hyman/meican/blob/master/docs/guide/installation-centos.md) or [Ubuntu](https://github.com/ufrgs-hyman/meican/blob/master/docs/guide/installation-ubuntu.md).
+Installation can be done using Docker and docker-compose commands.
 
-### Configuration
+1. git clone https://github.com/atlanticwave-sdx/sdx-meican.git
+2. update then environment variables in web/index.php file
+   
+   	defined('MEICAN_URL') or define('MEICAN_URL', 'localhost');
+	defined('API_URL') or define('API_URL', 'http://xx.xx.xxx.xxx:8080/SDX-Controller/1.0.0/');
+	defined('ORCID_CLIENT_ID') or define('ORCID_CLIENT_ID', 'xxxxxxxx');
+	defined('ORCID_CLIENT_SECRET') or define('ORCID_CLIENT_SECRET', 'xxxxxxxx');
+	defined('ENABLE_CILOGON_PAGE') or define('ENABLE_CILOGON_PAGE', true); // Cilogon environment variable for enabling/disabling cilogon
+	defined('CILOGON_CLIENT_ID') or define('CILOGON_CLIENT_ID', 'xxxxxxxxxxxx');
 
-The documentation is [here](https://github.com/ufrgs-hyman/meican/blob/master/docs/guide/configuration.md).
+3. start the container: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 
-### User guide
 
-A very short documentation is available on Help section of the application. The complete user guide currently is available only in [portuguese](https://wiki.rnp.br/display/secipo/Guia+MEICAN).
-
-### Migration
-
-A complete migration of the application to another machine is detailed in this [guide](https://github.com/ufrgs-hyman/meican/blob/master/docs/guide/migration.md).
-
-### Upgrade
-
-Look [this document](https://github.com/ufrgs-hyman/meican/blob/master/docs/guide/upgrade.md) for instructions.
 
 ## LICENSE
 
