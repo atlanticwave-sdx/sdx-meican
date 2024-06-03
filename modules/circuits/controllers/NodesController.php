@@ -138,6 +138,7 @@ class NodesController extends RbacController {
       $api_url=API_URL;
       $meican_url=MEICAN_URL;
       $enableCILogonPage = defined('ENABLE_CILOGON_PAGE') ? ENABLE_CILOGON_PAGE : false; // Cilogon environment variable
+      $CILogonClientID=CILOGON_CLIENT_ID;
 
       if ($enableCILogonPage) { // Cilogon environment variable is enabled
         $userId = Yii::$app->user->id;
@@ -164,7 +165,7 @@ class NodesController extends RbacController {
                 $total_seconds = $expiration_datetime->getTimestamp() - $curr_datetime->getTimestamp();
 
             } else {
-                header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
+                header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
                 exit();
             }
 
@@ -180,7 +181,7 @@ class NodesController extends RbacController {
                 $curl = curl_init();
       
                 curl_setopt_array($curl, array(
-                  CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=authorization_code&client_id=cilogon%3A%2Fclient_id%2F25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Fshow&client_secret=Vib4sbOGQXI8tt9s-uQ16hQnJlNUxUsAvAMISiCJBPFlLf2c82ZyUDKBYpv-eNX6qV-wW-OzRzoAaVslxCsozQ&code='.$code.'',
+                  CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=authorization_code&client_id=cilogon%3A%2Fclient_id%2F'.$CILogonClientID.'&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Fshow&client_secret=Vib4sbOGQXI8tt9s-uQ16hQnJlNUxUsAvAMISiCJBPFlLf2c82ZyUDKBYpv-eNX6qV-wW-OzRzoAaVslxCsozQ&code='.$code.'',
                   CURLOPT_RETURNTRANSFER => true,
                   CURLOPT_ENCODING => '',
                   CURLOPT_MAXREDIRS => 10,
@@ -207,17 +208,17 @@ class NodesController extends RbacController {
                   )->execute();
                 }
                 else{
-                  header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
+                  header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
                   exit();
                 } 
               }
               else {
-                header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
+                header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
                 exit();
               }
             }
             else {
-              header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
+              header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
                 exit();
             }
             
@@ -231,7 +232,7 @@ class NodesController extends RbacController {
               $curl = curl_init();
 
               curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=authorization_code&client_id=cilogon%3A%2Fclient_id%2F25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Fshow&client_secret=Vib4sbOGQXI8tt9s-uQ16hQnJlNUxUsAvAMISiCJBPFlLf2c82ZyUDKBYpv-eNX6qV-wW-OzRzoAaVslxCsozQ&code='.$code.'',
+                CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=authorization_code&client_id=cilogon%3A%2Fclient_id%2F'.$CILogonClientID.'&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Fshow&client_secret=Vib4sbOGQXI8tt9s-uQ16hQnJlNUxUsAvAMISiCJBPFlLf2c82ZyUDKBYpv-eNX6qV-wW-OzRzoAaVslxCsozQ&code='.$code.'',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -260,12 +261,12 @@ class NodesController extends RbacController {
                   ])->execute();
               }
               else{
-                header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
+                header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
                 exit();
               } 
             }
             else {
-              header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/25669b5df0f0c45880aa56c410bd32b9&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
+              header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
               exit();
             }
           }
