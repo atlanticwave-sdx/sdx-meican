@@ -34,6 +34,17 @@
   height: 250px;
   overflow-y: auto;
 }
+.field-group {
+            margin-bottom: 10px;
+        }
+
+        .input-container {
+            margin-top: 10px;
+        }
+
+        .deleteButton{
+          margin-top: 10px;
+        }
       
    </style>
    
@@ -57,9 +68,60 @@
   </div>
 
 <div class="form-group">
-    <label for="exampleInputPassword1">Quantity</label>
-    <input type="text" class="form-control" id="quantity" name="quantity" placeholder="Quantity" >
+    <label for="exampleInputPassword1">Endpoints</label>
+      <br>Interface:</br>
+      <select class="form-control" id="endpoint_1_interface_uri" name="endpoint_1_interface_uri" placeholder="interface uri" required>
+      <?php foreach ($nodes_array as $key => $value) {
+              foreach ($value['sub_nodes'] as $key2 => $value2) {
+                foreach ($value2['ports'] as $key3 => $value3) {
+                  echo "<option value='".$value3['id']."'>".$value3['id']."</option>";
+                }
+              }
+      }
+        ?>
+    </select>
+
+
+    <br>VLAN:</br>
+    <select class="form-control" id="endpoint_1_vlan" name="endpoint_1_vlan" placeholder="vlan" required>
+      <option value="any">any</option>
+      <option value="number">number</option>
+      <option value="untagged">untagged</option>
+      <option value="VLAN range">VLAN range</option>
+      <option value="all">all</option>
+    </select>
+
+    <div id="endpoint_1_vlan-input-container" class="input-container"></div>
+
+    <br>Interface:</br>
+    <select class="form-control" id="endpoint_2_interface_uri" name="endpoint_2_interface_uri" placeholder="interface uri" required>
+      <?php foreach ($nodes_array as $key => $value) {
+              foreach ($value['sub_nodes'] as $key2 => $value2) {
+                foreach ($value2['ports'] as $key3 => $value3) {
+                  echo "<option value='".$value3['id']."'>".$value3['id']."</option>";
+                }
+              }
+      }
+        ?>
+    </select>
+
+    
+    <br>VLAN:</br>
+    <select class="form-control" id="endpoint_2_vlan" name="endpoint_2_vlan" placeholder="vlan" required>
+      <option value="any">any</option>
+      <option value="number">number</option>
+      <option value="untagged">untagged</option>
+      <option value="VLAN range">VLAN range</option>
+      <option value="all">all</option>
+    </select>
+
+    <div id="endpoint_2_vlan-input-container" class="input-container"></div>
   </div>
+
+  <div id="field-container">
+            
+  </div>
+  <button type="button" class="btn btn-primary" onclick="appendFields()">Add Endpoint</button>
 
   <div class="form-group">
     <label for="exampleInputPassword1">Start time</label>
@@ -74,51 +136,7 @@
     <input type="date" class="form-control" id="end_time" name="end_time" placeholder="End time" >
   </div>
 
-   <div class="form-group">
-    <label for="exampleInputPassword1">Source port</label>
-    <select class="form-control" id="egress_port" name="egress_port" placeholder="Egress port" required>
-      <?php foreach ($nodes_array as $key => $value) {
-              foreach ($value['sub_nodes'] as $key2 => $value2) {
-                foreach ($value2['ports'] as $key3 => $value3) {
-                  unset($value3['label_range']);
-                  unset($value3['private_attributes']);
-                  echo "<option value='".json_encode($value3)."'>".$value3['id']."</option>";
-                }
-              }
-      }
-        ?>
-    </select>
-  </div>
 
-<!--
-  <div class="form-group">
-    <label for="exampleInputPassword1">Source VLAN</label>
-    <input type="number" maxlength="4" class="form-control" id="source_vlan" name="source_vlan" placeholder="0-4096" >
-  </div>
--->
-
-   <div class="form-group">
-    <label for="exampleInputPassword1">Destination port</label>
-    <select class="form-control" id="ingress_port" name="ingress_port" placeholder="Ingress port" required>
-       <?php foreach ($nodes_array as $key => $value) {
-              foreach ($value['sub_nodes'] as $key2 => $value2) {
-                foreach ($value2['ports'] as $key3 => $value3) {
-                  unset($value3['label_range']);
-                  unset($value3['private_attributes']);
-                  echo "<option value='".json_encode($value3)."'>".$value3['id']."</option>";
-                }
-              }
-      }
-        ?>
-    </select>
-  </div>
-
-  <!--
-  <div class="form-group">
-    <label for="exampleInputPassword1">Destination VLAN</label>
-    <input type="number" maxlength="4" class="form-control" id="destination_vlan" name="destination_vlan" placeholder="0-4096" >
-  </div>
-  -->
 
   <div class="form-group">
     <label for="inputLatencyRequired">Maximum Latency</label>
@@ -287,83 +305,189 @@ $( "#filtersform" ).submit(function( event ) {
     start_time=new Date(start_time).toISOString();
     end_time=new Date(end_time).toISOString();
 
-    //if(source_vlan>4096||source_vlan<0){
-    //  alert("source vlan should be between 0-4096");
-    //  return;
-    //}
+    var endpoints=[];
+    var endpoint1=[];
+    var endpoint2=[];
 
-    //else if(destination_vlan>4096||destination_vlan<0){
-    //  alert("destination vlan should be between 0-4096");
-    //  return;
-    //}
+    endpoint1["interface_uri"]=$('#endpoint_1_interface_uri').val();
+    endpoint1["vlan"]=$('#endpoint_1_vlan').val();
+    endpoint2["interface_uri"]=$('#endpoint_2_interface_uri').val();
+    endpoint2["vlan"]=$('#endpoint_2_vlan').val();
 
-    egress_port=JSON.parse(egress_port);
-    ingress_port=JSON.parse(ingress_port);
-
-    if(egress_port.state==null){
-      egress_port.state='null';
-    }
-    if(egress_port.status==null){
-      egress_port.status='null';
-    }
-    if(ingress_port.state==null){
-      ingress_port.state='null';
-    }
-    if(ingress_port.status==null){
-      ingress_port.status='null';
+    if(endpoint1["vlan"]=='number'||endpoint1["vlan"]=='VLAN range'){
+      endpoint1["vlan"]=$('#endpoint_1_vlan_value').val();
     }
 
+    if(endpoint2["vlan"]=='number'||endpoint2["vlan"]=='VLAN range'){
+      endpoint2["vlan"]=$('#endpoint_2_vlan_value').val();
+    }
 
-    console.log(id);
-    console.log(name);
-    console.log(quantity);
-    console.log(start_time);
-    console.log(end_time);
-    console.log(egress_port);
-    console.log(ingress_port);
-    console.log(time_stamp);
+    console.log(endpoint1);
+    endpoints.push(endpoint1);
+    console.log(endpoint2);
+    endpoints.push(endpoint2);
 
-    var request={"id":id,"name":name,"time_stamp":time_stamp,"version": 1,"egress_port":egress_port,"ingress_port":ingress_port};
+    
 
-    if (quantity) {
-      request["quantity"] = parseInt(quantity);
-    }
-    if (start_time) {
-      request["start_time"] = start_time;
-    }
-    if (end_time) {
-      request["end_time"] = end_time;
-    }
-    if (latency_required) {
-      request["latency_required"] = parseInt(latency_required);
-    }
-    if (bandwidth_required) {
-      request["bandwidth_required"] = parseInt(bandwidth_required);
-    }
+     const fieldGroups = document.getElementsByClassName('field-group');
+            const results = [];
+
+            results.push({
+                    interface_uri: endpoint1["interface_uri"],
+                    vlan: endpoint1["vlan"]
+                });
+
+             results.push({
+                    interface_uri: endpoint2["interface_uri"],
+                    vlan: endpoint2["vlan"]
+                });
+
+            for (let i = 0; i < fieldGroups.length; i++) {
+                const interfaceInput = fieldGroups[i].querySelector('select[name="interface"]').value;
+                const vlanSelect = fieldGroups[i].querySelector('select[name="vlan"]').value;
+                const vlanValueInput = fieldGroups[i].querySelector('input[name="vlan_value"]');
+
+                const vlanValue = vlanSelect === 'number' || vlanSelect === 'VLAN range' ? vlanValueInput.value : vlanSelect;
+
+                results.push({
+                    interface_uri: interfaceInput,
+                    vlan: vlanValue
+                });
+
+                
+            }
+
+            console.log("all endpoints:"+JSON.stringify(results));
+            
+
+            var request={"name":name,"endpoints":results};
 
     console.log(request);
+    console.log(JSON.stringify(request));
 
-    $.ajax({
-    type: "POST",
-    url: "https://"+meican_url+"/circuits/nodes/create",
-    data: JSON.stringify(request),
-    contentType: "application/json; charset=utf-8",
-    success: function(data){alert(data);},
-    error: function(errMsg) {
-        alert(errMsg);
-    }
-});
-    
-
-    
-
-
-    
+//     $.ajax({
+//     type: "POST",
+//     url: "https://"+meican_url+"/circuits/nodes/create",
+//     data: JSON.stringify(request),
+//     contentType: "application/json; charset=utf-8",
+//     success: function(data){alert(data);},
+//     error: function(errMsg) {
+//         alert(errMsg);
+//     }
+// });
+     
     
     
 });
 
 
+        function appendFields() {
+            const container = document.getElementById('field-container');
+
+            const newDiv = document.createElement('div');
+            newDiv.className = 'field-group';
+            newDiv.innerHTML+='Interface:'
+
+            const interfaceSelect = document.createElement('select');
+            interfaceSelect.name = 'interface';
+            interfaceSelect.className='form-control';
+
+        <?php
+            foreach ($nodes_array as $key => $value) {
+                foreach ($value['sub_nodes'] as $key2 => $value2) {
+                    foreach ($value2['ports'] as $key3 => $value3) {
+                        echo "interfaceSelect.innerHTML += '<option value=\"" . $value3['id'] . "\">" . $value3['id'] . "</option>';";
+                    }
+                }
+            }
+            ?>
+
+
+            const vlanSelect = document.createElement('select');
+            vlanSelect.name = 'vlan';
+            vlanSelect.className='form-control';
+             vlanSelect.onchange = function() {
+                handleVlanChange(newDiv, vlanSelect.value);
+            };
+            vlanSelect.innerHTML='<option value="any">any</option><option value="number">number</option><option value="untagged">untagged</option><option value="VLAN range">VLAN range</option><option value="all">all</option>';
+
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.innerText = 'Delete';
+            deleteButton.className='btn btn-primary deleteButton';
+            deleteButton.id='deleteButton';
+            deleteButton.style.backgroundColor = "red";
+            deleteButton.onclick = function() {
+                container.removeChild(newDiv);
+            };
+
+            newDiv.appendChild(interfaceSelect);
+            newDiv.innerHTML+='<br>VLAN:</br>';
+            newDiv.appendChild(vlanSelect);
+            newDiv.appendChild(deleteButton);
+
+            container.appendChild(newDiv);
+        }
+
+        function handleVlanChange(container, value) {
+            let existingInput = container.querySelector('input[name="vlan_value"]');
+            if (existingInput) {
+                container.removeChild(existingInput);
+            }
+
+            if (value === 'number' || value === 'VLAN range') {
+                const vlanInput = document.createElement('input');
+                vlanInput.type = 'text';
+                vlanInput.name = 'vlan_value';
+                vlanInput.placeholder = value === 'number' ? 'Enter VLAN Number' : 'Enter VLAN Range';
+                vlanInput.className='form-control';
+                temp=container.querySelector('button[id="deleteButton"]');
+                container.removeChild(temp);
+                container.appendChild(vlanInput);
+                container.appendChild(temp);
+            }
+        }
+
+        const dropdown = document.getElementById('endpoint_1_vlan');
+        const inputContainer = document.getElementById('endpoint_1_vlan-input-container');
+        const dropdown2 = document.getElementById('endpoint_2_vlan');
+        const inputContainer2 = document.getElementById('endpoint_2_vlan-input-container');
+
+        dropdown.addEventListener('change', function() {
+            // Clear any existing input fields
+            inputContainer.innerHTML = '';
+
+            // Options that require an additional input field
+            const optionsRequiringInput = ['number', 'VLAN range'];
+
+            if (optionsRequiringInput.includes(dropdown.value)) {
+                const inputField = document.createElement('input');
+                inputField.type = 'text';
+                inputField.placeholder = 'Please provide value';
+                inputField.name = 'endpoint_1_vlan_value';
+                inputField.id='endpoint_1_vlan_value';
+                inputField.className='form-control';
+                inputContainer.appendChild(inputField);
+            }
+        });
+
+        dropdown2.addEventListener('change', function() {
+            // Clear any existing input fields
+            inputContainer2.innerHTML = '';
+
+            // Options that require an additional input field
+            const optionsRequiringInput = ['number', 'VLAN range'];
+
+            if (optionsRequiringInput.includes(dropdown2.value)) {
+                const inputField = document.createElement('input');
+                inputField.type = 'text';
+                inputField.placeholder = 'Please provide value';
+                inputField.name = 'endpoint_2_vlan_value';
+                inputField.id = 'endpoint_2_vlan_value';
+                inputField.className='form-control';
+                inputContainer2.appendChild(inputField);
+            }
+        });
 
 
 </script>
