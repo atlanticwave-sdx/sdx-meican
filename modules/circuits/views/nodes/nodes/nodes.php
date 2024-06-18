@@ -124,11 +124,14 @@
   <button type="button" class="btn btn-primary" onclick="appendFields()">Add Endpoint</button>
 
   <div class="form-group">
+    <label for="exampleInputPassword1">Description</label>
+    <textarea class="form-control" id="description" name="description"></textarea>
+  </div>
+
+  <div class="form-group">
     <label for="exampleInputPassword1">Start time</label>
     <input type="date" class="form-control" id="start_time" name="start_time" placeholder="Start time" >
   </div>
-
-
 
 
    <div class="form-group">
@@ -136,17 +139,6 @@
     <input type="date" class="form-control" id="end_time" name="end_time" placeholder="End time" >
   </div>
 
-
-
-  <div class="form-group">
-    <label for="inputLatencyRequired">Maximum Latency</label>
-    <input type="number" maxlength="4" class="form-control" id="latency_required" name="latency_required" >
-  </div>
-
-  <div class="form-group">
-    <label for="inputBandwidthRequired">Minimum Bandwidth</label>
-    <input type="number" maxlength="4" class="form-control" id="bandwidth_required" name="bandwidth_required" >
-  </div>
  
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
