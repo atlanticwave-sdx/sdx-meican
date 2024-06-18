@@ -333,12 +333,12 @@ $( "#filtersform" ).submit(function( event ) {
             const results = [];
 
             results.push({
-                    interface_uri: endpoint1["interface_uri"],
+                    port_id: endpoint1["interface_uri"],
                     vlan: endpoint1["vlan"]
                 });
 
              results.push({
-                    interface_uri: endpoint2["interface_uri"],
+                    port_id: endpoint2["interface_uri"],
                     vlan: endpoint2["vlan"]
                 });
 
@@ -350,7 +350,7 @@ $( "#filtersform" ).submit(function( event ) {
                 const vlanValue = vlanSelect === 'number' || vlanSelect === 'VLAN range' ? vlanValueInput.value : vlanSelect;
 
                 results.push({
-                    interface_uri: interfaceInput,
+                    port_id: interfaceInput,
                     vlan: vlanValue
                 });
 
