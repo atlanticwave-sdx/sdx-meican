@@ -45,6 +45,11 @@
         .deleteButton{
           margin-top: 10px;
         }
+
+        .notification-btn {
+      margin-bottom: 10px;
+      margin-right: 10px;
+    }
       
    </style>
    
@@ -138,7 +143,34 @@
     <label for="exampleInputPassword1">End time</label>
     <input type="date" class="form-control" id="end_time" name="end_time" placeholder="End time" >
   </div>
+  
+  <div class="form-group">
+    <label for="min_bw">Minimum Bandwidth (Gbps)</label>
+    <input type="number" class="form-control" id="min_bw" name="min_bw" placeholder="Minimum Bandwidth (optional)">
+    <label><input type="checkbox" id="min_bw_strict" name="min_bw_strict"> Strict</label>
+  </div>
 
+  <div class="form-group">
+    <label for="max_delay">Maximum Delay (ms)</label>
+    <input type="number" class="form-control" id="max_delay" name="max_delay" placeholder="Maximum Delay (optional)">
+    <label><input type="checkbox" id="max_delay_strict" name="max_delay_strict"> Strict</label>
+  </div>
+
+  <div class="form-group">
+    <label for="max_number_oxps">Maximum Number of OXPs</label>
+    <input type="number" class="form-control" id="max_number_oxps" name="max_number_oxps" placeholder="Maximum Number of OXPs (optional)">
+    <label><input type="checkbox" id="max_number_oxps_strict" name="max_number_oxps_strict"> Strict</label>
+  </div>
+
+  <div id="notification-container">
+    <div class="form-group">
+      <label for="notifications">Notifications</label>
+      <input type="email" class="form-control notification-field" id="notification_1" name="notification_1" placeholder="Notification Email 1 (optional)">
+    </div>
+  </div>
+  <button type="button" class="btn btn-primary notification-btn" onclick="appendNotification()">Add Notification</button>
+
+  <div></div>
  
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
@@ -421,6 +453,38 @@ $( "#filtersform" ).submit(function( event ) {
             container.appendChild(newDiv);
         }
 
+        function appendNotification() {
+          const container = document.getElementById('notification-container');
+          const notificationCount = container.getElementsByClassName('notification-field').length;
+
+          if (notificationCount >= 10) {
+              alert('You can only add up to 10 Emails.');
+              return;
+          }
+
+          const newDiv = document.createElement('div');
+          newDiv.className = 'form-group notification-field';
+
+          const inputField = document.createElement('input');
+          inputField.type = 'email';
+          inputField.className = 'form-control';
+          inputField.name = `notification_${notificationCount + 1}`;
+          inputField.placeholder = `Notification Email ${notificationCount + 1} (optional)`;
+
+          const deleteButton = document.createElement('button');
+          deleteButton.type = 'button';
+          deleteButton.className = 'btn btn-danger deleteButton';
+          deleteButton.innerText = 'Delete';
+          deleteButton.style.backgroundColor = "red";
+          deleteButton.onclick = function() {
+              container.removeChild(newDiv);
+          };
+
+          newDiv.appendChild(inputField);
+          newDiv.appendChild(deleteButton);
+          container.appendChild(newDiv);
+        }
+
         function handleVlanChange(container, value) {
             let existingInput = container.querySelector('input[name="vlan_value"]');
             if (existingInput) {
@@ -485,6 +549,5 @@ $( "#filtersform" ).submit(function( event ) {
 </script>
 
 </html>
-
 
 
