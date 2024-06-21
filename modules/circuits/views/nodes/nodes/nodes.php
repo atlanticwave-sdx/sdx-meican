@@ -23,6 +23,15 @@
       max-height: 100%;
     }
 
+    .required::after {
+      content: " *";
+      color: red;
+    }
+
+    .error-message {
+      color: red;
+      font-size: small;
+    }
 
     .modal-dialog {
       overflow-y: initial !important
@@ -69,12 +78,12 @@
           <h4>Add connection</h4>
 
           <div class="form-group">
-            <label for="exampleInputPassword1">Name</label>
-            <input type="text" class="form-control" id="name" name="name" placeholder="Name" required>
+            <label for="exampleInputPassword1" class="required">Name</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="Name" maxlength="50" required>
           </div>
 
           <div class="form-group">
-            <label for="exampleInputPassword1">Endpoints</label>
+            <label for="exampleInputPassword1" class="required">Endpoints</label>
             <br>Interface:</br>
             <select class="form-control" id="endpoint_1_interface_uri" name="endpoint_1_interface_uri" placeholder="interface uri" required>
               <?php foreach ($nodes_array as $key => $value) {
@@ -131,35 +140,37 @@
 
           <div class="form-group">
             <label for="exampleInputPassword1">Description</label>
-            <textarea class="form-control" id="description" name="description"></textarea>
+            <textarea class="form-control" id="description" name="description" placeholder="Provide a description or URL (up to 255 characters)" maxlength="255"></textarea>
           </div>
 
           <div class="form-group">
             <label for="exampleInputPassword1">Start time</label>
             <input type="date" class="form-control" id="start_time" name="start_time" placeholder="Start time">
+            <small id="start_time_error" class="error-message"></small>
           </div>
 
 
           <div class="form-group">
             <label for="exampleInputPassword1">End time</label>
             <input type="date" class="form-control" id="end_time" name="end_time" placeholder="End time">
+            <small id="end_time_error" class="error-message"></small>
           </div>
 
           <div class="form-group">
             <label for="min_bw">Minimum Bandwidth (Gbps)</label>
-            <input type="number" class="form-control" id="min_bw" name="min_bw" placeholder="Minimum Bandwidth (optional)">
+            <input type="number" class="form-control" id="min_bw" name="min_bw" placeholder="(optional)" min="0" max="100">
             <label><input type="checkbox" id="min_bw_strict" name="min_bw_strict"> Strict</label>
           </div>
 
           <div class="form-group">
             <label for="max_delay">Maximum Delay (ms)</label>
-            <input type="number" class="form-control" id="max_delay" name="max_delay" placeholder="Maximum Delay (optional)">
+            <input type="number" class="form-control" id="max_delay" name="max_delay" placeholder="(optional)" min="0" max="1000">
             <label><input type="checkbox" id="max_delay_strict" name="max_delay_strict"> Strict</label>
           </div>
 
           <div class="form-group">
             <label for="max_number_oxps">Maximum Number of OXPs</label>
-            <input type="number" class="form-control" id="max_number_oxps" name="max_number_oxps" placeholder="Maximum Number of OXPs (optional)">
+            <input type="number" class="form-control" id="max_number_oxps" name="max_number_oxps" placeholder="(optional)" min="0" max="100">
             <label><input type="checkbox" id="max_number_oxps_strict" name="max_number_oxps_strict"> Strict</label>
           </div>
 
@@ -179,18 +190,8 @@
 
     </div>
   </div>
-
-
-
   <div id="wrapper">
-
   </div>
-
-
-
-
-
-
 </body>
 
 
@@ -227,20 +228,12 @@
           modalstring = modalstring + '<p>Status: ' + value.sub_nodes[j].ports[k].status + '</p>';
           modalstring = modalstring + '<p>State: ' + value.sub_nodes[j].ports[k].state + '</p>';
           modalstring = modalstring + '---------------------------------------------------';
-
         }
-
-
-
       }
       modalstring = modalstring + '</div></div></div></div>';
       $('#wrapper').append(modalstring);
       $("#myModal").modal('show');
-
     });
-
-
-
     marker.addTo(map);
     marker.openTooltip();
   }
@@ -283,25 +276,14 @@
               modalstring2 = modalstring2 + '<p>Status: ' + value3[k].status + '</p>';
               modalstring2 = modalstring2 + '<p>State: ' + value3[k].state + '</p>';
               modalstring2 = modalstring2 + '---------------------------------------------------';
-
-              $
             }
             modalstring2 = modalstring2 + '</div></div></div></div>';
             $('#wrapper').append(modalstring2);
             $("#myModal2").modal('show');
-
-
           }
-
         }
-
       });
-
-
     }
-
-
-
   }
 
   function generate_uuidv4() {
@@ -313,22 +295,13 @@
   }
 
   $("#filtersform").submit(function(event) {
-
     event.preventDefault();
     var id = generate_uuidv4();
     var name = $('#name').val();
-    // var quantity=$('#quantity').val();
-    var start_time = $('#start_time').val();
-    var end_time = $('#end_time').val();
-    // var egress_port=$('#egress_port').val();
-    // var ingress_port=$('#ingress_port').val();
-    // let time_stamp = new Date().toJSON();
     var meican_url = "<?php echo $meican_url; ?>";
-    //var source_vlan=$('#source_vlan').val();
-    //var destination_vlan=$('#destination_vlan').val();
-    // var latency_required=$('#latency_required').val();
-    // var bandwidth_required=$('#bandwidth_required').val();
     var description = $('#description').val();
+    var startTime = $('#start_time').val();
+    var endTime = $('#end_time').val();
     var min_bw = $('#min_bw').val();
     var min_bw_strict = $('#min_bw_strict').is(":checked");
     var max_delay = $('#max_delay').val();
@@ -353,13 +326,6 @@
       endpoint2["vlan"] = $('#endpoint_2_vlan_value').val();
     }
 
-    console.log(endpoint1);
-    endpoints.push(endpoint1);
-    console.log(endpoint2);
-    endpoints.push(endpoint2);
-
-
-
     const fieldGroups = document.getElementsByClassName('field-group');
     const results = [];
 
@@ -377,15 +343,12 @@
       const interfaceInput = fieldGroups[i].querySelector('select[name="interface"]').value;
       const vlanSelect = fieldGroups[i].querySelector('select[name="vlan"]').value;
       const vlanValueInput = fieldGroups[i].querySelector('input[name="vlan_value"]');
-
       const vlanValue = vlanSelect === 'number' || vlanSelect === 'VLAN range' ? vlanValueInput.value : vlanSelect;
 
       results.push({
         port_id: interfaceInput,
         vlan: vlanValue
       });
-
-
     }
 
     var request = {
@@ -441,11 +404,9 @@
 
     const notificationFields = document.querySelectorAll('.notification-field input[type="email"]');
     notificationFields.forEach(field => {
-      // if (field.value && field.id !== 'notification_1') {
       notifications.push({
         "email": field.value
       });
-      // }
     });
 
     if (notifications.length > 0) {
@@ -465,8 +426,6 @@
     //         alert(errMsg);
     //     }
     // });
-
-
 
   });
 
