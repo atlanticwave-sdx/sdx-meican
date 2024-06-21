@@ -140,7 +140,7 @@
 
           <div class="form-group">
             <label for="exampleInputPassword1">Description</label>
-            <textarea class="form-control" id="description" name="description" placeholder="Provide a description or URL (up to 255 characters)" maxlength="255"></textarea>
+            <textarea class="form-control" id="description" name="description" placeholder="(optional)" maxlength="255"></textarea>
           </div>
 
           <div class="form-group">
@@ -382,6 +382,7 @@
     }
     if (start_time > end_time) {
       alert("Enter valid Dates");
+      return;
     }
     if (Object.keys(scheduling).length > 0) {
       request.scheduling = scheduling;
