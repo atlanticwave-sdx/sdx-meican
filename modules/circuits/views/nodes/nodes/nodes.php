@@ -145,14 +145,16 @@
 
           <div class="form-group">
             <label for="exampleInputPassword1">Start time</label>
-            <input type="date" class="form-control" id="start_time" name="start_time" placeholder="Start time">
+            <!-- Time Zone needs to be verified -->
+            <input type="date" class="form-control" id="start_time" name="start_time" placeholder="Start time" min="<?php echo date('Y-m-d'); ?>"/>
             <small id="start_time_error" class="error-message"></small>
           </div>
 
 
           <div class="form-group">
             <label for="exampleInputPassword1">End time</label>
-            <input type="date" class="form-control" id="end_time" name="end_time" placeholder="End time">
+            <!-- Time Zone needs to be verified -->
+            <input type="date" class="form-control" id="end_time" name="end_time" placeholder="End time" min="<?php echo date('Y-m-d'); ?>">
             <small id="end_time_error" class="error-message"></small>
           </div>
 
@@ -300,8 +302,8 @@
     var name = $('#name').val();
     var meican_url = "<?php echo $meican_url; ?>";
     var description = $('#description').val();
-    var startTime = $('#start_time').val();
-    var endTime = $('#end_time').val();
+    var start_time = $('#start_time').val();
+    var end_time = $('#end_time').val();
     var min_bw = $('#min_bw').val();
     var min_bw_strict = $('#min_bw_strict').is(":checked");
     var max_delay = $('#max_delay').val();
@@ -360,16 +362,32 @@
       request.description = description;
     }
 
+    // =========================== Scheduling Assertion Starts =========================== //
+
     var scheduling = {};
+    function convertToEST(dateStr) {
+      if (!dateStr) return null;
+      var date = new Date(dateStr);
+      var estDate = new Date(date.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+      return estDate.toISOString(); //.split('.')[0];
+    }
+
     if (start_time) {
-      scheduling.start_time = new Date(start_time).toISOString();
+      start_time = convertToEST(start_time);
+      scheduling.start_time = start_time;
     }
     if (end_time) {
-      scheduling.end_time = new Date(end_time).toISOString();
+      end_time = convertToEST(end_time);
+      scheduling.end_time = end_time;
+    }
+    if (start_time > end_time) {
+      alert("Enter valid Dates");
     }
     if (Object.keys(scheduling).length > 0) {
       request.scheduling = scheduling;
     }
+
+    // =========================== QOS_Metrix Assertion Starts =========================== //
 
     var qos_metrics = {};
     if (min_bw) {
@@ -394,6 +412,8 @@
       request.qos_metrics = qos_metrics;
     }
 
+    // =========================== Notifications Assertion Starts =========================== //
+
     var notifications = [];
     const initialNotification = $('#notification_1').val();
     if (initialNotification) {
@@ -412,6 +432,8 @@
     if (notifications.length > 0) {
       request.notifications = notifications;
     }
+
+    // =========================== Assertion Ends =========================== //
 
     console.log(request);
     console.log(JSON.stringify(request));
