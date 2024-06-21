@@ -146,7 +146,7 @@
           <div class="form-group">
             <label for="exampleInputPassword1">Start time</label>
             <!-- Time Zone needs to be verified -->
-            <input type="date" class="form-control" id="start_time" name="start_time" placeholder="Start time" min="<?php echo date('Y-m-d'); ?>"/>
+            <input type="date" class="form-control" id="start_time" name="start_time" placeholder="Start time" min="<?php echo date('Y-m-d'); ?>" oninput="validateDate(this)">
             <small id="start_time_error" class="error-message"></small>
           </div>
 
@@ -154,25 +154,25 @@
           <div class="form-group">
             <label for="exampleInputPassword1">End time</label>
             <!-- Time Zone needs to be verified -->
-            <input type="date" class="form-control" id="end_time" name="end_time" placeholder="End time" min="<?php echo date('Y-m-d'); ?>">
+            <input type="date" class="form-control" id="end_time" name="end_time" placeholder="End time" min="<?php echo date('Y-m-d'); ?>" oninput="validateDate(this)">
             <small id="end_time_error" class="error-message"></small>
           </div>
 
           <div class="form-group">
             <label for="min_bw">Minimum Bandwidth (Gbps)</label>
-            <input type="number" class="form-control" id="min_bw" name="min_bw" placeholder="(optional)" min="0" max="100">
+            <input type="number" class="form-control" id="min_bw" name="min_bw" placeholder="(optional)" min="0" max="100" step="1" oninput="validateInput(this, 100)">
             <label><input type="checkbox" id="min_bw_strict" name="min_bw_strict"> Strict</label>
           </div>
 
           <div class="form-group">
             <label for="max_delay">Maximum Delay (ms)</label>
-            <input type="number" class="form-control" id="max_delay" name="max_delay" placeholder="(optional)" min="0" max="1000">
+            <input type="number" class="form-control" id="max_delay" name="max_delay" placeholder="(optional)" min="0" max="1000" step="1" oninput="validateInput(this, 1000)">
             <label><input type="checkbox" id="max_delay_strict" name="max_delay_strict"> Strict</label>
           </div>
 
           <div class="form-group">
             <label for="max_number_oxps">Maximum Number of OXPs</label>
-            <input type="number" class="form-control" id="max_number_oxps" name="max_number_oxps" placeholder="(optional)" min="0" max="100">
+            <input type="number" class="form-control" id="max_number_oxps" name="max_number_oxps" placeholder="(optional)" min="0" max="100" step="1" oninput="validateInput(this, 100)">
             <label><input type="checkbox" id="max_number_oxps_strict" name="max_number_oxps_strict"> Strict</label>
           </div>
 
@@ -452,6 +452,20 @@
 
   });
 
+  function validateInput(input, max) {
+    input.value = input.value.replace(/[^0-9]/g, '');
+    if (input.value > max) {
+      input.value = max;
+    }
+  }
+
+  function validateDate(input) {
+    const parts = input.value.split('-');
+    if (parts.length === 3) {
+      parts[0] = parts[0].substring(0, 4);
+      input.value = parts.join('-');
+    }
+  }
 
   function appendFields() {
     const container = document.getElementById('field-container');
