@@ -380,9 +380,11 @@
       end_time = convertToEST(end_time);
       scheduling.end_time = end_time;
     }
-    if (start_time > end_time) {
-      alert("Enter valid Dates");
+    if (end_time) {
+      if (start_time > end_time) {
+        alert("Enter valid Dates");
       return;
+    }
     }
     if (Object.keys(scheduling).length > 0) {
       request.scheduling = scheduling;
