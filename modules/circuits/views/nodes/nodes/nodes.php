@@ -383,8 +383,8 @@
     if (end_time) {
       if (start_time > end_time) {
         alert("Enter valid Dates");
-      return;
-    }
+        return;
+      }
     }
     if (Object.keys(scheduling).length > 0) {
       request.scheduling = scheduling;
