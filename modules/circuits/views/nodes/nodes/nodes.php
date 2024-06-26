@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  
 
   <style type="text/css">
     #map {
@@ -99,11 +100,11 @@
 
             <br>VLAN:</br>
             <select class="form-control" id="endpoint_1_vlan" name="endpoint_1_vlan" placeholder="vlan" required>
-              <option value="any">any</option>
-              <option value="number">number</option>
-              <option value="untagged">untagged</option>
-              <option value="VLAN range">VLAN range</option>
-              <option value="all">all</option>
+              <option value="any" title="Any available VLAN ID is chosen">any</option>
+              <option value="number" title="Specific VLAN ID, e.g., '50'">number</option>
+              <option value="untagged" title="Transports Ethernet frames without IEEE 802.1Q Ethertype">untagged</option>
+              <option value="VLAN range" title="Range of VLANs, e.g., '50:55'">VLAN range</option>
+              <option value="all" title="Transport all Ethernet frames with and without IEEE 802.Q Ethertype">all</option>
             </select>
 
             <div id="endpoint_1_vlan-input-container" class="input-container"></div>
@@ -123,11 +124,11 @@
 
             <br>VLAN:</br>
             <select class="form-control" id="endpoint_2_vlan" name="endpoint_2_vlan" placeholder="vlan" required>
-              <option value="any">any</option>
-              <option value="number">number</option>
-              <option value="untagged">untagged</option>
-              <option value="VLAN range">VLAN range</option>
-              <option value="all">all</option>
+            <option value="any" title="Any available VLAN ID is chosen">any</option>
+              <option value="number" title="Specific VLAN ID, e.g., '50'">number</option>
+              <option value="untagged" title="Transports Ethernet frames without IEEE 802.1Q Ethertype">untagged</option>
+              <option value="VLAN range" title="Range of VLANs, e.g., '50:55'">VLAN range</option>
+              <option value="all" title="Transport all Ethernet frames with and without IEEE 802.Q Ethertype">all</option>
             </select>
 
             <div id="endpoint_2_vlan-input-container" class="input-container"></div>
@@ -454,6 +455,7 @@
 
   });
 
+
   function validateInput(input, max) {
     input.value = input.value.replace(/[^0-9]/g, '');
     if (input.value > max) {
@@ -497,7 +499,13 @@
     vlanSelect.onchange = function() {
       handleVlanChange(newDiv, vlanSelect.value);
     };
-    vlanSelect.innerHTML = '<option value="any">any</option><option value="number">number</option><option value="untagged">untagged</option><option value="VLAN range">VLAN range</option><option value="all">all</option>';
+    vlanSelect.innerHTML = `
+      <option value="any" title="Any available VLAN ID chosen">any</option>
+      <option value="number" title="Specific VLAN ID, e.g., '50'">number</option>
+      <option value="untagged" title="Transport Ethernet frames without IEEE 802.1Q Ethertype">untagged</option>
+      <option value="VLAN range" title="Range of VLANs, e.g., '50:55'">VLAN range</option>
+      <option value="all" title="Transport all Ethernet frames with and without IEEE 802.Q Ethertype">all</option>
+    `;
 
     const deleteButton = document.createElement('button');
     deleteButton.type = 'button';
@@ -514,38 +522,6 @@
     newDiv.appendChild(vlanSelect);
     newDiv.appendChild(deleteButton);
 
-    container.appendChild(newDiv);
-  }
-
-  function appendNotification() {
-    const container = document.getElementById('notification-container');
-    const notificationCount = container.getElementsByClassName('notification-field').length;
-
-    if (notificationCount >= 10) {
-      alert('You can only add up to 10 Emails.');
-      return;
-    }
-
-    const newDiv = document.createElement('div');
-    newDiv.className = 'form-group notification-field';
-
-    const inputField = document.createElement('input');
-    inputField.type = 'email';
-    inputField.className = 'form-control';
-    inputField.name = `notification_${notificationCount + 1}`;
-    inputField.placeholder = `Notification Email ${notificationCount + 1} (optional)`;
-
-    const deleteButton = document.createElement('button');
-    deleteButton.type = 'button';
-    deleteButton.className = 'btn btn-danger deleteButton';
-    deleteButton.innerText = 'Delete';
-    deleteButton.style.backgroundColor = "red";
-    deleteButton.onclick = function() {
-      container.removeChild(newDiv);
-    };
-
-    newDiv.appendChild(inputField);
-    newDiv.appendChild(deleteButton);
     container.appendChild(newDiv);
   }
 
@@ -608,6 +584,38 @@
       inputContainer2.appendChild(inputField);
     }
   });
+
+  function appendNotification() {
+    const container = document.getElementById('notification-container');
+    const notificationCount = container.getElementsByClassName('notification-field').length;
+
+    if (notificationCount >= 10) {
+      alert('You can only add up to 10 Emails.');
+      return;
+    }
+
+    const newDiv = document.createElement('div');
+    newDiv.className = 'form-group notification-field';
+
+    const inputField = document.createElement('input');
+    inputField.type = 'email';
+    inputField.className = 'form-control';
+    inputField.name = `notification_${notificationCount + 1}`;
+    inputField.placeholder = `Notification Email ${notificationCount + 1} (optional)`;
+
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'btn btn-danger deleteButton';
+    deleteButton.innerText = 'Delete';
+    deleteButton.style.backgroundColor = "red";
+    deleteButton.onclick = function() {
+      container.removeChild(newDiv);
+    };
+
+    newDiv.appendChild(inputField);
+    newDiv.appendChild(deleteButton);
+    container.appendChild(newDiv);
+  }
 </script>
 
 </html>
