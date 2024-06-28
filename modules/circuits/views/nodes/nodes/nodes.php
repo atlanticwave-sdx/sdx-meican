@@ -455,7 +455,18 @@
 
   });
 
+  // Validating vlan input
+  function validateVlanInput(input) {
+    input.value = input.value.replace(/[^0-9]/g, '');
+    const vlanNumber = parseInt(input.value, 10);
+    if (isNaN(vlanNumber) || vlanNumber < 1 || vlanNumber > 4095) {
+      input.setCustomValidity("Please enter a valid VLAN number between 1 and 4095.");
+    } else {
+      input.setCustomValidity("");
+    }
+  }
 
+  // Validating qos metrix input fields
   function validateInput(input, max) {
     input.value = input.value.replace(/[^0-9]/g, '');
     if (input.value > max) {
@@ -537,6 +548,9 @@
       vlanInput.name = 'vlan_value';
       vlanInput.placeholder = value === 'number' ? 'Enter VLAN Number' : 'Enter VLAN Range';
       vlanInput.className = 'form-control';
+      vlanInput.oninput = function() {
+        validateVlanInput(vlanInput);
+      };
       temp = container.querySelector('button[id="deleteButton"]');
       container.removeChild(temp);
       container.appendChild(vlanInput);
@@ -563,6 +577,9 @@
       inputField.name = 'endpoint_1_vlan_value';
       inputField.id = 'endpoint_1_vlan_value';
       inputField.className = 'form-control';
+      inputField.oninput = function() {
+        validateVlanInput(inputField);
+      };
       inputContainer.appendChild(inputField);
     }
   });
@@ -581,6 +598,9 @@
       inputField.name = 'endpoint_2_vlan_value';
       inputField.id = 'endpoint_2_vlan_value';
       inputField.className = 'form-control';
+      inputField.oninput = function() {
+        validateVlanInput(inputField);
+      };
       inputContainer2.appendChild(inputField);
     }
   });
