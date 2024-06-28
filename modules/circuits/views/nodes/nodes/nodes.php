@@ -455,16 +455,36 @@
 
   });
 
-  // Validating vlan input
   function validateVlanInput(input) {
-    input.value = input.value.replace(/[^0-9]/g, '');
-    const vlanNumber = parseInt(input.value, 10);
-    if (isNaN(vlanNumber) || vlanNumber < 1 || vlanNumber > 4095) {
-      input.setCustomValidity("Please enter a valid VLAN number between 1 and 4095.");
+    if (input.valueType.includes('range')) {
+      input.value = input.value.replace(/[^0-9:]/g, '');
+      const regex = /^(\d{1,4}:\d{1,4})?$/;
+      if (!regex.test(input.value)) {
+          input.setCustomValidity("Please enter a valid VLAN range (1-4095 : 1-4095)");
+      } else {
+          const parts = input.value.split(':');
+          if (parts.length === 2) {
+              const [start, end] = parts.map(Number);
+              if (isNaN(start) || isNaN(end) || start < 1 || start > 4095 || end < 1 || end > 4095 || start > end || start == end) {
+                  input.setCustomValidity("Please enter a valid VLAN range (1-4095 : 1-4095)");
+              } else {
+                  input.setCustomValidity("");
+              }
+          } else {
+              input.setCustomValidity("Please enter a valid VLAN range (1-4095 : 1-4095)");
+          }
+      }
     } else {
-      input.setCustomValidity("");
+      input.value = input.value.replace(/[^0-9]/g, '');
+      const vlanNumber = parseInt(input.value, 10);
+      if (isNaN(vlanNumber) || vlanNumber < 1 || vlanNumber > 4095) {
+        input.setCustomValidity("Please enter a valid VLAN number between 1 and 4095.");
+      } else {
+        input.setCustomValidity("");
+      }
     }
   }
+
 
   // Validating qos metrix input fields
   function validateInput(input, max) {
@@ -548,6 +568,7 @@
       vlanInput.name = 'vlan_value';
       vlanInput.placeholder = value === 'number' ? 'Enter VLAN Number (1-4095)' : 'Enter VLAN Range (e.g., 50:55)';
       vlanInput.className = 'form-control';
+      vlanInput.valueType = value;
       vlanInput.oninput = function() {
         validateVlanInput(vlanInput);
       };
@@ -577,6 +598,7 @@
       inputField.name = 'endpoint_1_vlan_value';
       inputField.id = 'endpoint_1_vlan_value';
       inputField.className = 'form-control';
+      inputField.valueType = dropdown.value;
       inputField.oninput = function() {
         validateVlanInput(inputField);
       };
@@ -594,10 +616,11 @@
     if (optionsRequiringInput.includes(dropdown2.value)) {
       const inputField = document.createElement('input');
       inputField.type = 'text';
-      inputField.placeholder = dropdown.value === 'number' ? 'Enter VLAN Number (1-4095)' : 'Enter VLAN Range (e.g., 50:55)';
+      inputField.placeholder = dropdown2.value === 'number' ? 'Enter VLAN Number (1-4095)' : 'Enter VLAN Range (e.g., 50:55)';
       inputField.name = 'endpoint_2_vlan_value';
       inputField.id = 'endpoint_2_vlan_value';
       inputField.className = 'form-control';
+      inputField.valueType = dropdown2.value;
       inputField.oninput = function() {
         validateVlanInput(inputField);
       };
