@@ -103,35 +103,83 @@ class NodesController extends RbacController {
       curl_close($curl);
     }
 
-    public function actionCreate(){ // this route manages the view and backend logic for creating a circuit request
+    // public function actionCreate(){ // this route manages the view and backend logic for creating a circuit request
 
-        $request = Yii::$app->request->getRawBody(); // getting the JSON request body from the create connection form through MEICAN dashboard
-        $request=stripslashes($request);
-        $api_url=API_URL;
-        $curl = curl_init();
+    //     $request = Yii::$app->request->getRawBody(); // getting the JSON request body from the create connection form through MEICAN dashboard
+    //     $request=stripslashes($request);
+    //     $api_url=API_URL;
+    //     $username = 'admin';
+    //     $password = 'SuperSecretPwd';
+    //     $credentials = base64_encode("$username:$password");
+    //     $curl = curl_init();
 
-        /* CURL request to SDX-Controller endpoint for creating a circuit request*/
+    //     /* CURL request to SDX-Controller endpoint for creating a circuit request*/
 
-        curl_setopt_array($curl, array(
-          CURLOPT_URL => $api_url.'connection',
+    //     curl_setopt_array($curl, array(
+    //       CURLOPT_URL => 'http://127.0.0.1:5000/create_connection',
+    //       CURLOPT_RETURNTRANSFER => true,
+    //       CURLOPT_ENCODING => '',
+    //       CURLOPT_MAXREDIRS => 10,
+    //       CURLOPT_TIMEOUT => 0,
+    //       CURLOPT_FOLLOWLOCATION => true,
+    //       CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    //       CURLOPT_CUSTOMREQUEST => 'POST',
+    //       CURLOPT_POSTFIELDS =>$request,
+    //       CURLOPT_HTTPHEADER => array(
+    //         'Content-Type: application/json',
+    //         'Authorization: Basic $credentials'
+    //       ),
+    //     ));
+
+    //     $response = curl_exec($curl);
+
+    //     curl_close($curl);
+    //     echo $response;
+    // }
+
+    public function actionCreate() {
+      $request = Yii::$app->request->getRawBody(); // getting the JSON request body from the create connection form through MEICAN dashboard
+      $request = stripslashes($request);
+      $username = 'admin';
+      $password = 'SuperSecretPwd';
+      $credentials = base64_encode("$username:$password");
+  
+      $curl = curl_init();
+  
+      /* CURL request to SDX-Controller endpoint for creating a circuit request */
+      curl_setopt_array($curl, array(
+          CURLOPT_URL => "http://127.0.0.1:5000/connection",
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => '',
           CURLOPT_MAXREDIRS => 10,
           CURLOPT_TIMEOUT => 0,
           CURLOPT_FOLLOWLOCATION => true,
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          CURLOPT_CUSTOMREQUEST => 'POST',
-          CURLOPT_POSTFIELDS =>$request,
+          CURLOPT_CUSTOMREQUEST => "POST",
+          CURLOPT_POSTFIELDS => $request,
           CURLOPT_HTTPHEADER => array(
-            'Content-Type: application/json'
+              'Content-Type: application/json',
+              'Authorization: Basic ' . $credentials
           ),
-        ));
-
-        $response = curl_exec($curl);
-
-        curl_close($curl);
-        echo $response;
+      ));
+  
+      $response = curl_exec($curl);
+      $curl_error = curl_error($curl);
+  
+      if ($curl_error) {
+          echo 'Curl error: ' . $curl_error;
+      } else {
+          Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+          echo $response;
+      }
+  
+      curl_close($curl);
     }
+  
+  
+  
+  
+  
     
     public function actionShow() {   // this function manages the mapping of SDX-topology and displays on the MEICAN UI
       

@@ -440,18 +440,28 @@
     // =========================== Assertion Ends =========================== //
 
     console.log(request);
-    console.log(JSON.stringify(request));
+    // console.log(JSON.stringify(request));
 
-    //     $.ajax({
-    //     type: "POST",
-    //     url: "https://"+meican_url+"/circuits/nodes/create",
-    //     data: JSON.stringify(request),
-    //     contentType: "application/json; charset=utf-8",
-    //     success: function(data){alert(data);},
-    //     error: function(errMsg) {
-    //         alert(errMsg);
-    //     }
-    // });
+    var username = 'admin';
+    var password = 'SuperSecretPwd';
+    var encodedCredentials = btoa(username + ':' + password);
+
+    $.ajax({
+      type: "POST",
+      url: "https://"+meican_url+"/circuits/nodes/create",
+      data: JSON.stringify(request),
+      contentType: "application/json; charset=utf-8",
+      beforeSend: function (xhr) {
+            xhr.setRequestHeader("Authorization", "Basic " + encodedCredentials);
+        },
+      success: function(data){
+        alert("Response from Flask: " + JSON.stringify(data));
+      },
+      error: function(errMsg) {
+        console.error("Error:", errMsg);
+          alert("Error:" + JSON.stringify(errMsg));
+      }
+    });
 
   });
 
