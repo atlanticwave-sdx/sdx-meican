@@ -43,10 +43,13 @@ class NodesController extends RbacController {
     public function actionList() {
 
       $api_url = API_URL;
+      $username = 'admin';
+      $password = 'SuperSecretPwd';
+      $credentials = base64_encode("$username:$password");
       $curl = curl_init();
 
       curl_setopt_array($curl, array(
-        CURLOPT_URL => $api_url.'connections',
+        CURLOPT_URL => $api_url.'connection',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
@@ -54,10 +57,20 @@ class NodesController extends RbacController {
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'GET',
+        CURLOPT_HTTPHEADER => array(
+          'Authorization: Basic ' . $credentials
+        ),
       ));
 
       $str_response = curl_exec($curl);
+      $curl_error = curl_error($curl);
       curl_close($curl);
+
+      var_dump($api_url . 'connection');
+      // var_dump($str_response);
+      if ($curl_error) {
+          var_dump('Curl error: ' . $curl_error);
+      }
 
       return $this->render('nodes/list-connections', ['str_response' => $str_response]);
     }
