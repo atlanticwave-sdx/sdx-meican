@@ -440,27 +440,19 @@
     // =========================== Assertion Ends =========================== //
 
     console.log(request);
-    // console.log(JSON.stringify(request));
-
-    var username = 'admin';
-    var password = 'SuperSecretPwd';
-    var encodedCredentials = btoa(username + ':' + password);
+    console.log(JSON.stringify(request));
 
     $.ajax({
-      type: "POST",
-      url: "https://"+meican_url+"/circuits/nodes/create",
-      data: JSON.stringify(request),
-      contentType: "application/json; charset=utf-8",
-      beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", "Basic " + encodedCredentials);
+        type: "POST",
+        url: "https://"+meican_url+"/circuits/nodes/create",
+        data: JSON.stringify(request),
+        contentType: "application/json; charset=utf-8",
+        success: function(data){
+          alert(data);
         },
-      success: function(data){
-        alert("Response from Flask: " + JSON.stringify(data));
-      },
-      error: function(errMsg) {
-        console.error("Error:", errMsg);
-          alert("Error:" + JSON.stringify(errMsg));
-      }
+        error: function(errMsg) {
+            alert(errMsg);
+        }
     });
 
   });

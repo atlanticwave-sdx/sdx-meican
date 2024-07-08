@@ -78,7 +78,7 @@
                         <div class="table-responsive">
                            <table class="table table-striped">
                               <thead>
-                                 <!-- <tr>
+                                 <tr>
                                     
                                     <th style="width: 11%;">Name</th>
                                     <th style="width: 10%;">Quantity</th>
@@ -96,7 +96,6 @@
 
                                        if (is_array($connectionsData) && json_last_error() === JSON_ERROR_NONE) {
                                           foreach ($connectionsData as $connectionId => $connectionInfo) {
-                                             var_dump($connectionInfo);
                                              ?>
                                                 <tr id="circuits-gridcurrent-filters" class="filters">
                                                    <td><?php echo isset($connectionInfo['name']) ? $connectionInfo['name'] : ''; ?></td>
@@ -113,49 +112,8 @@
                                           }
                                        }
                                     }
-                                 ?> -->
-                                 
-                                 <tr>
-                                    <th style="width: 11%;">Name</th>
-                                    <th style="width: 10%;">ID</th>
-                                    <th style="width: 14%;">Port ID</th>
-                                    <th style="width: 14%;">State</th>
-                                    <th style="width: 14%;">Status</th>
-                                 </tr>
-
-                                 <?php
-                                 if (!empty($str_response)) {
-                                    $connectionsData = json_decode($str_response, true);
-
-                                    if (is_array($connectionsData) && json_last_error() === JSON_ERROR_NONE) {
-                                       foreach ($connectionsData['nodes'] as $node) {
-                                          $name = $node['name'] ?? '';
-                                          $id = $node['id'] ?? '';
-
-                                          foreach ($node['ports'] as $port) {
-                                             $port_id = $port['id'] ?? '';
-                                             $state = $port['state'] ?? '';
-                                             $status = $port['status'] ?? '';
-                                             ?>
-                                             <tr id="circuits-gridcurrent-filters" class="filters">
-                                                <td><?php echo htmlspecialchars($name); ?></td>
-                                                <td><?php echo htmlspecialchars($id); ?></td>
-                                                <td><?php echo htmlspecialchars($port_id); ?></td>
-                                                <td><?php echo htmlspecialchars($state); ?></td>
-                                                <td><?php echo htmlspecialchars($status); ?></td>
-                                                <td>
-                                                   <button type="button" class="btn btn-primary view-connection" data-connection='<?php echo json_encode($node); ?>'>Edit</button>
-                                                   <button type="submit" class="btn btn-danger delete-connection" data-connection='<?php echo json_encode($node); ?>' style="background-color:red;">Delete</button>
-                                                </td>
-                                             </tr>
-                                             <?php
-                                          }
-                                       }
-                                    }
-                                 }
                                  ?>
-
-
+                                 
                               </thead>
                               <tbody>
                                  <!-- <tr>
@@ -315,4 +273,3 @@
 </script>
 
 </html>
-
