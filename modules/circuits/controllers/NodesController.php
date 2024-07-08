@@ -145,10 +145,10 @@ class NodesController extends RbacController {
               'deleted_at' => null
           ])->execute();
           echo $response;
-      } catch (\Exception $e) {
-          Yii::error('DB Insert Error: ' . $e->getMessage());
-          echo json_encode(['error' => $e->getMessage()]);
-      }
+        } catch (\Exception $e) {
+            Yii::error('DB Insert Error: ' . $e->getMessage());
+            echo json_encode(['error' => $e->getMessage()]);
+        }
     }
     
     public function actionShow() {   // this function manages the mapping of SDX-topology and displays on the MEICAN UI
