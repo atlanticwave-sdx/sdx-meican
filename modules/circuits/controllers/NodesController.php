@@ -139,6 +139,7 @@ class NodesController extends RbacController {
       $meican_url=MEICAN_URL;
       $enableCILogonPage = defined('ENABLE_CILOGON_PAGE') ? ENABLE_CILOGON_PAGE : false; // Cilogon environment variable
       $CILogonClientID=CILOGON_CLIENT_ID;
+      $CILogonClientSecret=CILOGON_CLIENT_SECRET;
 
       if ($enableCILogonPage) { // Cilogon environment variable is enabled
         $userId = Yii::$app->user->id;
@@ -181,7 +182,7 @@ class NodesController extends RbacController {
                 $curl = curl_init();
       
                 curl_setopt_array($curl, array(
-                  CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=authorization_code&client_id=cilogon%3A%2Fclient_id%2F'.$CILogonClientID.'&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Fshow&client_secret=Vib4sbOGQXI8tt9s-uQ16hQnJlNUxUsAvAMISiCJBPFlLf2c82ZyUDKBYpv-eNX6qV-wW-OzRzoAaVslxCsozQ&code='.$code.'',
+                  CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=authorization_code&client_id=cilogon%3A%2Fclient_id%2F'.$CILogonClientID.'&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Fshow&client_secret='.$CILogonClientSecret.'&code='.$code.'',
                   CURLOPT_RETURNTRANSFER => true,
                   CURLOPT_ENCODING => '',
                   CURLOPT_MAXREDIRS => 10,
@@ -232,7 +233,7 @@ class NodesController extends RbacController {
               $curl = curl_init();
 
               curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=authorization_code&client_id=cilogon%3A%2Fclient_id%2F'.$CILogonClientID.'&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Fshow&client_secret=Vib4sbOGQXI8tt9s-uQ16hQnJlNUxUsAvAMISiCJBPFlLf2c82ZyUDKBYpv-eNX6qV-wW-OzRzoAaVslxCsozQ&code='.$code.'',
+                CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=authorization_code&client_id=cilogon%3A%2Fclient_id%2F'.$CILogonClientID.'&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Fshow&client_secret='.$CILogonClientSecret.'&code='.$code.'',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
