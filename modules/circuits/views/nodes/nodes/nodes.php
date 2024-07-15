@@ -145,7 +145,7 @@
           </div>
 
           <div class="form-group">
-            <label for="exampleInputPassword1">Start time</label>
+            <label for="exampleInputPassword1">Start time (optional)</label>
             <!-- Time Zone needs to be verified -->
             <input type="date" class="form-control" id="start_time" name="start_time" placeholder="Start time" min="<?php echo date('Y-m-d'); ?>" oninput="validateDate(this)">
             <small id="start_time_error" class="error-message"></small>
@@ -153,7 +153,7 @@
 
 
           <div class="form-group">
-            <label for="exampleInputPassword1">End time</label>
+            <label for="exampleInputPassword1">End time (optional)</label>
             <!-- Time Zone needs to be verified -->
             <input type="date" class="form-control" id="end_time" name="end_time" placeholder="End time" min="<?php echo date('Y-m-d'); ?>" oninput="validateDate(this)">
             <small id="end_time_error" class="error-message"></small>
@@ -478,7 +478,7 @@
       input.value = input.value.replace(/[^0-9]/g, '');
       const vlanNumber = parseInt(input.value, 10);
       if (isNaN(vlanNumber) || vlanNumber < 1 || vlanNumber > 4095) {
-        input.setCustomValidity("Please enter a valid VLAN number between 1 and 4095.");
+        input.setCustomValidity("Please enter a valid VLAN ID between 1 and 4095.");
       } else {
         input.setCustomValidity("");
       }
@@ -566,7 +566,7 @@
       const vlanInput = document.createElement('input');
       vlanInput.type = 'text';
       vlanInput.name = 'vlan_value';
-      vlanInput.placeholder = value === 'number' ? 'Enter VLAN Number (1-4095)' : 'Enter VLAN Range (e.g., 50:55)';
+      vlanInput.placeholder = value === 'number' ? 'Enter VLAN ID (1-4095)' : 'Enter VLAN Range (e.g., 50:55)';
       vlanInput.className = 'form-control';
       vlanInput.valueType = value;
       vlanInput.oninput = function() {
@@ -594,7 +594,7 @@
     if (optionsRequiringInput.includes(dropdown.value)) {
       const inputField = document.createElement('input');
       inputField.type = 'text';
-      inputField.placeholder = dropdown.value === 'number' ? 'Enter VLAN Number (1-4095)' : 'Enter VLAN Range (e.g., 50:55)';
+      inputField.placeholder = dropdown.value === 'number' ? 'Enter VLAN ID (1-4095)' : 'Enter VLAN Range (e.g., 50:55)';
       inputField.name = 'endpoint_1_vlan_value';
       inputField.id = 'endpoint_1_vlan_value';
       inputField.className = 'form-control';
@@ -616,7 +616,7 @@
     if (optionsRequiringInput.includes(dropdown2.value)) {
       const inputField = document.createElement('input');
       inputField.type = 'text';
-      inputField.placeholder = dropdown2.value === 'number' ? 'Enter VLAN Number (1-4095)' : 'Enter VLAN Range (e.g., 50:55)';
+      inputField.placeholder = dropdown2.value === 'number' ? 'Enter VLAN ID (1-4095)' : 'Enter VLAN Range (e.g., 50:55)';
       inputField.name = 'endpoint_2_vlan_value';
       inputField.id = 'endpoint_2_vlan_value';
       inputField.className = 'form-control';
