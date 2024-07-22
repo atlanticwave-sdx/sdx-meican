@@ -218,7 +218,6 @@
             formattedPortData += `<strong>Id:</strong> ${portData.id || ''}<br>`;
             formattedPortData += `<strong>Name:</strong> ${portData.name || ''}<br>`;
             formattedPortData += `<strong>Node:</strong> ${portData.node || ''}<br>`;
-            formattedPortData += `<strong>Short Name:</strong> ${portData.short_name || ''}<br>`;
             formattedPortData += `<strong>State:</strong> ${portData.state || ''}<br>`;
             formattedPortData += `<strong>Status:</strong> ${portData.status || ''}<br>`;
             return formattedPortData;
