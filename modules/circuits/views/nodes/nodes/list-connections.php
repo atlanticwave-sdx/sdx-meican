@@ -100,16 +100,17 @@
                                                 <tr id="circuits-gridcurrent-filters" class="filters">
                                                    <td><?php echo isset($connectionInfo['name']) ? $connectionInfo['name'] : ''; ?></td>
                                                    <td><?php echo isset($connectionInfo['quantity']) ? $connectionInfo['quantity'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['start_time']) ? $connectionInfo['start_time'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['end_time']) ? $connectionInfo['end_time'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['egress_port']['id']) ? $connectionInfo['egress_port']['id'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['ingress_port']['id']) ? $connectionInfo['ingress_port']['id'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['bandwidth_required']) ? $connectionInfo['bandwidth_required'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['scheduling']['start_time']) ? $connectionInfo['scheduling']['start_time'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['scheduling']['end_time']) ? $connectionInfo['scheduling']['end_time'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['endpoints'][0]['port_id']) ? $connectionInfo['endpoints'][0]['port_id'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['endpoints'][count($connectionInfo['endpoints']) - 1]['port_id']) ? $connectionInfo['endpoints'][count($connectionInfo['endpoints']) - 1]['port_id'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['qos_metrics']['min_bw']['value']) ? $connectionInfo['qos_metrics']['min_bw']['value'] : ''; ?></td>
                                                    <td><button type="button" class="btn btn-primary view-connection" data-connection='<?php echo json_encode($connectionInfo); ?>'>View</button></td>
                                                    <td><button type="submit" class="btn btn-primary delete-connection" delete-connection='<?php echo json_encode($connectionInfo); ?>' style="background-color:red;">Delete</button></td>
                                                 </tr>
                                              <?php
                                           }
+                                          
                                        }
                                     }
                                  ?>
@@ -195,33 +196,51 @@
 
          formattedData += `<strong>Id:</strong> ${data.id || ''}<br>`;
          formattedData += `<strong>Name:</strong> ${data.name || ''}<br>`;
-         formattedData += `<strong>Quantity:</strong> ${data.quantity || ''}<br>`;
-         formattedData += `<strong>Start Time:</strong> ${data.start_time || ''}<br>`;
-         formattedData += `<strong>End Time:</strong> ${data.end_time || ''}<br>`;
-         formattedData += `<strong>Bandwidth Required:</strong> ${data.bandwidth_required || ''}<br>`;
-         formattedData += `<strong>Latency Required:</strong> ${data.latency_required || ''}<br>`;
-         formattedData += `<strong>Time Stamp:</strong> ${data.time_stamp || ''}<br>`;
-         formattedData += `<strong>Version:</strong> ${data.version || ''}<br>`;
+         formattedData += `<strong>Description:</strong> ${data.description || ''}<br>`;
+         formattedData += `<strong>Start Time:</strong> ${data.scheduling.start_time || ''}<br>`;
+         formattedData += `<strong>End Time:</strong> ${data.scheduling.end_time || ''}<br>`;
 
-         formattedData += `<strong>Egress Port:</strong><br>`;
-         formattedData += `<div style="padding-left: 20px;">${formatNestedPortData(data.egress_port || {})}</div>`;
-         formattedData += `<strong>Ingress Port:</strong><br>`;
-         formattedData += `<div style="padding-left: 20px;">${formatNestedPortData(data.ingress_port || {})}</div>`;
+         formattedData += `<strong>QoS Metrics:</strong><br>`;
+         formattedData += `<div style="padding-left: 20px;">${formatQosMetrics(data.qos_metrics)}</div>`;
+
+         formattedData += `<strong>Notifications:</strong><br>`;
+         data.notifications.forEach((notification, index) => {
+            formattedData += `<div style="padding-left: 20px;"><strong>Email ${index + 1}: </strong>${formatNotificationData(notification)}</div></div>`;
+         });
+
+         formattedData += `<strong>Endpoints:</strong><br>`;
+         data.endpoints.forEach((endpoint, index) => {
+            formattedData += `<div style="padding-left: 20px;"><strong>Interface ${index + 1}:</strong><br>`;
+            formattedData += `<div style="padding-left: 20px;">${formatEndpointData(endpoint)}</div></div>`;
+         });
 
          return formattedData;
       }
 
-      // Function to format egress and ingress fields
-      function formatNestedPortData(portData) {
-         if (portData && Object.keys(portData).length > 0) {
-            let formattedPortData = '';
-            formattedPortData += `<strong>Id:</strong> ${portData.id || ''}<br>`;
-            formattedPortData += `<strong>Name:</strong> ${portData.name || ''}<br>`;
-            formattedPortData += `<strong>Node:</strong> ${portData.node || ''}<br>`;
-            formattedPortData += `<strong>State:</strong> ${portData.state || ''}<br>`;
-            formattedPortData += `<strong>Status:</strong> ${portData.status || ''}<br>`;
-            return formattedPortData;
+      // Function to format each endpoint field
+      function formatEndpointData(endpoint) {
+         let formattedEndpointData = '';
+         formattedEndpointData += `<strong>Port ID:</strong> ${endpoint.port_id || ''}<br>`;
+         formattedEndpointData += `<strong>VLAN:</strong> ${endpoint.vlan || ''}<br>`;
+         return formattedEndpointData;
+      }
+
+      // Function to format each notification field
+      function formatNotificationData(notification) {
+         let formattedNotificationData = '';
+         formattedNotificationData += `${notification.email || ''}<br>`;
+         return formattedNotificationData;
+      }
+
+      // Function to format QoS metrics
+      function formatQosMetrics(qosMetrics) {
+         let formattedQosMetrics = '';
+         if (qosMetrics) {
+            formattedQosMetrics += `<strong>Minimum Bandwidth:</strong> ${qosMetrics.min_bw.value || ''} (Strict: ${qosMetrics.min_bw.strict ? 'Yes' : 'No'})<br>`;
+            formattedQosMetrics += `<strong>Maximum Delay:</strong> ${qosMetrics.max_delay.value || ''} (Strict: ${qosMetrics.max_delay.strict ? 'Yes' : 'No'})<br>`;
+            formattedQosMetrics += `<strong>Maximum OXPs:</strong> ${qosMetrics.max_number_oxps.value || ''} (Strict: ${qosMetrics.max_number_oxps.strict ? 'Yes' : 'No'})<br>`;
          }
+         return formattedQosMetrics;
       }
       
       $(document).on('click', '.view-connection', function () {
