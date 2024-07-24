@@ -79,15 +79,10 @@
                            <table class="table table-striped">
                               <thead>
                                  <tr>
-                                    
-                                    <th style="width: 11%;">Name</th>
-                                    <th style="width: 10%;">Quantity</th>
-                                    <th style="width: 10%;"><a href="/circuits/reservation/status?ReservationSearch%5Bsrc_domain%5D=&amp;ReservationSearch%5Bdst_domain%5D=&amp;ReservationSearch%5Bdataplane_status%5D=ACTIVE&amp;_pjax=%23circuits-pjax&amp;sort=start" data-sort="start">Start Time <img style="width: 7px; height:11px;" src="/images/sort_image.png" alt="Order by:"></a></th>
-                                    <th style="width: 10%;"><a href="/circuits/reservation/status?ReservationSearch%5Bsrc_domain%5D=&amp;ReservationSearch%5Bdst_domain%5D=&amp;ReservationSearch%5Bdataplane_status%5D=ACTIVE&amp;_pjax=%23circuits-pjax&amp;sort=finish" data-sort="finish">End Time <img style="width: 7px; height:11px;" src="/images/sort_image.png" alt="Order by:"></a></th>
-                                    <th style="width: 14%;">Source Port</th>
-                                    <th style="width: 14%;">Destination Port</th>
-                                    <th style="width: 10%;"><a href="/circuits/reservation/status?ReservationSearch%5Bsrc_domain%5D=&amp;ReservationSearch%5Bdst_domain%5D=&amp;ReservationSearch%5Bdataplane_status%5D=ACTIVE&amp;_pjax=%23circuits-pjax&amp;sort=bandwidth" data-sort="bandwidth">Bandwidth <img style="width: 7px; height:11px;" src="/images/sort_image.png" alt="Order by:"></a></th>
-                                    
+                                    <th style="width: 20%;">Name</th>
+                                    <th style="width: 25%;">Connection ID</th>
+                                    <th style="width: 25%;">Description</th>
+                                    <th style="width: 22%;">EndPoints</th>
                                  </tr>
                                  
                                  <?php
@@ -99,12 +94,9 @@
                                              ?>
                                                 <tr id="circuits-gridcurrent-filters" class="filters">
                                                    <td><?php echo isset($connectionInfo['name']) ? $connectionInfo['name'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['quantity']) ? $connectionInfo['quantity'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['scheduling']['start_time']) ? $connectionInfo['scheduling']['start_time'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['scheduling']['end_time']) ? $connectionInfo['scheduling']['end_time'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['endpoints'][0]['port_id']) ? $connectionInfo['endpoints'][0]['port_id'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['endpoints'][count($connectionInfo['endpoints']) - 1]['port_id']) ? $connectionInfo['endpoints'][count($connectionInfo['endpoints']) - 1]['port_id'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['qos_metrics']['min_bw']['value']) ? $connectionInfo['qos_metrics']['min_bw']['value'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['id']) ? $connectionInfo['id'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['description']) ? $connectionInfo['description'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['endpoints']) ? implode(', ', array_column($connectionInfo['endpoints'], 'port_id')) : ''; ?></td>
                                                    <td><button type="button" class="btn btn-primary view-connection" data-connection='<?php echo json_encode($connectionInfo); ?>'>View</button></td>
                                                    <td><button type="submit" class="btn btn-primary delete-connection" delete-connection='<?php echo json_encode($connectionInfo); ?>' style="background-color:red;">Delete</button></td>
                                                 </tr>
@@ -134,15 +126,10 @@
                             <table class="table table-striped">
                               <thead>
                                  <tr>
-                                    
-                                    <th style="width: 11%;">Name</th>
-                                    <th style="width: 10%;">Quantity</th>
-                                    <th style="width: 10%;"><a href="/circuits/reservation/status?ReservationSearch%5Bsrc_domain%5D=&amp;ReservationSearch%5Bdst_domain%5D=&amp;ReservationSearch%5Bdataplane_status%5D=ACTIVE&amp;_pjax=%23circuits-pjax&amp;sort=start" data-sort="start">Start Time <img style="width: 7px; height:11px;" src="/images/sort_image.png" alt="Order by:"></a></th>
-                                    <th style="width: 10%;"><a href="/circuits/reservation/status?ReservationSearch%5Bsrc_domain%5D=&amp;ReservationSearch%5Bdst_domain%5D=&amp;ReservationSearch%5Bdataplane_status%5D=ACTIVE&amp;_pjax=%23circuits-pjax&amp;sort=finish" data-sort="finish">End Time <img style="width: 7px; height:11px;" src="/images/sort_image.png" alt="Order by:"></a></th>
-                                    <th style="width: 14%;">Source Port</th>
-                                    <th style="width: 14%;">Destination Port</th>
-                                    <th style="width: 10%;"><a href="/circuits/reservation/status?ReservationSearch%5Bsrc_domain%5D=&amp;ReservationSearch%5Bdst_domain%5D=&amp;ReservationSearch%5Bdataplane_status%5D=ACTIVE&amp;_pjax=%23circuits-pjax&amp;sort=bandwidth" data-sort="bandwidth">Bandwidth <img style="width: 7px; height:11px;" src="/images/sort_image.png" alt="Order by:"></a></th>
-                                    
+                                    <th style="width: 20%;">Name</th>
+                                    <th style="width: 25%;">Connection ID</th>
+                                    <th style="width: 25%;">Description</th>
+                                    <th style="width: 22%;">EndPoints</th>
                                  </tr>
                               </thead>
                               <tbody>
@@ -266,6 +253,7 @@
          const connectionId = parsedData.id;
          const meican_url="<?php echo MEICAN_URL;?>";
          const row = $(this).closest('tr');
+         console.log("Connection ID", connectionId);
 
          $.ajax({
             url: "https://"+meican_url+"/circuits/nodes/delete",
