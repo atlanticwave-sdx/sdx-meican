@@ -253,7 +253,6 @@
          const connectionId = parsedData.id;
          const meican_url="<?php echo MEICAN_URL;?>";
          const row = $(this).closest('tr');
-         console.log("Connection ID", connectionId);
 
          $.ajax({
             url: "https://"+meican_url+"/circuits/nodes/delete",
