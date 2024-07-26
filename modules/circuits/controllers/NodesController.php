@@ -101,6 +101,7 @@ class NodesController extends RbacController {
 
       $connection_response = curl_exec($curl);
       curl_close($curl);
+      echo $connection_response;
     }
 
     public function actionCreate(){ // this route manages the view and backend logic for creating a circuit request

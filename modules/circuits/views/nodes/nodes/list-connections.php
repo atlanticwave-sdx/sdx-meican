@@ -259,12 +259,12 @@
             type: "GET",
             data: { connectionId: connectionId },
             contentType: "application/json; charset=utf-8",
-            success: function(data){
+            success: function(data, textStatus, jqXHR) {
                row.remove();
-               alert(data);
+               alert("Status: " + jqXHR.status + " - Response: " + data);
             },
-            error: function(errMsg) {
-               alert(errMsg);
+            error: function(jqXHR, textStatus, errorThrown) {
+                  alert("Status: " + jqXHR.status + " - Error: " + errorThrown);
             }
          });
       });
