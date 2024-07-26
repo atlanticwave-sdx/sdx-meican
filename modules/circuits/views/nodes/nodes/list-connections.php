@@ -91,7 +91,6 @@
 
                                        if (is_array($connectionsData) && json_last_error() === JSON_ERROR_NONE) {
                                           foreach ($connectionsData as $connectionId => $connectionInfo) {
-                                             var_dump($connectionInfo['endpoints']);
                                              ?>
                                                 <tr id="circuits-gridcurrent-filters" class="filters">
                                                    <td><?php echo isset($connectionInfo['name']) ? $connectionInfo['name'] : ''; ?></td>
