@@ -208,8 +208,8 @@
       // Function to format each endpoint field
       function formatEndpointData(endpoint) {
          let formattedEndpointData = '';
-         formattedEndpointData += `<strong>Port ID:</strong> ${endpoint.port_id || ''}<br>`;
-         formattedEndpointData += `<strong>VLAN:</strong> ${endpoint.vlan || ''}<br>`;
+         formattedEndpointData += `<strong>ID:</strong> ${endpoint.id || ''}<br>`;
+         formattedEndpointData += `<strong>VLAN:</strong> ${endpoint.label_range || ''}<br>`;
          return formattedEndpointData;
       }
 
