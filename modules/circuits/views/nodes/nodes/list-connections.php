@@ -91,12 +91,13 @@
 
                                        if (is_array($connectionsData) && json_last_error() === JSON_ERROR_NONE) {
                                           foreach ($connectionsData as $connectionId => $connectionInfo) {
+                                             var_dump($connectionInfo['endpoints']);
                                              ?>
                                                 <tr id="circuits-gridcurrent-filters" class="filters">
                                                    <td><?php echo isset($connectionInfo['name']) ? $connectionInfo['name'] : ''; ?></td>
                                                    <td><?php echo isset($connectionInfo['id']) ? $connectionInfo['id'] : ''; ?></td>
                                                    <td><?php echo isset($connectionInfo['description']) ? $connectionInfo['description'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['endpoints']) ? implode(', ', array_column($connectionInfo['endpoints'], 'port_id')) : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['endpoints']) ? implode(', ', array_column($connectionInfo['endpoints'], 'id')) : ''; ?></td>
                                                    <td><button type="button" class="btn btn-primary view-connection" data-connection='<?php echo json_encode($connectionInfo); ?>'>View</button></td>
                                                    <td><button type="submit" class="btn btn-primary delete-connection" delete-connection='<?php echo json_encode($connectionInfo); ?>' style="background-color:red;">Delete</button></td>
                                                 </tr>
@@ -261,6 +262,10 @@
             contentType: "application/json; charset=utf-8",
             success: function(data){
                row.remove();
+               alert(data);
+            },
+            error: function(errMsg) {
+               alert(errMsg);
             }
          });
       });
