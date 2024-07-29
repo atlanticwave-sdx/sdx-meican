@@ -442,16 +442,16 @@
     console.log(request);
     console.log(JSON.stringify(request));
 
-    //     $.ajax({
-    //     type: "POST",
-    //     url: "https://"+meican_url+"/circuits/nodes/create",
-    //     data: JSON.stringify(request),
-    //     contentType: "application/json; charset=utf-8",
-    //     success: function(data){alert(data);},
-    //     error: function(errMsg) {
-    //         alert(errMsg);
-    //     }
-    // });
+        $.ajax({
+        type: "POST",
+        url: "https://"+meican_url+"/circuits/nodes/create",
+        data: JSON.stringify(request),
+        contentType: "application/json; charset=utf-8",
+        success: function(data){alert(data);},
+        error: function(errMsg) {
+            alert(errMsg);
+        }
+    });
 
   });
 

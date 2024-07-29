@@ -79,15 +79,10 @@
                            <table class="table table-striped">
                               <thead>
                                  <tr>
-                                    
-                                    <th style="width: 11%;">Name</th>
-                                    <th style="width: 10%;">Quantity</th>
-                                    <th style="width: 10%;"><a href="/circuits/reservation/status?ReservationSearch%5Bsrc_domain%5D=&amp;ReservationSearch%5Bdst_domain%5D=&amp;ReservationSearch%5Bdataplane_status%5D=ACTIVE&amp;_pjax=%23circuits-pjax&amp;sort=start" data-sort="start">Start Time <img style="width: 7px; height:11px;" src="/images/sort_image.png" alt="Order by:"></a></th>
-                                    <th style="width: 10%;"><a href="/circuits/reservation/status?ReservationSearch%5Bsrc_domain%5D=&amp;ReservationSearch%5Bdst_domain%5D=&amp;ReservationSearch%5Bdataplane_status%5D=ACTIVE&amp;_pjax=%23circuits-pjax&amp;sort=finish" data-sort="finish">End Time <img style="width: 7px; height:11px;" src="/images/sort_image.png" alt="Order by:"></a></th>
-                                    <th style="width: 14%;">Source Port</th>
-                                    <th style="width: 14%;">Destination Port</th>
-                                    <th style="width: 10%;"><a href="/circuits/reservation/status?ReservationSearch%5Bsrc_domain%5D=&amp;ReservationSearch%5Bdst_domain%5D=&amp;ReservationSearch%5Bdataplane_status%5D=ACTIVE&amp;_pjax=%23circuits-pjax&amp;sort=bandwidth" data-sort="bandwidth">Bandwidth <img style="width: 7px; height:11px;" src="/images/sort_image.png" alt="Order by:"></a></th>
-                                    
+                                    <th style="width: 20%;">Name</th>
+                                    <th style="width: 25%;">Connection ID</th>
+                                    <th style="width: 25%;">Description</th>
+                                    <th style="width: 22%;">EndPoints</th>
                                  </tr>
                                  
                                  <?php
@@ -99,17 +94,15 @@
                                              ?>
                                                 <tr id="circuits-gridcurrent-filters" class="filters">
                                                    <td><?php echo isset($connectionInfo['name']) ? $connectionInfo['name'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['quantity']) ? $connectionInfo['quantity'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['start_time']) ? $connectionInfo['start_time'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['end_time']) ? $connectionInfo['end_time'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['egress_port']['id']) ? $connectionInfo['egress_port']['id'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['ingress_port']['id']) ? $connectionInfo['ingress_port']['id'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['bandwidth_required']) ? $connectionInfo['bandwidth_required'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['id']) ? $connectionInfo['id'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['description']) ? $connectionInfo['description'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['endpoints']) ? implode(', ', array_column($connectionInfo['endpoints'], 'id')) : ''; ?></td>
                                                    <td><button type="button" class="btn btn-primary view-connection" data-connection='<?php echo json_encode($connectionInfo); ?>'>View</button></td>
                                                    <td><button type="submit" class="btn btn-primary delete-connection" delete-connection='<?php echo json_encode($connectionInfo); ?>' style="background-color:red;">Delete</button></td>
                                                 </tr>
                                              <?php
                                           }
+                                          
                                        }
                                     }
                                  ?>
@@ -133,15 +126,10 @@
                             <table class="table table-striped">
                               <thead>
                                  <tr>
-                                    
-                                    <th style="width: 11%;">Name</th>
-                                    <th style="width: 10%;">Quantity</th>
-                                    <th style="width: 10%;"><a href="/circuits/reservation/status?ReservationSearch%5Bsrc_domain%5D=&amp;ReservationSearch%5Bdst_domain%5D=&amp;ReservationSearch%5Bdataplane_status%5D=ACTIVE&amp;_pjax=%23circuits-pjax&amp;sort=start" data-sort="start">Start Time <img style="width: 7px; height:11px;" src="/images/sort_image.png" alt="Order by:"></a></th>
-                                    <th style="width: 10%;"><a href="/circuits/reservation/status?ReservationSearch%5Bsrc_domain%5D=&amp;ReservationSearch%5Bdst_domain%5D=&amp;ReservationSearch%5Bdataplane_status%5D=ACTIVE&amp;_pjax=%23circuits-pjax&amp;sort=finish" data-sort="finish">End Time <img style="width: 7px; height:11px;" src="/images/sort_image.png" alt="Order by:"></a></th>
-                                    <th style="width: 14%;">Source Port</th>
-                                    <th style="width: 14%;">Destination Port</th>
-                                    <th style="width: 10%;"><a href="/circuits/reservation/status?ReservationSearch%5Bsrc_domain%5D=&amp;ReservationSearch%5Bdst_domain%5D=&amp;ReservationSearch%5Bdataplane_status%5D=ACTIVE&amp;_pjax=%23circuits-pjax&amp;sort=bandwidth" data-sort="bandwidth">Bandwidth <img style="width: 7px; height:11px;" src="/images/sort_image.png" alt="Order by:"></a></th>
-                                    
+                                    <th style="width: 20%;">Name</th>
+                                    <th style="width: 25%;">Connection ID</th>
+                                    <th style="width: 25%;">Description</th>
+                                    <th style="width: 22%;">EndPoints</th>
                                  </tr>
                               </thead>
                               <tbody>
@@ -195,34 +183,51 @@
 
          formattedData += `<strong>Id:</strong> ${data.id || ''}<br>`;
          formattedData += `<strong>Name:</strong> ${data.name || ''}<br>`;
-         formattedData += `<strong>Quantity:</strong> ${data.quantity || ''}<br>`;
-         formattedData += `<strong>Start Time:</strong> ${data.start_time || ''}<br>`;
-         formattedData += `<strong>End Time:</strong> ${data.end_time || ''}<br>`;
-         formattedData += `<strong>Bandwidth Required:</strong> ${data.bandwidth_required || ''}<br>`;
-         formattedData += `<strong>Latency Required:</strong> ${data.latency_required || ''}<br>`;
-         formattedData += `<strong>Time Stamp:</strong> ${data.time_stamp || ''}<br>`;
-         formattedData += `<strong>Version:</strong> ${data.version || ''}<br>`;
+         formattedData += `<strong>Description:</strong> ${data.description || ''}<br>`;
+         formattedData += `<strong>Start Time:</strong> ${data.scheduling.start_time || ''}<br>`;
+         formattedData += `<strong>End Time:</strong> ${data.scheduling.end_time || ''}<br>`;
 
-         formattedData += `<strong>Egress Port:</strong><br>`;
-         formattedData += `<div style="padding-left: 20px;">${formatNestedPortData(data.egress_port || {})}</div>`;
-         formattedData += `<strong>Ingress Port:</strong><br>`;
-         formattedData += `<div style="padding-left: 20px;">${formatNestedPortData(data.ingress_port || {})}</div>`;
+         formattedData += `<strong>QoS Metrics:</strong><br>`;
+         formattedData += `<div style="padding-left: 20px;">${formatQosMetrics(data.qos_metrics)}</div>`;
+
+         formattedData += `<strong>Notifications:</strong><br>`;
+         data.notifications.forEach((notification, index) => {
+            formattedData += `<div style="padding-left: 20px;"><strong>Email ${index + 1}: </strong>${formatNotificationData(notification)}</div></div>`;
+         });
+
+         formattedData += `<strong>Endpoints:</strong><br>`;
+         data.endpoints.forEach((endpoint, index) => {
+            formattedData += `<div style="padding-left: 20px;"><strong>Interface ${index + 1}:</strong><br>`;
+            formattedData += `<div style="padding-left: 20px;">${formatEndpointData(endpoint)}</div></div>`;
+         });
 
          return formattedData;
       }
 
-      // Function to format egress and ingress fields
-      function formatNestedPortData(portData) {
-         if (portData && Object.keys(portData).length > 0) {
-            let formattedPortData = '';
-            formattedPortData += `<strong>Id:</strong> ${portData.id || ''}<br>`;
-            formattedPortData += `<strong>Name:</strong> ${portData.name || ''}<br>`;
-            formattedPortData += `<strong>Node:</strong> ${portData.node || ''}<br>`;
-            formattedPortData += `<strong>Short Name:</strong> ${portData.short_name || ''}<br>`;
-            formattedPortData += `<strong>State:</strong> ${portData.state || ''}<br>`;
-            formattedPortData += `<strong>Status:</strong> ${portData.status || ''}<br>`;
-            return formattedPortData;
+      // Function to format each endpoint field
+      function formatEndpointData(endpoint) {
+         let formattedEndpointData = '';
+         formattedEndpointData += `<strong>ID:</strong> ${endpoint.id || ''}<br>`;
+         formattedEndpointData += `<strong>VLAN:</strong> ${endpoint.label_range || ''}<br>`;
+         return formattedEndpointData;
+      }
+
+      // Function to format each notification field
+      function formatNotificationData(notification) {
+         let formattedNotificationData = '';
+         formattedNotificationData += `${notification.email || ''}<br>`;
+         return formattedNotificationData;
+      }
+
+      // Function to format QoS metrics
+      function formatQosMetrics(qosMetrics) {
+         let formattedQosMetrics = '';
+         if (qosMetrics) {
+            formattedQosMetrics += `<strong>Minimum Bandwidth:</strong> ${qosMetrics.min_bw.value || ''} (Strict: ${qosMetrics.min_bw.strict ? 'Yes' : 'No'})<br>`;
+            formattedQosMetrics += `<strong>Maximum Delay:</strong> ${qosMetrics.max_delay.value || ''} (Strict: ${qosMetrics.max_delay.strict ? 'Yes' : 'No'})<br>`;
+            formattedQosMetrics += `<strong>Maximum OXPs:</strong> ${qosMetrics.max_number_oxps.value || ''} (Strict: ${qosMetrics.max_number_oxps.strict ? 'Yes' : 'No'})<br>`;
          }
+         return formattedQosMetrics;
       }
       
       $(document).on('click', '.view-connection', function () {
@@ -254,8 +259,12 @@
             type: "GET",
             data: { connectionId: connectionId },
             contentType: "application/json; charset=utf-8",
-            success: function(data){
+            success: function(data, textStatus, jqXHR) {
                row.remove();
+               alert("Status: " + jqXHR.status + " - Response: " + data);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                  alert("Status: " + jqXHR.status + " - Error: " + errorThrown);
             }
          });
       });
