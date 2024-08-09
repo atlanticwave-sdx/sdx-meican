@@ -180,7 +180,6 @@
 
       function formatJsonData(data) {
          let formattedData = '';
-         console.log(data);
 
          formattedData += `<strong>Id:</strong> ${data.id || ''}<br>`;
          formattedData += `<strong>Name:</strong> ${data.name || ''}<br>`;
