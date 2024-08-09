@@ -180,20 +180,37 @@
 
       function formatJsonData(data) {
          let formattedData = '';
+         console.log(data);
 
          formattedData += `<strong>Id:</strong> ${data.id || ''}<br>`;
          formattedData += `<strong>Name:</strong> ${data.name || ''}<br>`;
+         if(data.description!==undefined){
          formattedData += `<strong>Description:</strong> ${data.description || ''}<br>`;
-         formattedData += `<strong>Start Time:</strong> ${data.scheduling.start_time || ''}<br>`;
-         formattedData += `<strong>End Time:</strong> ${data.scheduling.end_time || ''}<br>`;
+         }
 
+         if(data.scheduling!==undefined){
+            if(data.scheduling.start_time!==undefined){
+         formattedData += `<strong>Start Time:</strong> ${data.scheduling.start_time || ''}<br>`;
+         }
+         }
+         
+         if(data.scheduling!==undefined){
+            if(data.scheduling.end_time!==undefined){
+         formattedData += `<strong>End Time:</strong> ${data.scheduling.end_time || ''}<br>`;
+         }
+         }
+
+         if(data.qos_metrics!==undefined){
          formattedData += `<strong>QoS Metrics:</strong><br>`;
          formattedData += `<div style="padding-left: 20px;">${formatQosMetrics(data.qos_metrics)}</div>`;
+         }
 
+         if(data.notifications!==undefined){
          formattedData += `<strong>Notifications:</strong><br>`;
          data.notifications.forEach((notification, index) => {
             formattedData += `<div style="padding-left: 20px;"><strong>Email ${index + 1}: </strong>${formatNotificationData(notification)}</div></div>`;
          });
+         }
 
          formattedData += `<strong>Endpoints:</strong><br>`;
          data.endpoints.forEach((endpoint, index) => {
