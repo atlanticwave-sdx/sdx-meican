@@ -101,7 +101,7 @@
             <br>VLAN:</br>
             <select class="form-control" id="endpoint_1_vlan" name="endpoint_1_vlan" placeholder="vlan" required>
               <option value="any" title="Any available VLAN ID is chosen">any</option>
-              <option value="number" title="Specific VLAN ID, e.g., '50'">number</option>
+              <option value="number" title="Specific VLAN ID, e.g., '50'">VLAN ID</option>
               <option value="untagged" title="Transports Ethernet frames without IEEE 802.1Q Ethertype">untagged</option>
               <option value="VLAN range" title="Range of VLANs, e.g., '50:55'">VLAN range</option>
               <option value="all" title="Transport all Ethernet frames with and without IEEE 802.Q Ethertype">all</option>
@@ -125,7 +125,7 @@
             <br>VLAN:</br>
             <select class="form-control" id="endpoint_2_vlan" name="endpoint_2_vlan" placeholder="vlan" required>
             <option value="any" title="Any available VLAN ID is chosen">any</option>
-              <option value="number" title="Specific VLAN ID, e.g., '50'">number</option>
+              <option value="number" title="Specific VLAN ID, e.g., '50'">VLAN ID</option>
               <option value="untagged" title="Transports Ethernet frames without IEEE 802.1Q Ethertype">untagged</option>
               <option value="VLAN range" title="Range of VLANs, e.g., '50:55'">VLAN range</option>
               <option value="all" title="Transport all Ethernet frames with and without IEEE 802.Q Ethertype">all</option>
@@ -532,7 +532,7 @@
     };
     vlanSelect.innerHTML = `
       <option value="any" title="Any available VLAN ID chosen">any</option>
-      <option value="number" title="Specific VLAN ID, e.g., '50'">number</option>
+      <option value="number" title="Specific VLAN ID, e.g., '50'">VLAN ID</option>
       <option value="untagged" title="Transport Ethernet frames without IEEE 802.1Q Ethertype">untagged</option>
       <option value="VLAN range" title="Range of VLANs, e.g., '50:55'">VLAN range</option>
       <option value="all" title="Transport all Ethernet frames with and without IEEE 802.Q Ethertype">all</option>

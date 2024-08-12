@@ -224,7 +224,7 @@
       function formatEndpointData(endpoint) {
          let formattedEndpointData = '';
          formattedEndpointData += `<strong>ID:</strong> ${endpoint.id || ''}<br>`;
-         formattedEndpointData += `<strong>VLAN:</strong> ${endpoint.label_range || ''}<br>`;
+         formattedEndpointData += `<strong>VLAN:</strong> ${endpoint.vlan || ''}<br>`;
          return formattedEndpointData;
       }
 
@@ -239,9 +239,15 @@
       function formatQosMetrics(qosMetrics) {
          let formattedQosMetrics = '';
          if (qosMetrics) {
-            formattedQosMetrics += `<strong>Minimum Bandwidth:</strong> ${qosMetrics.min_bw.value || ''} (Strict: ${qosMetrics.min_bw.strict ? 'Yes' : 'No'})<br>`;
-            formattedQosMetrics += `<strong>Maximum Delay:</strong> ${qosMetrics.max_delay.value || ''} (Strict: ${qosMetrics.max_delay.strict ? 'Yes' : 'No'})<br>`;
-            formattedQosMetrics += `<strong>Maximum OXPs:</strong> ${qosMetrics.max_number_oxps.value || ''} (Strict: ${qosMetrics.max_number_oxps.strict ? 'Yes' : 'No'})<br>`;
+            if(qosMetrics.min_bw!==undefined){
+               formattedQosMetrics += `<strong>Minimum Bandwidth:</strong> ${qosMetrics.min_bw.value || ''} (Strict: ${qosMetrics.min_bw.strict ? 'Yes' : 'No'})<br>`;
+            }
+            if(qosMetrics.max_delay!==undefined){
+               formattedQosMetrics += `<strong>Maximum Delay:</strong> ${qosMetrics.max_delay.value || ''} (Strict: ${qosMetrics.max_delay.strict ? 'Yes' : 'No'})<br>`;
+            }
+            if(qosMetrics.max_number_oxps!==undefined){
+               formattedQosMetrics += `<strong>Maximum OXPs:</strong> ${qosMetrics.max_number_oxps.value || ''} (Strict: ${qosMetrics.max_number_oxps.strict ? 'Yes' : 'No'})<br>`;
+            }
          }
          return formattedQosMetrics;
       }
