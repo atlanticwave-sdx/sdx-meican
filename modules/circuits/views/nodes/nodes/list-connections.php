@@ -183,17 +183,33 @@
 
          formattedData += `<strong>Id:</strong> ${data.id || ''}<br>`;
          formattedData += `<strong>Name:</strong> ${data.name || ''}<br>`;
+         if(data.description!==undefined){
          formattedData += `<strong>Description:</strong> ${data.description || ''}<br>`;
-         formattedData += `<strong>Start Time:</strong> ${data.scheduling.start_time || ''}<br>`;
-         formattedData += `<strong>End Time:</strong> ${data.scheduling.end_time || ''}<br>`;
+         }
 
+         if(data.scheduling!==undefined){
+            if(data.scheduling.start_time!==undefined){
+         formattedData += `<strong>Start Time:</strong> ${data.scheduling.start_time || ''}<br>`;
+         }
+         }
+         
+         if(data.scheduling!==undefined){
+            if(data.scheduling.end_time!==undefined){
+         formattedData += `<strong>End Time:</strong> ${data.scheduling.end_time || ''}<br>`;
+         }
+         }
+
+         if(data.qos_metrics!==undefined){
          formattedData += `<strong>QoS Metrics:</strong><br>`;
          formattedData += `<div style="padding-left: 20px;">${formatQosMetrics(data.qos_metrics)}</div>`;
+         }
 
+         if(data.notifications!==undefined){
          formattedData += `<strong>Notifications:</strong><br>`;
          data.notifications.forEach((notification, index) => {
             formattedData += `<div style="padding-left: 20px;"><strong>Email ${index + 1}: </strong>${formatNotificationData(notification)}</div></div>`;
          });
+         }
 
          formattedData += `<strong>Endpoints:</strong><br>`;
          data.endpoints.forEach((endpoint, index) => {
@@ -208,7 +224,7 @@
       function formatEndpointData(endpoint) {
          let formattedEndpointData = '';
          formattedEndpointData += `<strong>ID:</strong> ${endpoint.id || ''}<br>`;
-         formattedEndpointData += `<strong>VLAN:</strong> ${endpoint.label_range || ''}<br>`;
+         formattedEndpointData += `<strong>VLAN:</strong> ${endpoint.vlan || ''}<br>`;
          return formattedEndpointData;
       }
 
@@ -223,9 +239,15 @@
       function formatQosMetrics(qosMetrics) {
          let formattedQosMetrics = '';
          if (qosMetrics) {
-            formattedQosMetrics += `<strong>Minimum Bandwidth:</strong> ${qosMetrics.min_bw.value || ''} (Strict: ${qosMetrics.min_bw.strict ? 'Yes' : 'No'})<br>`;
-            formattedQosMetrics += `<strong>Maximum Delay:</strong> ${qosMetrics.max_delay.value || ''} (Strict: ${qosMetrics.max_delay.strict ? 'Yes' : 'No'})<br>`;
-            formattedQosMetrics += `<strong>Maximum OXPs:</strong> ${qosMetrics.max_number_oxps.value || ''} (Strict: ${qosMetrics.max_number_oxps.strict ? 'Yes' : 'No'})<br>`;
+            if(qosMetrics.min_bw!==undefined){
+               formattedQosMetrics += `<strong>Minimum Bandwidth:</strong> ${qosMetrics.min_bw.value || ''} (Strict: ${qosMetrics.min_bw.strict ? 'Yes' : 'No'})<br>`;
+            }
+            if(qosMetrics.max_delay!==undefined){
+               formattedQosMetrics += `<strong>Maximum Delay:</strong> ${qosMetrics.max_delay.value || ''} (Strict: ${qosMetrics.max_delay.strict ? 'Yes' : 'No'})<br>`;
+            }
+            if(qosMetrics.max_number_oxps!==undefined){
+               formattedQosMetrics += `<strong>Maximum OXPs:</strong> ${qosMetrics.max_number_oxps.value || ''} (Strict: ${qosMetrics.max_number_oxps.strict ? 'Yes' : 'No'})<br>`;
+            }
          }
          return formattedQosMetrics;
       }

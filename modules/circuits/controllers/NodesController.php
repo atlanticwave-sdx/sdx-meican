@@ -310,7 +310,9 @@ class NodesController extends RbacController {
 
         foreach ($sub_nodes as $key2 => $value2) {
           // code...
-          if($value2['id']==$node_id){
+          $ports=$value2['ports'];
+          foreach($ports as $key3=>$value3){
+          if($value3['id']==$node_id){
 
             $temp2=array();
             array_push($temp2,$value['latitude']);
@@ -320,6 +322,7 @@ class NodesController extends RbacController {
             break;
 
           }
+        }
         }
       }
 
@@ -371,9 +374,10 @@ class NodesController extends RbacController {
 
     foreach ($links as $key => $value) {
       // code...
-      $latlng=find_subnode_by_id($nodes_array,$value->ports[0]->node);
-      $latlng2=find_subnode_by_id($nodes_array,$value->ports[1]->node);
+      $latlng=find_subnode_by_id($nodes_array,$value->ports[0]);
+      $latlng2=find_subnode_by_id($nodes_array,$value->ports[1]);
       if(!empty($latlng)&&!empty($latlng2)){
+        //echo "here";
         $temp_node=array();
         $temp_node['link']=$latlng['node']."-".$latlng2['node'];
         $temp_node['latlngs']=array(
@@ -400,6 +404,12 @@ class NodesController extends RbacController {
       }
       
     }
+
+    //echo"<pre>";print_r($nodes_array);echo"</pre>";
+    //echo"<pre>";print_r($latlng_array);echo"</pre>";
+    //echo"<pre>";print_r($links_array);echo"</pre>";
+
+    //exit();
         
         return $this->render('nodes/nodes',['nodes_array'=>$nodes_array,'latlng_array'=>$latlng_array,'links_array'=>$links_array,'meican_url'=>$meican_url]);
     }
