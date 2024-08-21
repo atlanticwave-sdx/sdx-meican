@@ -35,11 +35,11 @@
     }
 
     .modal-dialog {
+      width: 75vw;
       overflow-y: initial !important
     }
 
     .modal-body {
-      height: 250px;
       overflow-y: auto;
     }
 
@@ -59,6 +59,17 @@
       margin-bottom: 10px;
       margin-right: 10px;
     }
+
+    #portsTable th, #portsTable td {
+      padding: 8px;
+      text-align: left;
+    }
+
+    #tableSearch {
+      margin-bottom: 10px;
+    }
+
+
   </style>
 
 
@@ -219,23 +230,38 @@
       var i = e.target.myID;
       $('#wrapper').empty();
       var modalstring = '<div id="myModal" class="modal fade" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">' + key + '</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body">';
+
+      modalstring += '<input id="tableSearch" type="text" placeholder="Search..." class="form-control mb-3">';
+
+      modalstring += '<table id="portsTable" class="table table-bordered table-striped"><thead><tr><th>Location</th><th>ID</th><th>Name</th><th>Node</th><th>Type</th><th>Status</th><th>State</th></tr></thead><tbody>';
       for (var j = 0; j < value.sub_nodes.length; j++) {
-        modalstring = modalstring + '<p>Location: ' + value.sub_nodes[j].sub_node_name + '</p><p>Ports:</p>';
+          var portLocation = value.sub_nodes[j].sub_node_name;
 
-        for (var k = 0; k < value.sub_nodes[j].ports.length; k++) {
-
-          modalstring = modalstring + '<p>ID: ' + value.sub_nodes[j].ports[k].id + '</p>';
-          modalstring = modalstring + '<p>Name: ' + value.sub_nodes[j].ports[k].name + '</p>';
-          modalstring = modalstring + '<p>Node: ' + value.sub_nodes[j].ports[k].node + '</p>';
-          modalstring = modalstring + '<p>Type: ' + value.sub_nodes[j].ports[k].type + '</p>';
-          modalstring = modalstring + '<p>Status: ' + value.sub_nodes[j].ports[k].status + '</p>';
-          modalstring = modalstring + '<p>State: ' + value.sub_nodes[j].ports[k].state + '</p>';
-          modalstring = modalstring + '---------------------------------------------------';
-        }
+          for (var k = 0; k < value.sub_nodes[j].ports.length; k++) {
+              var port = value.sub_nodes[j].ports[k];
+              modalstring += '<tr>';
+              modalstring += '<td>' + portLocation + '</td>';
+              modalstring += '<td>' + port.id + '</td>';
+              modalstring += '<td>' + port.name + '</td>';
+              modalstring += '<td>' + port.node + '</td>';
+              modalstring += '<td>' + port.type + '</td>';
+              modalstring += '<td>' + port.status + '</td>';
+              modalstring += '<td>' + port.state + '</td>';
+              modalstring += '</tr>';
+          }
       }
-      modalstring = modalstring + '</div></div></div></div>';
+
+      modalstring += '</tbody></table></div></div></div></div>';
       $('#wrapper').append(modalstring);
       $("#myModal").modal('show');
+
+      $("#tableSearch").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#portsTable tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+      });
+
     });
     marker.addTo(map);
     marker.openTooltip();
