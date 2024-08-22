@@ -39,6 +39,10 @@
       overflow-y: initial !important
     }
 
+    .links-modal {
+      width: 95vw;
+    }
+
     .modal-body {
       overflow-y: auto;
     }
@@ -60,12 +64,12 @@
       margin-right: 10px;
     }
 
-    #portsTable th, #portsTable td {
+    #portsTable th, #portsTable td, #linksTable th, #linksTable td {
       padding: 8px;
       text-align: left;
     }
 
-    #tableSearch {
+    #tableSearchPorts, #tableSearchLinks {
       margin-bottom: 10px;
     }
 
@@ -231,7 +235,7 @@
       $('#wrapper').empty();
       var modalstring = '<div id="myModal" class="modal fade" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">' + key + '</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body">';
 
-      modalstring += '<input id="tableSearch" type="text" placeholder="Search..." class="form-control mb-3">';
+      modalstring += '<input id="tableSearchPorts" type="text" placeholder="Search..." class="form-control mb-3">';
 
       modalstring += '<table id="portsTable" class="table table-bordered table-striped"><thead><tr><th>Location</th><th>ID</th><th>Name</th><th>Node</th><th>Type</th><th>Status</th><th>State</th></tr></thead><tbody>';
       for (var j = 0; j < value.sub_nodes.length; j++) {
@@ -245,7 +249,7 @@
               modalstring += '<td>' + port.name + '</td>';
               modalstring += '<td>' + port.node + '</td>';
               modalstring += '<td>' + port.type + '</td>';
-              modalstring += '<td>' + port.status + '</td>';
+              modalstring += '<td style="color:' + (port.status == 'up' ? 'green' : 'red') + '; font-weight: bold;">' + port.status + '</td>';  
               modalstring += '<td>' + port.state + '</td>';
               modalstring += '</tr>';
           }
@@ -255,7 +259,7 @@
       $('#wrapper').append(modalstring);
       $("#myModal").modal('show');
 
-      $("#tableSearch").on("keyup", function() {
+      $("#tableSearchPorts").on("keyup", function() {
         var value = $(this).val().toLowerCase();
         $("#portsTable tbody tr").filter(function() {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
@@ -289,26 +293,37 @@
         for (let [key3, value3] of Object.entries(links_array)) {
           if (key3 == i) {
             $('#wrapper').empty();
+            var modalstring2 = '<div id="myModal2" class="modal fade" tabindex="-1"><div class="modal-dialog links-modal"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">' + i + '</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body"><p style="font-weight: bold">Links:</p>';
 
-            var modalstring2 = '<div id="myModal2" class="modal fade" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">' + i + '</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body"><p>Links:</p>';
+            modalstring2 += '<input id="tableSearchLinks" type="text" placeholder="Search..." class="form-control mb-3">';
+
+            modalstring2 += '<table id="linksTable" class="table table-bordered table-striped"><thead><tr><th>ID</th><th>Name</th><th>Bandwidth</th><th>Residual <br /> Bandwidth</th><th>Type</th><th>Packet <br /> loss</th><th>Latency</th><th>Availability</th><th>Status</th><th>State</th></tr></thead><tbody>';
 
             for (var k = 0; k < value3.length; k++) {
-
-              modalstring2 = modalstring2 + '<p>ID: ' + value3[k].id + '</p>';
-              modalstring2 = modalstring2 + '<p>Name: ' + value3[k].name + '</p>';
-              modalstring2 = modalstring2 + '<p>Bandwidth: ' + value3[k].bandwidth + '</p>';
-              modalstring2 = modalstring2 + '<p>Residual Bandwidth: ' + value3[k].residual_bandwidth + '</p>';
-              modalstring2 = modalstring2 + '<p>Type: ' + value3[k].type + '</p>';
-              modalstring2 = modalstring2 + '<p>Packet loss: ' + value3[k].packet_loss + '</p>';
-              modalstring2 = modalstring2 + '<p>Latency: ' + value3[k].latency + '</p>';
-              modalstring2 = modalstring2 + '<p>Availability: ' + value3[k].availability + '</p>';
-              modalstring2 = modalstring2 + '<p>Status: ' + value3[k].status + '</p>';
-              modalstring2 = modalstring2 + '<p>State: ' + value3[k].state + '</p>';
-              modalstring2 = modalstring2 + '---------------------------------------------------';
+                var link = value3[k];
+                modalstring2 += '<tr>';
+                modalstring2 += '<td>' + link.id + '</td>';
+                modalstring2 += '<td>' + link.name + '</td>';
+                modalstring2 += '<td>' + link.bandwidth + '</td>';
+                modalstring2 += '<td>' + link.residual_bandwidth + '</td>';
+                modalstring2 += '<td>' + link.type + '</td>';
+                modalstring2 += '<td>' + link.packet_loss + '</td>';
+                modalstring2 += '<td>' + link.latency + '</td>';
+                modalstring2 += '<td>' + link.availability + '</td>';
+                modalstring2 += '<td style="color:' + (link.status == 'up' ? 'green' : 'red') + '; font-weight: bold;">' + link.status + '</td>';
+                modalstring2 += '<td>' + link.state + '</td>';
+                modalstring2 += '</tr>';
             }
-            modalstring2 = modalstring2 + '</div></div></div></div>';
+            modalstring2 += '</tbody></table></div></div></div></div>';
             $('#wrapper').append(modalstring2);
             $("#myModal2").modal('show');
+
+            $("#tableSearchLinks").on("keyup", function() {
+              var value = $(this).val().toLowerCase();
+              $("#linksTable tbody tr").filter(function() {
+                  $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+              });
+            });
           }
         }
       });
