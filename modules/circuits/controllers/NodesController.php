@@ -296,7 +296,6 @@ class NodesController extends RbacController {
     ));
 
     $response = curl_exec($curl);
-
     curl_close($curl);
 
     /* Processing topology JSON */

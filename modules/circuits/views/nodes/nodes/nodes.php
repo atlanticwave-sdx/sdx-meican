@@ -287,6 +287,27 @@
       }).bindTooltip(linkname).addTo(map);
 
       polyline.myID = linkname;
+
+
+      var links_array = <?php echo json_encode($links_array); ?>;
+        for (let [key3, value3] of Object.entries(links_array)) {
+          if (key3 == polyline.myID) {
+
+            for (var k = 0; k < value3.length; k++) {
+                var link = value3[k];
+                 if(link.status!='up'){
+                  polyline.setStyle({
+                      color: 'yellow'
+                          });
+                }
+
+              }
+
+          }
+        }
+
+
+
       polyline.bindTooltip(linkname).on('click', function(e) {
         var i = e.target.myID;
         var links_array = <?php echo json_encode($links_array); ?>;
