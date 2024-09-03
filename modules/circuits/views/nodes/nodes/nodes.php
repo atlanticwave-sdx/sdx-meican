@@ -214,7 +214,7 @@
 
 
 <script type="text/javascript">
-  var map = L.map('map').setView(new L.LatLng(25.75, -80.37), 2);;
+  var map = L.map('map',{closePopupOnClick : false}).setView(new L.LatLng(25.75, -80.37), 2);;
 
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
@@ -230,7 +230,18 @@
     }
     marker.myID = key;
 
-    marker.bindTooltip(locations).on('click', function(e) {
+    var ports_down=0;
+    for (var j = 0; j < value.sub_nodes.length; j++) {
+      for (var k = 0; k < value.sub_nodes[j].ports.length; k++) {
+        var port = value.sub_nodes[j].ports[k];
+            if(port.status!='up'){
+                ports_down=ports_down+1;
+              }
+          }
+      }
+      
+    var tooltip = L.tooltip({permanent:true}).setContent(locations);
+    marker.bindTooltip(tooltip).on('click', function(e) {
       var i = e.target.myID;
       $('#wrapper').empty();
       var modalstring = '<div id="myModal" class="modal fade" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">' + key + '</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body">';
@@ -267,8 +278,17 @@
       });
 
     });
+    
     marker.addTo(map);
     marker.openTooltip();
+     if(ports_down>0){
+      var popup = L.popup({autoClose:false,closeOnClick:false,keepInView:true,permanent:true,interactive:true})
+    .setContent('<p>ports down: <b style="color:red">'+ports_down+'</b></p>');
+        marker.bindPopup(popup);
+        marker.openPopup();
+      }
+    
+    
   }
 
   var latlngs = <?php echo json_encode($latlng_array); ?>;
