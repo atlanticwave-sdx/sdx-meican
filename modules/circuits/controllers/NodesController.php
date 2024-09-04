@@ -46,7 +46,7 @@ class NodesController extends RbacController {
       $curl = curl_init();
 
       curl_setopt_array($curl, array(
-        CURLOPT_URL => $api_url.'connections',
+        CURLOPT_URL => $api_url.'l2vpn',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
@@ -68,7 +68,7 @@ class NodesController extends RbacController {
       $curl = curl_init();
 
       curl_setopt_array($curl, array(
-        CURLOPT_URL => $api_url.'connection/' . $connectionId,
+        CURLOPT_URL => $api_url.'l2vpn/' . $connectionId,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
@@ -89,7 +89,7 @@ class NodesController extends RbacController {
       $curl = curl_init();
 
       curl_setopt_array($curl, array(
-        CURLOPT_URL => $api_url.'connection/' . $connectionId,
+        CURLOPT_URL => $api_url.'l2vpn/' . $connectionId,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
@@ -114,7 +114,7 @@ class NodesController extends RbacController {
         /* CURL request to SDX-Controller endpoint for creating a circuit request*/
 
         curl_setopt_array($curl, array(
-          CURLOPT_URL => $api_url.'connection',
+          CURLOPT_URL => $api_url.'l2vpn',
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => '',
           CURLOPT_MAXREDIRS => 10,
