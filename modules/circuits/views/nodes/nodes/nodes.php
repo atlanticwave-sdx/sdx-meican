@@ -214,6 +214,199 @@
 
 
 <script type="text/javascript">
+
+    var meican_url = "<?php echo $meican_url; ?>";
+
+    function refreshMapData() {
+
+    var map = L.map('map',{closePopupOnClick : false}).setView(new L.LatLng(25.75, -80.37), 2);;
+
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+      }).addTo(map);
+    // map.eachLayer(function (layer) {
+    //   if (layer instanceof L.Marker || layer instanceof L.Polyline) {
+    //     map.removeLayer(layer);
+    //   }
+    // });
+    
+    $.ajax({
+        url: "https://"+meican_url+"/circuits/nodes/refreshtopology",
+        type: "GET",
+        contentType: "application/json",
+        success: function(data) {
+
+          let jsonData = null;
+          if (typeof data != null) {
+              try {
+                  jsonData = JSON.parse(data);
+
+                  var nodes = jsonData.nodes
+                  var latlngs = jsonData.latlngs
+                  var links_array = jsonData.links
+
+                  for (let [key, value] of Object.entries(nodes)) {
+                    var marker = L.marker([value.latitude, value.longitude]);
+                    var locations = "";
+                    for (var j = 0; j < value.sub_nodes.length; j++) {
+                      locations = locations + value.sub_nodes[j].sub_node_name + " ";
+                    }
+                    marker.myID = key;
+
+                    var ports_down=0;
+                    for (var j = 0; j < value.sub_nodes.length; j++) {
+                      for (var k = 0; k < value.sub_nodes[j].ports.length; k++) {
+                        var port = value.sub_nodes[j].ports[k];
+                            if(port.status!='up'){
+                                ports_down=ports_down+1;
+                              }
+                          }
+                      }
+                      
+                    var tooltip = L.tooltip({permanent:true}).setContent(locations);
+                    marker.bindTooltip(tooltip).on('click', function(e) {
+                      var i = e.target.myID;
+                      $('#wrapper').empty();
+                      var modalstring = '<div id="myModal" class="modal fade" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">' + key + '</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body">';
+
+                      modalstring += '<input id="tableSearchPorts" type="text" placeholder="Search..." class="form-control mb-3">';
+
+                      modalstring += '<table id="portsTable" class="table table-bordered table-striped"><thead><tr><th>Location</th><th>ID</th><th>Name</th><th>Node</th><th>Type</th><th>Status</th><th>State</th></tr></thead><tbody>';
+                      for (var j = 0; j < value.sub_nodes.length; j++) {
+                          var portLocation = value.sub_nodes[j].sub_node_name;
+
+                          for (var k = 0; k < value.sub_nodes[j].ports.length; k++) {
+                              var port = value.sub_nodes[j].ports[k];
+                              modalstring += '<tr>';
+                              modalstring += '<td>' + portLocation + '</td>';
+                              modalstring += '<td>' + port.id + '</td>';
+                              modalstring += '<td>' + port.name + '</td>';
+                              modalstring += '<td>' + port.node + '</td>';
+                              modalstring += '<td>' + port.type + '</td>';
+                              modalstring += '<td style="color:' + (port.status == 'up' ? 'green' : 'red') + '; font-weight: bold;">' + port.status + '</td>';  
+                              modalstring += '<td>' + port.state + '</td>';
+                              modalstring += '</tr>';
+                          }
+                      }
+
+                      modalstring += '</tbody></table></div></div></div></div>';
+                      $('#wrapper').append(modalstring);
+                      $("#myModal").modal('show');
+
+                      $("#tableSearchPorts").on("keyup", function() {
+                        var value = $(this).val().toLowerCase();
+                        $("#portsTable tbody tr").filter(function() {
+                            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                        });
+                      });
+
+                    });
+                    
+                    marker.addTo(map);
+                    marker.openTooltip();
+                    if(ports_down>0){
+                      var popup = L.popup({autoClose:false,closeOnClick:false,keepInView:true,permanent:true,interactive:true})
+                    .setContent('<p>ports down: <b style="color:red">'+ports_down+'</b></p>');
+                        marker.bindPopup(popup);
+                        marker.openPopup();
+                      }
+                    
+                    
+                  }
+                  for (let [key, value] of Object.entries(latlngs)) {
+                    var latlngs_final = [];
+                    var latlngs2 = value.latlngs;
+                    var linkname = value.link;
+                    for (let [key2, value2] of Object.entries(latlngs2)) {
+                      var link = [value2[0], value2[1]];
+                      latlngs_final.push(link);
+
+                      var polyline = L.polyline(latlngs_final, {
+                        color: 'blue'
+                      }).bindTooltip(linkname).addTo(map);
+
+                      polyline.myID = linkname;
+
+
+                        for (let [key3, value3] of Object.entries(links_array)) {
+                          if (key3 == polyline.myID) {
+
+                            for (var k = 0; k < value3.length; k++) {
+                                var link = value3[k];
+                                if(link.status!='up'){
+                                  polyline.setStyle({
+                                      color: 'yellow'
+                                          });
+                                }
+
+                              }
+
+                          }
+                        }
+
+
+
+                      polyline.bindTooltip(linkname).on('click', function(e) {
+                        var i = e.target.myID;
+                        for (let [key3, value3] of Object.entries(links_array)) {
+                          if (key3 == i) {
+                            $('#wrapper').empty();
+                            var modalstring2 = '<div id="myModal2" class="modal fade" tabindex="-1"><div class="modal-dialog links-modal"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">' + i + '</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body"><p style="font-weight: bold">Links:</p>';
+
+                            modalstring2 += '<input id="tableSearchLinks" type="text" placeholder="Search..." class="form-control mb-3">';
+
+                            modalstring2 += '<table id="linksTable" class="table table-bordered table-striped"><thead><tr><th>ID</th><th>Name</th><th>Bandwidth</th><th>Residual <br /> Bandwidth</th><th>Type</th><th>Packet <br /> loss</th><th>Latency</th><th>Availability</th><th>Status</th><th>State</th></tr></thead><tbody>';
+
+                            for (var k = 0; k < value3.length; k++) {
+                                var link = value3[k];
+                                modalstring2 += '<tr>';
+                                modalstring2 += '<td>' + link.id + '</td>';
+                                modalstring2 += '<td>' + link.name + '</td>';
+                                modalstring2 += '<td>' + link.bandwidth + '</td>';
+                                modalstring2 += '<td>' + link.residual_bandwidth + '</td>';
+                                modalstring2 += '<td>' + link.type + '</td>';
+                                modalstring2 += '<td>' + link.packet_loss + '</td>';
+                                modalstring2 += '<td>' + link.latency + '</td>';
+                                modalstring2 += '<td>' + link.availability + '</td>';
+                                modalstring2 += '<td style="color:' + (link.status == 'up' ? 'green' : 'red') + '; font-weight: bold;">' + link.status + '</td>';
+                                modalstring2 += '<td>' + link.state + '</td>';
+                                modalstring2 += '</tr>';
+                            }
+                            modalstring2 += '</tbody></table></div></div></div></div>';
+                            $('#wrapper').append(modalstring2);
+                            $("#myModal2").modal('show');
+
+                            $("#tableSearchLinks").on("keyup", function() {
+                              var value = $(this).val().toLowerCase();
+                              $("#linksTable tbody tr").filter(function() {
+                                  $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                              });
+                            });
+                          }
+                        }
+                      });
+                    }
+                  }
+              } catch (e) {
+                  console.error("Failed to parse JSON response:", e);
+                  return;
+              }
+          } else {
+              alert("Topology data is null");
+          }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error fetching topology data:", error);
+        }
+    });
+    setTimeout(function(){
+    map.remove();
+    }, 4000);
+    
+  }
+  
+
   var map = L.map('map',{closePopupOnClick : false}).setView(new L.LatLng(25.75, -80.37), 2);;
 
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -741,6 +934,10 @@
     newDiv.appendChild(deleteButton);
     container.appendChild(newDiv);
   }
+
+  map.remove();
+  refreshMapData();
+  setInterval(refreshMapData, 5000);
 </script>
 
 </html>
