@@ -408,7 +408,6 @@ class NodesController extends RbacController {
     $response = curl_exec($curl);
     curl_close($curl);
 
-    $userId = Yii::$app->user->id;
     $userId = 7; // Hardcoded for testing
     $associatedDomains = (new \yii\db\Query())
         ->select(['domain'])
