@@ -417,7 +417,6 @@ class NodesController extends RbacController {
         ->scalar();
     
     $allowedDomains = $associatedDomains ? explode(',', $associatedDomains) : [];
-    var_dump($allowedDomains);
 
     /* Processing topology JSON */
     function find_subnode_by_id($nodes_array,$node_id){
@@ -475,18 +474,6 @@ class NodesController extends RbacController {
         
         $location = json_decode(json_encode($value->location), true);
         $ports = json_decode(json_encode($value->ports), true);
-
-        $skipNode = true;
-        foreach ($allowedDomains as $domain) {
-            if (strpos($value->id, $domain) !== false) {
-                $skipNode = false;
-                break;
-            }
-        }
-
-        if ($skipNode) {
-            continue;
-        }
         
         if (!array_key_exists($location['iso3166_2_lvl4'],$nodes_array)){
 
