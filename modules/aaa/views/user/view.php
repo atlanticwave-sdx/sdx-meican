@@ -5,6 +5,7 @@
  */
 
 use yii\helpers\Url;
+use yii\helpers\Html;
 use meican\aaa\RbacController;
 
 $this->params['header'] = [$model->name, [Yii::t("aaa", 'Home'), Yii::t("aaa", 'Users'), $model->name]];
@@ -40,7 +41,7 @@ $this->params['header'] = [$model->name, [Yii::t("aaa", 'Home'), Yii::t("aaa", '
             <div class="box-body">
                 <?php if (!empty($domains)): ?>
                     <form method="POST" action="">
-                    <?= \yii\helpers\Html::hiddenInput(Yii::$app->request->csrfParam, Yii::$app->request->csrfToken) ?>
+                        <?= Html::hiddenInput(Yii::$app->request->csrfParam, Yii::$app->request->csrfToken) ?>
 
                         <table class="table table-bordered">
                             <thead>
@@ -50,11 +51,11 @@ $this->params['header'] = [$model->name, [Yii::t("aaa", 'Home'), Yii::t("aaa", '
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach($domains as $domain): ?>
+                                <?php foreach ($domains as $domain): ?>
                                     <tr>
-                                        <td><?= $domain ?></td>
+                                        <td><?= Html::encode($domain) ?></td>
                                         <td>
-                                            <input type="checkbox" name="selected_domains[]" value="<?= $domain ?>"
+                                            <input type="checkbox" name="selected_domains[]" value="<?= Html::encode($domain) ?>"
                                                 <?= in_array($domain, $selectedDomains) ? 'checked' : '' ?>>
                                         </td>
                                     </tr>
