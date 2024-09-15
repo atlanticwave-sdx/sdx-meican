@@ -408,6 +408,17 @@ class NodesController extends RbacController {
     $response = curl_exec($curl);
     curl_close($curl);
 
+    $userId = Yii::$app->user->id;
+    $userId = 7; // Hardcoded for testing
+    $associatedDomains = (new \yii\db\Query())
+        ->select(['domain'])
+        ->from('meican_user_topology_domain')
+        ->where(['user_id' => $userId])
+        ->scalar();
+    
+    $allowedDomains = $associatedDomains ? explode(',', $associatedDomains) : [];
+    var_dump($allowedDomains);
+
     /* Processing topology JSON */
     function find_subnode_by_id($nodes_array,$node_id){
 
@@ -440,11 +451,23 @@ class NodesController extends RbacController {
 
     }
 
-
-    
     $json_response=json_decode($response);
     $nodes=$json_response->nodes;
     $links=$json_response->links;
+
+    if (empty($allowedDomains)) {
+      $nodes = [];
+    } else {
+        $nodes = array_filter($nodes, function($node) use ($allowedDomains) {
+            foreach ($allowedDomains as $domain) {
+                if (strpos($node->id, $domain) !== false) {
+                    return true; // Keep the node
+                }
+            }
+            return false; // Remove the node
+        });
+    }
+
     $nodes_array=array();
 
     foreach ($nodes as $key => $value) {
@@ -452,6 +475,18 @@ class NodesController extends RbacController {
         
         $location = json_decode(json_encode($value->location), true);
         $ports = json_decode(json_encode($value->ports), true);
+
+        $skipNode = true;
+        foreach ($allowedDomains as $domain) {
+            if (strpos($value->id, $domain) !== false) {
+                $skipNode = false;
+                break;
+            }
+        }
+
+        if ($skipNode) {
+            continue;
+        }
         
         if (!array_key_exists($location['iso3166_2_lvl4'],$nodes_array)){
 

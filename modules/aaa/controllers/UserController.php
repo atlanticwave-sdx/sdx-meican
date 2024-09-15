@@ -161,6 +161,7 @@ class UserController extends RbacController {
                 Yii::$app->db->createCommand()->delete('meican_user_topology_domain', ['user_id' => $user->id])->execute();
                 Yii::$app->getSession()->setFlash('success', 'All domains have been removed.');
             }
+            return $this->redirect(['view', 'id' => $user->id]);
         }
         
         return $this->render('view', array(
