@@ -58,7 +58,7 @@ class NodesController extends RbacController {
       $response = curl_exec($curl);
       curl_close($curl);
 
-      $userId = 7; // Hardcoded for testing
+      $userId = Yii::$app->user->id; // Testing the Admin User
       $associatedDomains = (new \yii\db\Query())
           ->select(['domain'])
           ->from('meican_user_topology_domain')
@@ -431,7 +431,7 @@ class NodesController extends RbacController {
     $response = curl_exec($curl);
     curl_close($curl);
 
-    $userId = 7; // Hardcoded for testing
+    $userId = Yii::$app->user->id; // Testing the Admin User
     $associatedDomains = (new \yii\db\Query())
         ->select(['domain'])
         ->from('meican_user_topology_domain')
