@@ -58,6 +58,15 @@ class NodesController extends RbacController {
       $response = curl_exec($curl);
       curl_close($curl);
 
+      $userId = 7; // Hardcoded for testing
+      $associatedDomains = (new \yii\db\Query())
+          ->select(['domain'])
+          ->from('meican_user_topology_domain')
+          ->where(['user_id' => $userId])
+          ->scalar();
+      
+      $allowedDomains = $associatedDomains ? explode(',', $associatedDomains) : [];
+
       /* Processing topology JSON */
       function find_subnode_by_id_refresh($nodes_array,$node_id){
         $temp=array();
@@ -85,6 +94,20 @@ class NodesController extends RbacController {
       $json_response=json_decode($response);
       $nodes=$json_response->nodes;
       $links=$json_response->links;
+
+      if (empty($allowedDomains)) {
+        $nodes = [];
+      } else {
+          $nodes = array_filter($nodes, function($node) use ($allowedDomains) {
+              foreach ($allowedDomains as $domain) {
+                  if (strpos($node->id, $domain) !== false) {
+                      return true; // Keep the node
+                  }
+              }
+              return false; // Remove the node
+          });
+      }
+
       $nodes_array=array();
 
       foreach ($nodes as $key => $value) {
