@@ -36,7 +36,7 @@ $this->params['header'] = [$model->name, [Yii::t("aaa", 'Home'), Yii::t("aaa", '
     <div class="col-md-6">
         <div class="box box-default">
             <div class="box-header with-border">
-                <h3 class="box-title"><?= Yii::t("aaa", "Topology Roles"); ?></h3>
+                <h3 class="box-title"><?= Yii::t("aaa", "Topology Domains"); ?></h3>
             </div>
             <div class="box-body">
                 <?php if (!empty($domains)): ?>
