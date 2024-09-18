@@ -51,6 +51,24 @@ class UserController extends RbacController {
     public function actionView($id) {
         $user = User::findOne($id);
 
+        $api_url=API_URL;
+        $curl = curl_init();
+    
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $api_url.'topology/domain',
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
+    
+        $response = curl_exec($curl);
+        curl_close($curl);
+        $domains = json_decode($response, true);
+
         if(self::can("user/read")){
         	$roles = UserDomainRole::find()->where(['user_id' => $user->id])->all();
         	$filtered = [];
@@ -94,11 +112,52 @@ class UserController extends RbacController {
         		'sort' => false,
         ]);
 
-        return $this->render('view', array(
-                'model' => $user,
-                'domainRolesProvider' => $domainProvider,
-        		'systemRolesProvider' => $systemProvider,
-        ));
+        $selectedDomainsString = (new \yii\db\Query())
+            ->select(['domain'])
+            ->from('meican_user_topology_domain')
+            ->where(['user_id' => $user->id])
+            ->scalar();
+    
+        $selectedDomains = $selectedDomainsString ? explode(',', $selectedDomainsString) : [];
+        
+        if (Yii::$app->request->isPost) {
+            $submittedDomains = Yii::$app->request->post('selected_domains', []);
+            
+            if (!empty($submittedDomains)) {
+                $domainString = implode(',', array_unique($submittedDomains));
+                
+                if ($selectedDomainsString) {
+                    if ($domainString !== $selectedDomainsString) {
+                        Yii::$app->db->createCommand()->update('meican_user_topology_domain', [
+                            'domain' => $domainString,
+                        ], ['user_id' => $user->id])->execute();
+        
+                        Yii::$app->getSession()->setFlash('success', 'Selected domains have been updated.');
+                    }
+                } else {
+                    Yii::$app->db->createCommand()->insert('meican_user_topology_domain', [
+                        'user_id' => $user->id,
+                        'domain' => $domainString
+                    ])->execute();
+        
+                    Yii::$app->getSession()->setFlash('success', 'Selected domains have been added.');
+                }
+            } else {
+                Yii::$app->db->createCommand()->delete('meican_user_topology_domain', ['user_id' => $user->id])->execute();
+                Yii::$app->getSession()->setFlash('success', 'All domains have been removed.');
+            }
+        
+            return $this->redirect(['view', 'id' => $user->id]);
+        }
+    
+        return $this->render('view', [
+            'model' => $user,
+            'domainRolesProvider' => $domainProvider,
+            'systemRolesProvider' => $systemProvider,
+            'domains' => $domains,
+            'selectedDomains' => $selectedDomains,
+        ]);
+    
     }
 
     public function actionCreate() {
