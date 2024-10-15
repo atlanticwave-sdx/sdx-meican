@@ -92,47 +92,7 @@
                                  
                                  <?php
                                     if (!empty($str_response)) {
-                                       // $connectionsData = json_decode($str_response, true);
-
-                                       $connectionsData = array(
-                                          "name" => "demo",
-                                          "endpoints" => array(
-                                             array(
-                                                   "port_id" => "urn:sdx:port:ampath.net:Ampath3:50",
-                                                   "vlan" => "102"
-                                             ),
-                                             array(
-                                                   "port_id" => "urn:sdx:port:ampath.net:Ampath3:50",
-                                                   "vlan" => "10:30"
-                                             )
-                                          ),
-                                          "description" => "This is test",
-                                          "scheduling" => array(
-                                             "start_time" => "2024-10-02T00:00:00.000Z",
-                                             "end_time" => "2024-10-24T00:00:00.000Z"
-                                          ),
-                                          "qos_metrics" => array(
-                                             "min_bw" => array(
-                                                   "value" => 35,
-                                                   "strict" => true
-                                             ),
-                                             "max_delay" => array(
-                                                   "value" => 245,
-                                                   "strict" => true
-                                             ),
-                                             "max_number_oxps" => array(
-                                                   "value" => 28,
-                                                   "strict" => false
-                                             )
-                                          ),
-                                          "notifications" => array(
-                                             array(
-                                                   "email" => "sample@gmail.com"
-                                             )
-                                          )
-                                       );
-
-
+                                       $connectionsData = json_decode($str_response, true);
                                        if (is_array($connectionsData) && json_last_error() === JSON_ERROR_NONE) {
                                           foreach ($connectionsData as $connectionId => $connectionInfo) {
                                              ?>
@@ -335,6 +295,7 @@
       let endDateChanged = false;
       let originalStartDate = '';
       let originalEndDate = '';
+      let editconnectionId = null;
       
 
       //////////////////////// View Modal related functions start ////////////////////////
@@ -347,9 +308,8 @@
 
       function formatJsonData(data) {
          let formattedData = '';
-         data = data["22f93b6f-570b-4120-a4f7-24a928a50704"];
-         // formattedData += `<strong>Id:</strong> ${data.id || ''}<br>`;
-         formattedData += `<strong>Id:</strong> ${"22f93b6f-570b-4120-a4f7-24a928a50704" || ''}<br>`;
+         formattedData += `<strong>Id:</strong> ${data.id || ''}<br>`;
+         editconnectionId = data.id;
          formattedData += `<strong>Name:</strong> ${data.name || ''}<br>`;
          if(data.description!==undefined){
          formattedData += `<strong>Description:</strong> ${data.description || ''}<br>`;
@@ -391,8 +351,8 @@
       // Function to format each endpoint field
       function formatEndpointData(endpoint) {
          let formattedEndpointData = '';
-         formattedEndpointData += `<strong>ID:</strong> ${endpoint.port_id || ''}<br>`;
-         formattedEndpointData += `<strong>VLAN:</strong> ${endpoint.vlan || ''}<br>`;
+         formattedEndpointData += `<strong>ID:</strong> ${endpoint.id || ''}<br>`;
+         formattedEndpointData += `<strong>VLAN:</strong> ${endpoint.vlan_range || ''}<br>`;
          return formattedEndpointData;
       }
 
@@ -427,14 +387,46 @@
          const meican_url="<?php echo MEICAN_URL;?>";
 
          $.ajax({
-            url: "http://127.0.0.1:5000/topology",
+            url: "https://"+meican_url+"/circuits/nodes/connection",
             type: "GET",
             data: { connectionId: connectionId },
             contentType: "application/json; charset=utf-8",
             success: function(data){
-               openModal(data);
+               openModal(JSON.parse(data));
             }
          });
+
+         $.ajax({
+            url: "https://"+meican_url+"/circuits/nodes/refreshtopology",
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+               console.log("Topology refreshed successfully:");
+                  let jsonData = null;
+                  if (typeof data != null) {
+                     try {
+                        jsonData = JSON.parse(data);
+                        
+                        nodesArray = [];
+                        Object.values(jsonData.nodes).forEach(region => 
+                              region.sub_nodes.forEach(subNode => 
+                                 subNode.ports.forEach(port => nodesArray.push(port))
+                              )
+                        );
+                        console.log(nodesArray);
+                     } catch (e) {
+                        console.error("Error parsing JSON data:", e);
+                     }
+                  } else {
+                     console.warn("Empty data returned from the server.");
+                  }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                  console.error("Error:", textStatus, errorThrown);
+                  alert("Error occurred: " + textStatus);
+            }
+         });
+
       });
       //////////////////////// View Modal related functions end ////////////////////////
 
@@ -490,8 +482,9 @@
 
             if (interfaceUri && vlanValue) {
                   endpoints.push({
-                     port_id: interfaceUri,
-                     vlan: vlanValue
+                     id: interfaceUri,
+                     name: interfaceUri,
+                     vlan_range: vlanValue
                   });
             } else {
                   console.warn(`Skipping endpoint ${index + 1} due to missing interface URI or VLAN value.`);
@@ -501,7 +494,7 @@
          return endpoints;
       }
 
-      function appendFields(endpoint = {}) {
+      function appendFields(endpoint = { id: '' }) {
          const container = document.getElementById('edit-field-container');
 
          const newDiv = document.createElement('div');
@@ -514,7 +507,8 @@
 
          const newIndex = container.children.length + 3;
          $(interfaceSelect).attr('id', `edit-endpoint_${newIndex}_interface_uri`);
-         populateEndpointSelectOptions($(interfaceSelect), endpoint.port_id || '');
+
+         populateEndpointSelectOptions($(interfaceSelect), endpoint.id || '');
 
          newDiv.appendChild(interfaceSelect);
 
@@ -548,6 +542,7 @@
             container.removeChild(newDiv);
             reIndexEndpoints();
          };
+
          newDiv.appendChild(vlanSelect);
          newDiv.appendChild(inputContainer);
          newDiv.appendChild(deleteButton);
@@ -555,6 +550,7 @@
 
          populateVlanField($(vlanSelect), $(inputContainer), endpoint.vlan || 'any');
       }
+
 
       function reIndexEndpoints() {
          $('#edit-field-container .endpoint-field').each(function(index) {
@@ -705,6 +701,11 @@
             isValid = false;
          }
 
+         // if (startDate == endDate) {
+         //    displayDateError(startDateInput, 'Start date and End date cannot be the same.');
+         //    isValid = false;
+         // }
+
          return isValid;
       }
 
@@ -794,6 +795,7 @@
       }
 
       function openEditModal(connectionData) {
+         
          $('#edit-endpoint_1_interface_uri').empty();
          $('#edit-endpoint_2_interface_uri').empty();
          $('#edit-endpoint_1_vlan-input-container').empty();
@@ -801,12 +803,14 @@
          $('#edit-field-container').empty();
 
          connectionData.endpoints.forEach((endpoint, index) => {
+            console.log(endpoint);
+            console.log(nodesArray);
             if (index === 0) {
-                  populateEndpointSelectOptions($('#edit-endpoint_1_interface_uri'), endpoint.port_id || '');
-                  populateVlanField($('#edit-endpoint_1_vlan'), $('#edit-endpoint_1_vlan-input-container'), endpoint.vlan);
+                  populateEndpointSelectOptions($('#edit-endpoint_1_interface_uri'), endpoint.id || '');
+                  populateVlanField($('#edit-endpoint_1_vlan'), $('#edit-endpoint_1_vlan-input-container'), endpoint.vlan_range);
             } else if (index === 1) {
-                  populateEndpointSelectOptions($('#edit-endpoint_2_interface_uri'), endpoint.port_id || '');
-                  populateVlanField($('#edit-endpoint_2_vlan'), $('#edit-endpoint_2_vlan-input-container'), endpoint.vlan);
+                  populateEndpointSelectOptions($('#edit-endpoint_2_interface_uri'), endpoint.id || '');
+                  populateVlanField($('#edit-endpoint_2_vlan'), $('#edit-endpoint_2_vlan-input-container'), endpoint.vlan_range);
             } else {
                   appendFields(endpoint);
             }
@@ -878,62 +882,20 @@
 
          $('#editModal').modal('show');
       }
-
       $(document).on('click', '#edit-btn', function () {
-         const connectionData = {
-            id: "22f93b6f-570b-4120-a4f7-24a928a50704",
-            name: "demo",
-            description: "This is test",
-            scheduling: {
-               start_time: "2024-10-02T00:00:00.000Z",
-               end_time: "2024-10-24T00:00:00.000Z"
-            },
-            qos_metrics: {
-               min_bw: { value: 35, strict: true },
-               max_delay: { value: 245, strict: true },
-               max_number_oxps: { value: 28, strict: true }
-            },
-            notifications: [
-               { email: "sample@gmail.com" },
-               { email: "sample@gmail.com" }
-            ],
-            endpoints: [
-               { port_id: "urn:sdx:port:ampath.net:Ampath3:50", vlan: "102" },
-               { port_id: "urn:sdx:port:ampath.net:Ampath3:2", vlan: "10:30" },
-               { port_id: "urn:sdx:port:ampath.net:Ampath3:3", vlan: "10:30" },
-               { port_id: "urn:sdx:port:ampath.net:Ampath2:1", vlan: "1012" }
-            ]
-         };
+         console.log(editconnectionId);
 
          $.ajax({
-            url: "https://"+meican_url+"/circuits/nodes/refreshtopology",
+            url: "https://"+meican_url+"/circuits/nodes/connection",
             type: "GET",
+            data: { connectionId: editconnectionId },
             contentType: "application/json; charset=utf-8",
-            success: function (data) {
-                  let jsonData = null;
-                  if (typeof data != null) {
-                     try {
-                        jsonData = JSON.parse(data);
-                        
-                        nodesArray = [];
-                        Object.values(jsonData.nodes).forEach(region => 
-                              region.sub_nodes.forEach(subNode => 
-                                 subNode.ports.forEach(port => nodesArray.push(port))
-                              )
-                        );
-                        openEditModal(connectionData);
-                     } catch (e) {
-                        console.error("Error parsing JSON data:", e);
-                     }
-                  } else {
-                     console.warn("Empty data returned from the server.");
-                  }
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                  console.error("Error:", textStatus, errorThrown);
-                  alert("Error occurred: " + textStatus);
+            success: function(data){
+               openEditModal(JSON.parse(data));
             }
          });
+
+
 
          $('.vlan-dropdown').on('change', function() {
             const vlanDropdown = $(this);
@@ -987,19 +949,19 @@
             connectionData.qos_metrics = {};
             if (min_bw) {
                   connectionData.qos_metrics.min_bw = {
-                     value: min_bw,
+                     value: parseInt(min_bw, 10),
                      strict: $('#edit-min_bw_strict').is(':checked'),
                   };
             }
             if (max_delay) {
                   connectionData.qos_metrics.max_delay = {
-                     value: max_delay,
+                     value: parseInt(max_delay, 10),
                      strict: $('#edit-max_delay_strict').is(':checked'),
                   };
             }
             if (max_number_oxps) {
                   connectionData.qos_metrics.max_number_oxps = {
-                     value: max_number_oxps,
+                     value: parseInt(max_number_oxps, 10),
                      strict: $('#edit-max_number_oxps_strict').is(':checked'),
                   };
             }
@@ -1010,8 +972,28 @@
             connectionData.notifications = notifications;
          }
 
-         const jsonOutput = JSON.stringify(connectionData, null, 2);
-         console.log(jsonOutput);
+         console.log(JSON.stringify(connectionData));
+
+         $.ajax({
+            url: "https://" + meican_url + "/circuits/nodes/editconnection",
+            type: "PATCH",
+            contentType: "application/json",
+            accept: "application/json",
+            data: JSON.stringify({
+               connectionId: editconnectionId,
+               request: connectionData
+            }),
+            success: function (response) {
+               console.log("Edit successful:", response);
+               alert("Connection has been updated successfully!" + response);
+               $('#editModal').modal('hide');
+               location.reload();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+               console.error("Error updating connection:", textStatus, errorThrown);
+            }
+         });
+
       });
       
    </script>
