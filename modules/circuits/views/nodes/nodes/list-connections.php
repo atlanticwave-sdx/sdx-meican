@@ -98,9 +98,9 @@
                                              ?>
                                                 <tr id="circuits-gridcurrent-filters" class="filters">
                                                    <td><?php echo isset($connectionInfo['name']) ? $connectionInfo['name'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['id']) ? $connectionInfo['id'] : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['service_id']) ? $connectionInfo['service_id'] : ''; ?></td>
                                                    <td><?php echo isset($connectionInfo['description']) ? $connectionInfo['description'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['endpoints']) ? implode(', ', array_column($connectionInfo['endpoints'], 'id')) : ''; ?></td>
+                                                   <td><?php echo isset($connectionInfo['endpoints']) ? implode(', ', array_column($connectionInfo['endpoints'], 'port_id')) : ''; ?></td>
                                                    <td><button type="button" class="btn btn-primary view-connection" data-connection='<?php echo json_encode($connectionInfo); ?>'>View | Edit</button></td>
                                                    <td><button type="submit" class="btn btn-primary delete-connection" delete-connection='<?php echo json_encode($connectionInfo); ?>' style="background-color:red;">Delete</button></td>
                                                 </tr>
@@ -307,9 +307,15 @@
       }
 
       function formatJsonData(data) {
+
+         const key = Object.keys(data)[0];
+         data = data[key];
+
          let formattedData = '';
-         formattedData += `<strong>Id:</strong> ${data.id || ''}<br>`;
-         editconnectionId = data.id;
+
+         formattedData += `<strong>Id:</strong> ${data.service_id || ''}<br>`;
+         editconnectionId = data.service_id;
+
          formattedData += `<strong>Name:</strong> ${data.name || ''}<br>`;
          if(data.description!==undefined){
          formattedData += `<strong>Description:</strong> ${data.description || ''}<br>`;
@@ -351,8 +357,9 @@
       // Function to format each endpoint field
       function formatEndpointData(endpoint) {
          let formattedEndpointData = '';
-         formattedEndpointData += `<strong>ID:</strong> ${endpoint.id || ''}<br>`;
-         formattedEndpointData += `<strong>VLAN:</strong> ${endpoint.vlan_range || ''}<br>`;
+         formattedEndpointData += `<strong>ID:</strong> ${endpoint.port_id || ''}<br>`;
+         // Needs to be chnaged to vlan_range => vlan
+         formattedEndpointData += `<strong>VLAN:</strong> ${endpoint.vlan || ''}<br>`;
          return formattedEndpointData;
       }
 
@@ -383,7 +390,7 @@
       $(document).on('click', '.view-connection', function () {
          const connectionData = $(this).attr('data-connection');
          const parsedData = JSON.parse(connectionData);
-         const connectionId = parsedData.id;
+         const connectionId = parsedData.service_id;
          const meican_url="<?php echo MEICAN_URL;?>";
 
          $.ajax({
@@ -401,7 +408,6 @@
             type: "GET",
             contentType: "application/json; charset=utf-8",
             success: function (data) {
-               console.log("Topology refreshed successfully:");
                   let jsonData = null;
                   if (typeof data != null) {
                      try {
@@ -413,7 +419,6 @@
                                  subNode.ports.forEach(port => nodesArray.push(port))
                               )
                         );
-                        console.log(nodesArray);
                      } catch (e) {
                         console.error("Error parsing JSON data:", e);
                      }
@@ -484,7 +489,7 @@
                   endpoints.push({
                      id: interfaceUri,
                      name: interfaceUri,
-                     vlan_range: vlanValue
+                     vlan: vlanValue
                   });
             } else {
                   console.warn(`Skipping endpoint ${index + 1} due to missing interface URI or VLAN value.`);
@@ -802,15 +807,17 @@
          $('#edit-endpoint_2_vlan-input-container').empty();
          $('#edit-field-container').empty();
 
+         const key = Object.keys(connectionData)[0];
+         connectionData = connectionData[key];
+         console.log(connectionData);
+
          connectionData.endpoints.forEach((endpoint, index) => {
-            console.log(endpoint);
-            console.log(nodesArray);
             if (index === 0) {
-                  populateEndpointSelectOptions($('#edit-endpoint_1_interface_uri'), endpoint.id || '');
-                  populateVlanField($('#edit-endpoint_1_vlan'), $('#edit-endpoint_1_vlan-input-container'), endpoint.vlan_range);
+                  populateEndpointSelectOptions($('#edit-endpoint_1_interface_uri'), endpoint.port_id || '');
+                  populateVlanField($('#edit-endpoint_1_vlan'), $('#edit-endpoint_1_vlan-input-container'), endpoint.vlan);
             } else if (index === 1) {
-                  populateEndpointSelectOptions($('#edit-endpoint_2_interface_uri'), endpoint.id || '');
-                  populateVlanField($('#edit-endpoint_2_vlan'), $('#edit-endpoint_2_vlan-input-container'), endpoint.vlan_range);
+                  populateEndpointSelectOptions($('#edit-endpoint_2_interface_uri'), endpoint.port_id || '');
+                  populateVlanField($('#edit-endpoint_2_vlan'), $('#edit-endpoint_2_vlan-input-container'), endpoint.vlan);
             } else {
                   appendFields(endpoint);
             }
@@ -883,7 +890,6 @@
          $('#editModal').modal('show');
       }
       $(document).on('click', '#edit-btn', function () {
-         console.log(editconnectionId);
 
          $.ajax({
             url: "https://"+meican_url+"/circuits/nodes/connection",
