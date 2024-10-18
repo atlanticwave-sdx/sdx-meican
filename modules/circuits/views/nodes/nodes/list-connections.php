@@ -990,8 +990,8 @@
                request: connectionData
             }),
             success: function (response) {
-               console.log("Edit successful:", response);
-               alert("Connection has been updated successfully!" + response);
+               console.log(response);
+               alert(response);
                $('#editModal').modal('hide');
                location.reload();
             },
