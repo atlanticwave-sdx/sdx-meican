@@ -488,7 +488,6 @@
             if (interfaceUri && vlanValue) {
                   endpoints.push({
                      port_id: interfaceUri,
-                     name: interfaceUri,
                      vlan: vlanValue
                   });
             } else {
