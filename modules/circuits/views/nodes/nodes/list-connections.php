@@ -423,7 +423,7 @@
                         console.error("Error parsing JSON data:", e);
                      }
                   } else {
-                     console.warn("Empty data returned from the server.");
+                     console.error("Empty data returned from the server.");
                   }
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -439,7 +439,7 @@
       $(document).on('click', '.delete-connection', function () {
          const connectionData = $(this).attr('delete-connection');
          const parsedData = JSON.parse(connectionData);
-         const connectionId = parsedData.id;
+         const connectionId = parsedData.service_id;
          const meican_url="<?php echo MEICAN_URL;?>";
          const row = $(this).closest('tr');
 
@@ -462,6 +462,7 @@
       //////////////////////// Endpoints related functions start ////////////////////////
       function populateEndpointSelectOptions(selectElement, selectedValue = '') {
          selectElement.empty();
+
 
          if (nodesArray && nodesArray.length > 0) {
             nodesArray.forEach(node => {
@@ -491,7 +492,7 @@
                      vlan: vlanValue
                   });
             } else {
-                  console.warn(`Skipping endpoint ${index + 1} due to missing interface URI or VLAN value.`);
+                  console.error(`Skipping endpoint ${index + 1} due to missing interface URI or VLAN value.`);
             }
          });
 
@@ -512,7 +513,7 @@
          const newIndex = container.children.length + 3;
          $(interfaceSelect).attr('id', `edit-endpoint_${newIndex}_interface_uri`);
 
-         populateEndpointSelectOptions($(interfaceSelect), endpoint.id || '');
+         populateEndpointSelectOptions($(interfaceSelect), endpoint.port_id || '');
 
          newDiv.appendChild(interfaceSelect);
 
@@ -808,7 +809,6 @@
 
          const key = Object.keys(connectionData)[0];
          connectionData = connectionData[key];
-         console.log(connectionData);
 
          connectionData.endpoints.forEach((endpoint, index) => {
             if (index === 0) {
@@ -977,7 +977,7 @@
             connectionData.notifications = notifications;
          }
 
-         console.log(JSON.stringify(connectionData));
+         // console.log(JSON.stringify(connectionData));
 
          $.ajax({
             url: "https://" + meican_url + "/circuits/nodes/editconnection",
@@ -989,7 +989,6 @@
                request: connectionData
             }),
             success: function (response) {
-               console.log(response);
                alert(response);
                $('#editModal').modal('hide');
                location.reload();
