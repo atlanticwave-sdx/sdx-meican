@@ -10,7 +10,7 @@ class m240912_143040_create_meican_user_topology_domain_table extends Migration
                 CREATE TABLE `meican_user_topology_domain` (
                         `id` int(11) NOT NULL,
                         `user_id` int(11) NOT NULL,
-                        `domain` varchar(60) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL
+                        `domain` text CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL
                       ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
                 ");
 
