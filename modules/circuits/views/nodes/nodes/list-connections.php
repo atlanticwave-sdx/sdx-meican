@@ -410,7 +410,6 @@
             contentType: "application/json; charset=utf-8",
             success: function(data){
                openModal(JSON.parse(data));
-               console.log(data);
             }
          });
 
