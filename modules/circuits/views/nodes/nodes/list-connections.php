@@ -85,7 +85,7 @@
                               <thead>
                                  <tr>
                                     <th style="width: 20%;">Name</th>
-                                    <th style="width: 25%;">Connection ID</th>
+                                    <th style="width: 25%;">Service ID</th>
                                     <th style="width: 25%;">Description</th>
                                     <th style="width: 22%;">EndPoints</th>
                                  </tr>
@@ -100,7 +100,17 @@
                                                    <td><?php echo isset($connectionInfo['name']) ? $connectionInfo['name'] : ''; ?></td>
                                                    <td><?php echo isset($connectionInfo['service_id']) ? $connectionInfo['service_id'] : ''; ?></td>
                                                    <td><?php echo isset($connectionInfo['description']) ? $connectionInfo['description'] : ''; ?></td>
-                                                   <td><?php echo isset($connectionInfo['endpoints']) ? implode(', ', array_column($connectionInfo['endpoints'], 'port_id')) : ''; ?></td>
+                                                   <td>
+                                                      <?php
+                                                      if (isset($connectionInfo['endpoints']) && is_array($connectionInfo['endpoints'])) {
+                                                         foreach ($connectionInfo['endpoints'] as $endpoint) {
+                                                            $port = isset($endpoint['port_id']) ? str_replace('urn:sdx:port:', '', $endpoint['port_id']) : '';
+                                                            $vlan = isset($endpoint['vlan']) ? $endpoint['vlan'] : '';
+                                                            echo "<div>{$port} <strong>[VLAN: {$vlan}]</strong></div>";
+                                                         }
+                                                      }
+                                                      ?>
+                                                   </td>
                                                    <td><button type="button" class="btn btn-primary view-connection" data-connection='<?php echo json_encode($connectionInfo); ?>'>View | Edit</button></td>
                                                    <td><button type="submit" class="btn btn-primary delete-connection" delete-connection='<?php echo json_encode($connectionInfo); ?>' style="background-color:red;">Delete</button></td>
                                                 </tr>
