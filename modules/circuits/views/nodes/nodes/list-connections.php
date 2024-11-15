@@ -22,35 +22,35 @@
 
    <style type="text/css">
      
-     #map { height: 800px;
-      width: 1400px;
-      max-width: 100%;
-      max-height: 100%; }
+      #map {
+         height: 800px;
+         width: 1400px;
+         max-width: 100%;
+         max-height: 100%;
+      }
+
+      .modal-dialog{
+            overflow-y: initial !important
+      }
+      .modal-body{
+         height: 560px;
+         overflow-y: auto;
+         font-family: "Helvetica Neue";
+         font-size: 16px;
+      }
+
+      .modal-title {
+      font-weight: bold;
+      font-size: 24px;
+      font-family: Arial, sans-serif;
+      }
+      .modal-header {
+         display: flex;
+      }
       
-
-.modal-dialog{
-      overflow-y: initial !important
-}
-.modal-body{
-   height: 560px;
-   overflow-y: auto;
-   font-family: "Helvetica Neue";
-   font-size: 16px;
-}
-
-.modal-title {
-  font-weight: bold;
-  font-size: 24px;
-  font-family: Arial, sans-serif;
-}
-.modal-header {
-   display: flex;
-   /* justify-content: space-between; */
-   /* align-items: center; */
-}
-   #tableSearchListConnections {
-      margin-bottom: 10px;
-    }
+      #tableSearchListConnections {
+         margin-bottom: 10px;
+      }
 
       
    </style>
@@ -1016,6 +1016,7 @@
 
       });
 
+      // Search for connections
       $("#tableSearchListConnections").on("keyup", function () {
          var value = $(this).val().toLowerCase();
 
