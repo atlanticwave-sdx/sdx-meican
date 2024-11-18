@@ -22,32 +22,35 @@
 
    <style type="text/css">
      
-     #map { height: 800px;
-      width: 1400px;
-      max-width: 100%;
-      max-height: 100%; }
+      #map {
+         height: 800px;
+         width: 1400px;
+         max-width: 100%;
+         max-height: 100%;
+      }
+
+      .modal-dialog{
+            overflow-y: initial !important
+      }
+      .modal-body{
+         height: 560px;
+         overflow-y: auto;
+         font-family: "Helvetica Neue";
+         font-size: 16px;
+      }
+
+      .modal-title {
+      font-weight: bold;
+      font-size: 24px;
+      font-family: Arial, sans-serif;
+      }
+      .modal-header {
+         display: flex;
+      }
       
-
-.modal-dialog{
-      overflow-y: initial !important
-}
-.modal-body{
-   height: 560px;
-   overflow-y: auto;
-   font-family: "Helvetica Neue";
-   font-size: 16px;
-}
-
-.modal-title {
-  font-weight: bold;
-  font-size: 24px;
-  font-family: Arial, sans-serif;
-}
-.modal-header {
-   display: flex;
-   /* justify-content: space-between; */
-   /* align-items: center; */
-}
+      #tableSearchListConnections {
+         margin-bottom: 10px;
+      }
 
       
    </style>
@@ -73,6 +76,9 @@
          </div>
          <div class="box-body">
             <div id="circuits-pjax" data-pjax-container="" data-pjax-push-state="" data-pjax-timeout="1000">
+
+               <input id="tableSearchListConnections" type="text" placeholder="Search..." class="form-control mb-3">
+               
                <ul id="w0" class="nav nav-tabs">
                   <li class="active"><a href="#tabCurrent" data-toggle="tab">Current</a></li>
                   <li><a href="#tabPast" data-toggle="tab">Past</a></li>
@@ -1009,7 +1015,19 @@
          });
 
       });
-      
+
+      // Search for connections
+      $("#tableSearchListConnections").on("keyup", function () {
+         var value = $(this).val().toLowerCase();
+
+         $("#circuits-gridcurrent tr").each(function () {
+            var rowText = $(this).text().toLowerCase();
+            var isMatch = rowText.includes(value);
+            
+            $(this).toggle(isMatch);
+         });
+      });
+
    </script>
 
 
