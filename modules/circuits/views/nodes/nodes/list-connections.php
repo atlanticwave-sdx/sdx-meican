@@ -79,10 +79,7 @@
 
                <input id="tableSearchListConnections" type="text" placeholder="Search..." class="form-control mb-3">
                
-               <ul id="w0" class="nav nav-tabs">
-                  <li class="active"><a href="#tabCurrent" data-toggle="tab">Current</a></li>
-                  <li><a href="#tabPast" data-toggle="tab">Past</a></li>
-               </ul>
+               
                <div class="tab-content">
                   <div id="tabCurrent" class="tab-pane active">
                      <div id="circuits-gridcurrent" class="grid-view">
