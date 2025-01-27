@@ -76,6 +76,58 @@
 
   </style>
 
+      <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .status {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+    </style>
+
 
 </head>
 
@@ -84,6 +136,12 @@
 
 
   <div class="container-fluid">
+
+    <label class="switch">
+        <input type="checkbox" id="autoRefreshToggle">
+        <span class="slider"></span>
+    </label>
+    <span id="statusText" class="status">Auto-Refresh is OFF</span>
 
     <div class="row">
       <div class="col-sm-9">
@@ -217,21 +275,18 @@
 
     var meican_url = "<?php echo $meican_url; ?>";
 
-    function refreshMapData() {
+    function refreshMapData(){
 
-    var map = L.map('map',{closePopupOnClick : false}).setView(new L.LatLng(25.75, -80.37), 2);;
-
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap'
-      }).addTo(map);
-    // map.eachLayer(function (layer) {
-    //   if (layer instanceof L.Marker || layer instanceof L.Polyline) {
-    //     map.removeLayer(layer);
-    //   }
-    // });
-    
-    $.ajax({
+      map.eachLayer((layer) => {
+  if (layer instanceof L.Marker) {
+     layer.remove();
+  }
+  if (layer instanceof L.Polyline) {
+     layer.remove();
+  }
+  });
+      //L.marker([50.5, 30.5]).addTo(map);
+          $.ajax({
         url: "https://"+meican_url+"/circuits/nodes/refreshtopology",
         type: "GET",
         contentType: "application/json",
@@ -400,11 +455,7 @@
             console.error("Error fetching topology data:", error);
         }
     });
-    setTimeout(function(){
-    map.remove();
-    }, 4000);
-    
-  }
+    }
   
 
   var map = L.map('map',{closePopupOnClick : false}).setView(new L.LatLng(25.75, -80.37), 2);;
@@ -935,9 +986,47 @@
     container.appendChild(newDiv);
   }
 
-  map.remove();
-  refreshMapData();
-  setInterval(refreshMapData, 5000);
+  
+
+  // setTimeout(function(){
+  //   refreshMapData();
+  //   console.log("timeout working");
+    
+  // }, 10000);
+
+  // setInterval(refreshMapData, 10000);
 </script>
+
+    <script>
+        const toggle = document.getElementById('autoRefreshToggle');
+        const statusText = document.getElementById('statusText');
+
+        // Example function to demonstrate auto-refresh processing
+        function autoRefreshProcessing() {
+            if (!toggle.checked) return; // Do nothing if auto-refresh is off
+            console.log('Auto-Refresh is processing...');
+            refreshMapData();
+        }
+
+        // Update status text and handle auto-refresh state
+        toggle.addEventListener('change', () => {
+            if (toggle.checked) {
+                statusText.textContent = 'Auto-Refresh is ON';
+                console.log('Auto-Refresh activated');
+                // Call autoRefreshProcessing() at intervals when toggled on
+                const interval = setInterval(() => {
+                    if (!toggle.checked) {
+                        clearInterval(interval); // Stop when toggled off
+                        console.log('Auto-Refresh stopped');
+                        return;
+                    }
+                    autoRefreshProcessing();
+                }, 9000); // Example: Run every 3 seconds
+            } else {
+                statusText.textContent = 'Auto-Refresh is OFF';
+                console.log('Auto-Refresh deactivated');
+            }
+        });
+    </script>
 
 </html>
