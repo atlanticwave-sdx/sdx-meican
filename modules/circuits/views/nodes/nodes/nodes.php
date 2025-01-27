@@ -313,7 +313,7 @@
                     for (var j = 0; j < value.sub_nodes.length; j++) {
                       for (var k = 0; k < value.sub_nodes[j].ports.length; k++) {
                         var port = value.sub_nodes[j].ports[k];
-                            if(port.status!='up'){
+                            if(port.status!='up' && port.state=='enabled'){
                                 ports_down=ports_down+1;
                               }
                           }
