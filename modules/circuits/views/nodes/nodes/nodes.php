@@ -126,6 +126,27 @@
             margin-top: 10px;
             font-size: 16px;
         }
+
+        .advanced-options {
+            display: none; /* Hide advanced fields initially */
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .advButton {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .advButton:hover {
+            background-color: #0056b3;
+        }
     </style>
 
 
@@ -158,12 +179,12 @@
 
           <div class="form-group">
             <label for="exampleInputPassword1" class="required">Endpoints</label>
-            <br>Interface:</br>
+            <br>Port ID:</br>
             <select class="form-control" id="endpoint_1_interface_uri" name="endpoint_1_interface_uri" placeholder="interface uri" required>
               <?php foreach ($nodes_array as $key => $value) {
                 foreach ($value['sub_nodes'] as $key2 => $value2) {
                   foreach ($value2['ports'] as $key3 => $value3) {
-                    echo "<option value='" . $value3['id'] . "'>" . $value3['id'] . "</option>";
+                    echo "<option value='" . $value3['id'] . "'>" . str_replace("urn:sdx:port:", "",$value3['id']) . "</option>";
                   }
                 }
               }
@@ -182,12 +203,12 @@
 
             <div id="endpoint_1_vlan-input-container" class="input-container"></div>
 
-            <br>Interface:</br>
+            <br>Port ID:</br>
             <select class="form-control" id="endpoint_2_interface_uri" name="endpoint_2_interface_uri" placeholder="interface uri" required>
               <?php foreach ($nodes_array as $key => $value) {
                 foreach ($value['sub_nodes'] as $key2 => $value2) {
                   foreach ($value2['ports'] as $key3 => $value3) {
-                    echo "<option value='" . $value3['id'] . "'>" . $value3['id'] . "</option>";
+                    echo "<option value='" . $value3['id'] . "'>" . str_replace("urn:sdx:port:", "",$value3['id']) . "</option>";
                   }
                 }
               }
@@ -232,6 +253,10 @@
             <small id="end_time_error" class="error-message"></small>
           </div>
 
+                  <!-- Show Advanced Options Button -->
+        <button type="button" class="advButton" onclick="toggleAdvancedOptions()">Show Advanced Options</button>
+
+          <div id="advancedOptions" class="advanced-options">
           <div class="form-group">
             <label for="min_bw">Minimum Bandwidth (Gbps)</label>
             <input type="number" class="form-control" id="min_bw" name="min_bw" placeholder="(optional)" min="0" max="100" step="1" oninput="validateInput(this, 100)">
@@ -257,9 +282,10 @@
             </div>
           </div>
           <button type="button" class="btn btn-primary notification-btn" onclick="appendNotification()">Add Notification</button>
+        </div>
 
           <div></div>
-
+          <br>
           <button type="submit" class="btn btn-primary">Submit</button>
         </form>
       </div>
@@ -327,7 +353,7 @@
 
                       modalstring += '<input id="tableSearchPorts" type="text" placeholder="Search..." class="form-control mb-3">';
 
-                      modalstring += '<table id="portsTable" class="table table-bordered table-striped"><thead><tr><th>Location</th><th>ID</th><th>Name</th><th>Node</th><th>Type</th><th>Status</th><th>State</th></tr></thead><tbody>';
+                      modalstring += '<table id="portsTable" class="table table-bordered table-striped"><thead><tr><th>Location</th><th>ID</th><th>Port Name</th><th>Node</th><th>Type</th><th>Status</th><th>State</th></tr></thead><tbody>';
                       for (var j = 0; j < value.sub_nodes.length; j++) {
                           var portLocation = value.sub_nodes[j].sub_node_name;
 
@@ -337,7 +363,7 @@
                               modalstring += '<td>' + portLocation + '</td>';
                               modalstring += '<td>' + port.id + '</td>';
                               modalstring += '<td>' + port.name + '</td>';
-                              modalstring += '<td>' + port.node + '</td>';
+                              modalstring += '<td>' + port.node.replace("urn:sdx:node:",""); + '</td>';
                               modalstring += '<td>' + port.type + '</td>';
                               modalstring += '<td style="color:' + (port.status == 'up' ? 'green' : 'red') + '; font-weight: bold;">' + port.status + '</td>';  
                               modalstring += '<td>' + port.state + '</td>';
@@ -478,7 +504,7 @@
     for (var j = 0; j < value.sub_nodes.length; j++) {
       for (var k = 0; k < value.sub_nodes[j].ports.length; k++) {
         var port = value.sub_nodes[j].ports[k];
-            if(port.status!='up'){
+            if(port.status!='up' && port.state=='enabled'){
                 ports_down=ports_down+1;
               }
           }
@@ -492,7 +518,7 @@
 
       modalstring += '<input id="tableSearchPorts" type="text" placeholder="Search..." class="form-control mb-3">';
 
-      modalstring += '<table id="portsTable" class="table table-bordered table-striped"><thead><tr><th>Location</th><th>ID</th><th>Name</th><th>Node</th><th>Type</th><th>Status</th><th>State</th></tr></thead><tbody>';
+      modalstring += '<table id="portsTable" class="table table-bordered table-striped"><thead><tr><th>Location</th><th>ID</th><th>Port Name</th><th>Node</th><th>Type</th><th>Status</th><th>State</th></tr></thead><tbody>';
       for (var j = 0; j < value.sub_nodes.length; j++) {
           var portLocation = value.sub_nodes[j].sub_node_name;
 
@@ -502,7 +528,7 @@
               modalstring += '<td>' + portLocation + '</td>';
               modalstring += '<td>' + port.id + '</td>';
               modalstring += '<td>' + port.name + '</td>';
-              modalstring += '<td>' + port.node + '</td>';
+              modalstring += '<td>' + port.node.replace("urn:sdx:node:",""); + '</td>';
               modalstring += '<td>' + port.type + '</td>';
               modalstring += '<td style="color:' + (port.status == 'up' ? 'green' : 'red') + '; font-weight: bold;">' + port.status + '</td>';  
               modalstring += '<td>' + port.state + '</td>';
@@ -833,7 +859,7 @@
 
     const newDiv = document.createElement('div');
     newDiv.className = 'field-group';
-    newDiv.innerHTML += 'Interface:'
+    newDiv.innerHTML += 'Port ID:'
 
     const interfaceSelect = document.createElement('select');
     interfaceSelect.name = 'interface';
@@ -843,7 +869,7 @@
     foreach ($nodes_array as $key => $value) {
       foreach ($value['sub_nodes'] as $key2 => $value2) {
         foreach ($value2['ports'] as $key3 => $value3) {
-          echo "interfaceSelect.innerHTML += '<option value=\"" . $value3['id'] . "\">" . $value3['id'] . "</option>';";
+          echo "interfaceSelect.innerHTML += '<option value=\"" . $value3['id'] . "\">" . str_replace("urn:sdx:port:", "",$value3['id']) . "</option>';";
         }
       }
     }
@@ -1027,6 +1053,21 @@
                 console.log('Auto-Refresh deactivated');
             }
         });
+    </script>
+
+        <script>
+        function toggleAdvancedOptions() {
+            var advancedOptions = document.getElementById("advancedOptions");
+            var button = document.querySelector("button[onclick='toggleAdvancedOptions()']");
+
+            if (advancedOptions.style.display === "none" || advancedOptions.style.display === "") {
+                advancedOptions.style.display = "block";
+                button.textContent = "Hide Advanced Options";
+            } else {
+                advancedOptions.style.display = "none";
+                button.textContent = "Show Advanced Options";
+            }
+        }
     </script>
 
 </html>
