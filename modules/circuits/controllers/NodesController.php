@@ -40,6 +40,30 @@ class NodesController extends RbacController {
 
     public $enableCsrfValidation = false;
 
+    public function actionFeedbackform(){
+
+      return $this->render('nodes/feedbackForm');
+    }
+
+    public function actionFeedbackformsubmit(){
+
+        $request = Yii::$app->request->getRawBody(); // getting the JSON request body from the create connection form through MEICAN dashboard
+        $request=stripslashes($request);
+        $arr=json_decode($request,true);
+        $name=$arr['name'];
+        $org=$arr['organization'];
+        $msg=$arr['message'];
+        $mail=Yii::$app->mailer->compose()
+          ->setFrom('meican.sdx@gmail.com')
+          ->setTo('meican.sdx@gmail.com')
+          ->setSubject('MEICAN feedback form')
+          ->setTextBody('Plain text content')
+          ->setHtmlBody('from '.$name.'<br>institue: '.$org.'<br>message: '.$msg.'')
+          ->send();
+
+        echo "Feedback submitted";
+    }
+
     public function actionRefreshtopology() {   // this function manages the mapping of SDX-topology and displays on the MEICAN UI
       
       $api_url=API_URL;

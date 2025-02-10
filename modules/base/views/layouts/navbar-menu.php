@@ -64,9 +64,7 @@ use meican\notify\models\Notification;
         <div class="pull-left">
           <a href="<?= Url::toRoute(['/aaa/user/account']); ?>" class="btn btn-default"><?= Yii::t("home", "My account"); ?></a>
         </div>
-        <div class="pull-right">
-          <a href="#" class="btn btn-default feedback-btn">Feedback</a>
-        </div>
+        
       </li>
     </ul>
   </li>
