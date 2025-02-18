@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   
 
   <style type="text/css">
@@ -180,16 +181,31 @@
           <div class="form-group">
             <label for="exampleInputPassword1" class="required">Endpoints</label>
             <br>Port ID:</br>
-            <select class="form-control" id="endpoint_1_interface_uri" name="endpoint_1_interface_uri" placeholder="interface uri" required>
-              <?php foreach ($nodes_array as $key => $value) {
-                foreach ($value['sub_nodes'] as $key2 => $value2) {
-                  foreach ($value2['ports'] as $key3 => $value3) {
-                    echo "<option value='" . $value3['id'] . "'>" . str_replace("urn:sdx:port:", "",$value3['id']) . "</option>";
-                  }
-                }
-              }
+            <div class="relative w-96">
+        <!-- Searchable Dropdown -->
+        <div class="relative">
+            <input type="hidden" id="endpoint_1_interface_uri" name="endpoint_1_interface_uri"> <!-- Hidden field for full ID -->
+            <input type="text" id="search" placeholder="Search institue/organization" 
+                   class="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none"
+                   onkeyup="filterDropdown()" onclick="showDropdown()">
+            
+            <!-- Dropdown List -->
+            <div id="dropdownContainer" class="absolute w-full mt-1 bg-white border rounded-md shadow-lg hidden">
+                <ul id="dropdownList" class="max-h-60 overflow-auto"></ul>
+            </div>
+        </div>
+    </div>
+            <?php $nodes_json = json_encode($nodes_array); //echo"<pre>";print_r($nodes_json);echo "</pre>";?>
+            <!-- <select class="form-control" id="endpoint_1_interface_uri" name="endpoint_1_interface_uri" placeholder="interface uri" required>
+              //<?php //foreach ($nodes_array as $key => $value) {
+                //foreach ($value['sub_nodes'] as $key2 => $value2) {
+                  //foreach ($value2['ports'] as $key3 => $value3) {
+                    //echo "<option value='" . $value3['id'] . "'>" . str_replace("urn:sdx:port:", "",$value3['id']) . "</option>";
+                  //}
+                //}
+              //}
               ?>
-            </select>
+            </select> -->
 
 
             <br>VLAN:</br>
@@ -204,16 +220,20 @@
             <div id="endpoint_1_vlan-input-container" class="input-container"></div>
 
             <br>Port ID:</br>
-            <select class="form-control" id="endpoint_2_interface_uri" name="endpoint_2_interface_uri" placeholder="interface uri" required>
-              <?php foreach ($nodes_array as $key => $value) {
-                foreach ($value['sub_nodes'] as $key2 => $value2) {
-                  foreach ($value2['ports'] as $key3 => $value3) {
-                    echo "<option value='" . $value3['id'] . "'>" . str_replace("urn:sdx:port:", "",$value3['id']) . "</option>";
-                  }
-                }
-              }
-              ?>
-            </select>
+                <div class="relative w-96">
+        <!-- Searchable Dropdown -->
+        <div class="relative">
+            <input type="hidden" id="endpoint_2_interface_uri" name="endpoint_2_interface_uri"> 
+            <input type="text" id="search2" placeholder="Search institue/organization" 
+                   class="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none"
+                   onkeyup="filterDropdown2()" onclick="showDropdown2()">
+            
+            
+            <div id="dropdownContainer2" class="absolute w-full mt-1 bg-white border rounded-md shadow-lg hidden">
+                <ul id="dropdownList2" class="max-h-60 overflow-auto"></ul>
+            </div>
+        </div>
+    </div> 
 
 
             <br>VLAN:</br>
@@ -296,6 +316,125 @@
   </div>
 </body>
 
+    <script>
+        const data = <?php echo $nodes_json; ?>;
+
+        let allPorts = [];
+
+        // Extract all port IDs initially
+        function extractPorts() {
+            Object.values(data).forEach(location => {
+                location.sub_nodes.forEach(subNode => {
+                    subNode.ports.forEach(port => {
+                        allPorts.push(port);
+                    });
+                });
+            });
+        }
+
+        function getMatchingPorts(searchTerm) {
+            if (!searchTerm) return allPorts; // Show all ports when no search term
+            return allPorts.filter(port => 
+                port.entities.some(entity => entity.toLowerCase().includes(searchTerm))
+            );
+        }
+
+        function populateDropdown(ports) {
+            const dropdownList = document.getElementById("dropdownList");
+            dropdownList.innerHTML = ""; // Clear previous results
+
+            if (ports.length === 0) {
+                dropdownList.innerHTML = `<li class="px-4 py-2 text-gray-500">No matches found</li>`;
+                return;
+            }
+
+            ports.forEach(port => {
+                let listItem = document.createElement("li");
+                listItem.className = "px-4 py-2 cursor-pointer hover:bg-gray-200";
+                listItem.textContent = port.id.replace("urn:sdx:port:", ""); // Show shortened version
+                listItem.onclick = () => selectPort(port.id);
+                dropdownList.appendChild(listItem);
+            });
+            
+        }
+
+        function populateDropdown2(ports){
+
+          const dropdownList2 = document.getElementById("dropdownList2");
+            dropdownList2.innerHTML = ""; // Clear previous results
+
+            if (ports.length === 0) {
+                dropdownList2.innerHTML = `<li class="px-4 py-2 text-gray-500">No matches found</li>`;
+                return;
+            }
+
+            ports.forEach(port => {
+                let listItem = document.createElement("li");
+                listItem.className = "px-4 py-2 cursor-pointer hover:bg-gray-200";
+                listItem.textContent = port.id.replace("urn:sdx:port:", ""); // Show shortened version
+                listItem.onclick = () => selectPort2(port.id);
+                dropdownList2.appendChild(listItem);
+            });
+
+        }
+
+        function filterDropdown() {
+            const searchTerm = document.getElementById("search").value.toLowerCase();
+            const filteredPorts = getMatchingPorts(searchTerm);
+            populateDropdown(filteredPorts);
+            showDropdown();
+        }
+
+        function selectPort(fullPortId) {
+            const shortPortId = fullPortId.replace("urn:sdx:port:", ""); // Remove prefix for display
+            document.getElementById("search").value = shortPortId;
+            document.getElementById("endpoint_1_interface_uri").value = fullPortId; // Store full ID in hidden input
+            hideDropdown();
+        }
+
+         function filterDropdown2() {
+            const searchTerm = document.getElementById("search2").value.toLowerCase();
+            const filteredPorts = getMatchingPorts(searchTerm);
+            populateDropdown2(filteredPorts);
+            showDropdown2();
+        }
+
+        function selectPort2(fullPortId) {
+            const shortPortId = fullPortId.replace("urn:sdx:port:", ""); // Remove prefix for display
+            document.getElementById("search2").value = shortPortId;
+            document.getElementById("endpoint_2_interface_uri").value = fullPortId; // Store full ID in hidden input
+            hideDropdown2();
+        }
+
+        function showDropdown() {
+            document.getElementById("dropdownContainer").classList.remove("hidden");
+        }
+
+        function showDropdown2() {
+            document.getElementById("dropdownContainer2").classList.remove("hidden");
+        }
+
+        function hideDropdown() {
+            document.getElementById("dropdownContainer").classList.add("hidden");
+        }
+
+        function hideDropdown2() {
+            document.getElementById("dropdownContainer2").classList.add("hidden");
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", function(event) {
+            if (!event.target.closest(".relative")) {
+                hideDropdown();
+                hideDropdown2();
+            }
+        });
+
+        // Initial setup: Extract ports and show all by default
+        extractPorts();
+        populateDropdown(allPorts);
+        populateDropdown2(allPorts);
+    </script>
 
 <script type="text/javascript">
 
