@@ -121,6 +121,9 @@ use meican\home\forms\FeedbackForm;
         </div>
         <!-- Default to the left -->
         <strong>&copy; 2021 <a href="http://www.rnp.br" target="_blank">RNP</a></strong>
+        <div class="pull-right hidden-xs">
+        <strong style="margin-right: 50px;"><a href="<?= Url::base(); ?>/circuits/nodes/feedbackform" target="_self">Feedback</a></strong>
+    </div>
     </footer>
     <?php endif; ?>
 
