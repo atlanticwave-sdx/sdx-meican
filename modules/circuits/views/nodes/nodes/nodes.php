@@ -219,19 +219,8 @@
             </div>
         </div>
     </div>
-            <?php $nodes_json = json_encode($nodes_array); //echo"<pre>";print_r($nodes_json);echo "</pre>";?>
-            <!-- <select class="form-control" id="endpoint_1_interface_uri" name="endpoint_1_interface_uri" placeholder="interface uri" required>
-              //<?php //foreach ($nodes_array as $key => $value) {
-                //foreach ($value['sub_nodes'] as $key2 => $value2) {
-                  //foreach ($value2['ports'] as $key3 => $value3) {
-                    //echo "<option value='" . $value3['id'] . "'>" . str_replace("urn:sdx:port:", "",$value3['id']) . "</option>";
-                  //}
-                //}
-              //}
-              ?>
-            </select> -->
-
-
+            <?php $nodes_json = json_encode($nodes_array);?>
+      
             <br>VLAN:</br>
             <select class="form-control" id="endpoint_1_vlan" name="endpoint_1_vlan" placeholder="vlan" required>
               <option value="any" title="Any available VLAN ID is chosen">any</option>
@@ -375,15 +364,15 @@
             ports.forEach(port => {
                 let listItem = document.createElement("li");
                 listItem.className = "px-4 py-2 cursor-pointer hover:bg-gray-200";
-                //listItem.textContent = port.id.replace("urn:sdx:port:", ""); // Show shortened version
+                
                              // Extract short ID
-        let shortPortId = port.id.replace("urn:sdx:port:", "");
+                let shortPortId = port.id.replace("urn:sdx:port:", "");
 
-        // Format entities
-        let entitiesText = port.entities.join(", ");
+                // Format entities
+                let entitiesText = port.entities.join(", ");
 
-        // Use innerHTML to apply bold formatting
-        listItem.innerHTML = `<strong>${shortPortId}</strong> (${entitiesText})`;
+                // Use innerHTML to apply bold formatting
+                listItem.innerHTML = `(${shortPortId}) <strong>${entitiesText}</strong>`;
                 listItem.onclick = () => selectPort(port.id);
                 dropdownList.appendChild(listItem);
             });
@@ -403,15 +392,15 @@
             ports.forEach(port => {
                 let listItem = document.createElement("li");
                 listItem.className = "px-4 py-2 cursor-pointer hover:bg-gray-200";
-                //listItem.textContent = port.id.replace("urn:sdx:port:", ""); // Show shortened version
+                
                              // Extract short ID
-        let shortPortId = port.id.replace("urn:sdx:port:", "");
+                let shortPortId = port.id.replace("urn:sdx:port:", "");
 
         // Format entities
-        let entitiesText = port.entities.join(", ");
+                let entitiesText = port.entities.join(", ");
 
         // Use innerHTML to apply bold formatting
-        listItem.innerHTML = `<strong>${shortPortId}</strong> (${entitiesText})`;
+                listItem.innerHTML = `(${shortPortId}) <strong>${entitiesText}</strong>`;
                 listItem.onclick = () => selectPort2(port.id);
                 dropdownList2.appendChild(listItem);
             });
@@ -484,15 +473,15 @@
             ports.forEach(port => {
                 let listItem = document.createElement("li");
                 listItem.className = "px-4 py-2 cursor-pointer hover:bg-gray-200";
-                //listItem.textContent = port.id.replace("urn:sdx:port:", ""); // Show shortened version
+              
                   // Extract short ID
-        let shortPortId = port.id.replace("urn:sdx:port:", "");
+                let shortPortId = port.id.replace("urn:sdx:port:", "");
 
         // Format entities
-        let entitiesText = port.entities.join(", ");
+                let entitiesText = port.entities.join(", ");
 
         // Use innerHTML to apply bold formatting
-        listItem.innerHTML = `<strong>${shortPortId}</strong> (${entitiesText})`;
+                listItem.innerHTML = `(${shortPortId}) <strong>${entitiesText}</strong>`;
                 listItem.onclick = () => selectPortArr(inputElement, port.id);
                 dropdownList.appendChild(listItem);
             });
@@ -560,7 +549,7 @@
      layer.remove();
   }
   });
-      //L.marker([50.5, 30.5]).addTo(map);
+      
           $.ajax({
         url: "https://"+meican_url+"/circuits/nodes/refreshtopology",
         type: "GET",
@@ -1104,29 +1093,8 @@
   }
 
   function appendFields() {
-    // const container = document.getElementById('field-container');
-
-    // const newDiv = document.createElement('div');
-    // newDiv.className = 'field-group';
-    // newDiv.innerHTML += 'Port ID:'
-
-    // const interfaceSelect = document.createElement('select');
-    // interfaceSelect.name = 'interface';
-    // interfaceSelect.className = 'form-control';
-
-    // <?php
-    // foreach ($nodes_array as $key => $value) {
-    //   foreach ($value['sub_nodes'] as $key2 => $value2) {
-    //     foreach ($value2['ports'] as $key3 => $value3) {
-    //       echo "interfaceSelect.innerHTML += '<option value=\"" . $value3['id'] . "\">" . str_replace("urn:sdx:port:", "",$value3['id']) . "</option>';";
-    //     }
-    //   }
-    // }
-
-
-    //?>
-
-    const fieldsContainer = document.getElementById("field-container");
+    
+        const fieldsContainer = document.getElementById("field-container");
 
             // Create new search field container
             const newDiv = document.createElement("div");
@@ -1167,13 +1135,10 @@
       container.removeChild(newDiv);
     };
 
-    //newDiv.appendChild(interfaceSelect);
     newDiv.innerHTML += '<br>VLAN:</br>';
     newDiv.appendChild(vlanSelect);
     newDiv.appendChild(deleteButton);
     newDiv.innerHTML += '<br></br>';
-
-    //container.appendChild(newDiv);
     fieldsContainer.appendChild(newDiv);
   }
 
@@ -1281,15 +1246,7 @@
     container.appendChild(newDiv);
   }
 
-  
 
-  // setTimeout(function(){
-  //   refreshMapData();
-  //   console.log("timeout working");
-    
-  // }, 10000);
-
-  // setInterval(refreshMapData, 10000);
 </script>
 
     <script>
