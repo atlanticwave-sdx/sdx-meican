@@ -78,6 +78,8 @@ class GroupController extends RbacController {
                     'test'=>Yii::t("aaa", 'Automated Tests'),
                     'role'=>Yii::t("aaa", 'Roles'),
                     'SdxCircuit'=>Yii::t("aaa", 'SDX Circuit'),
+                    'group'=>Yii::t("aaa", 'Groups'),
+                    'user'=>Yii::t("aaa", 'Users'),
                 ),
                 'root' => array(
                     'configuration'=>Yii::t("aaa", 'Reservations Configuration'),
@@ -146,6 +148,8 @@ class GroupController extends RbacController {
                     'test'=>Yii::t("aaa", 'Automated Tests'),
                     'role'=>Yii::t("aaa", 'Roles'),
                     'SdxCircuit'=>Yii::t("aaa", 'SDX Circuit'),
+                    'group'=>Yii::t("aaa", 'Groups'),
+                    'user'=>Yii::t("aaa", 'Users'),
                 ),
                 'root' => array(
                     'configuration'=>Yii::t("aaa", 'Reservations Configuration'),

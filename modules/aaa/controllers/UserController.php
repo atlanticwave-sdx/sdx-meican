@@ -40,6 +40,24 @@ class UserController extends RbacController {
         }
         else return $this->goHome();
 
+        
+        
+        foreach ($data->allModels as $key=>$value) {
+            $userId = Yii::$app->user->id;
+             if ($value->id == 1 && $userId!=1) {
+        unset($data->allModels[$key]); // Removes the entire object
+        }
+        $auth = Yii::$app->authManager;
+        $roles = $auth->getRolesByUser($value->id);
+        foreach ($roles as $role) {
+            $group = Group::findOne(['role_name'=>$role->name]);
+            $connection=Yii::$app->db;
+            $command=$connection->createCommand(
+                    "SELECT * FROM meican_group WHERE role_name='".$group->role_name."'")->queryAll();
+        }
+        $value->role_name=$command[0]['name'];
+        }
+
         return $this->render('index', array(
                 'searchModel' => $searchModel,
                 'users' => $data,

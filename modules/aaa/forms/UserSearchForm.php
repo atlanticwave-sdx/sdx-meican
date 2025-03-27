@@ -18,13 +18,15 @@ class UserSearchForm extends Model {
     public $id;
     public $login;
     public $name;
+    public $email;
     public $numRoles;
+    public $role_name;
 
     /**
      */
     public function rules()    {
         return [
-            [['login', 'name', 'id', 'numRoles'], 'required'],
+            [['login', 'name', 'id', 'numRoles','email'], 'required'],
         ];
     }
     
@@ -33,6 +35,7 @@ class UserSearchForm extends Model {
             'login'=>Yii::t('aaa', 'User'),
             "numRoles"=>Yii::t('aaa', 'Roles in Domain'),
             'name' => Yii::t('aaa', 'Name'),
+            'email' => Yii::t('aaa', 'Email'),
         ];
     }
     
@@ -40,6 +43,7 @@ class UserSearchForm extends Model {
         $this->id = $user->id;
         $this->login = $user->login;
         $this->name = $user->name;
+        $this->email = $user->email;
         $this->numRoles = $numRoles;
     }
 }
