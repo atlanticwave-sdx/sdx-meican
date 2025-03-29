@@ -19,12 +19,14 @@ $this->params['header'] = ["Groups", ['Home', 'Groups']];
 ?>
 
 <div class="box box-default">
+    <?php if($userId==1){ ?>
     <div class="box-header with-border">
         <?= GridButtons::widget(); ?>
     </div>
+    <?php } ?>
     <div class="box-body">
         <?php
-    
+    if($userId==1){
         $form = ActiveForm::begin([
             'method' => 'post',
             'action' => ['delete'],
@@ -63,6 +65,33 @@ $this->params['header'] = ["Groups", ['Home', 'Groups']];
         ]);
         
         ActiveForm::end();
+    }
+    else{
+
+         echo Grid::widget([
+            'dataProvider' => $groups,
+            'columns' => array(
+                [
+                    'class' => 'yii\grid\ActionColumn',
+                    'template'=>'{update}',
+                    'buttons' => [
+                            'update' => function ($url, $model) {
+                                return Html::a('<span class="fa fa-pencil"></span>', $url);
+                            }
+                    ],
+                    'headerOptions'=>['style'=>'width: 2%;'],
+                ],
+                    'name',
+                [
+                    'label' => 'Type',
+                    'value' => function($group){
+                        return $group->getType();
+                    }
+                ],
+                ),
+        ]);
+
+    }
         
         ?>
     </div>

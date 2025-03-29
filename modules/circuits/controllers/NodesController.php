@@ -498,6 +498,7 @@ class NodesController extends RbacController {
     $response = curl_exec($curl);
     curl_close($curl);
 
+
     $userId = Yii::$app->user->id; // Testing the Admin User
     $associatedDomains = (new \yii\db\Query())
         ->select(['domain'])
@@ -507,6 +508,7 @@ class NodesController extends RbacController {
     
     $allowedDomains = $associatedDomains ? explode(',', $associatedDomains) : [];
 
+    
     /* Processing topology JSON */
     function find_subnode_by_id($nodes_array,$node_id){
 
@@ -624,12 +626,6 @@ class NodesController extends RbacController {
       }
       
     }
-
-    //echo"<pre>";print_r($nodes_array);echo"</pre>";
-    //echo"<pre>";print_r($latlng_array);echo"</pre>";
-    //echo"<pre>";print_r($links_array);echo"</pre>";
-
-    //exit();
         
         return $this->render('nodes/nodes',['nodes_array'=>$nodes_array,'latlng_array'=>$latlng_array,'links_array'=>$links_array,'meican_url'=>$meican_url]);
     }
