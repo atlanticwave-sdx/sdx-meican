@@ -585,6 +585,7 @@
                       
                     var tooltip = L.tooltip({permanent:true}).setContent(locations);
                     marker.bindTooltip(tooltip).on('click', function(e) {
+
                       var i = e.target.myID;
                       $('#wrapper').empty();
                       var modalstring = '<div id="myModal" class="modal fade" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">' + key + '</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body">';
@@ -597,8 +598,16 @@
 
                           for (var k = 0; k < value.sub_nodes[j].ports.length; k++) {
                               var port = value.sub_nodes[j].ports[k];
+                              var entities=value.sub_nodes[j].ports[k].entities;
+                              
                               modalstring += '<tr>';
-                              modalstring += '<td>' + portLocation + '</td>';
+                              if(entities.length===0){
+                                modalstring += '<td>' + portLocation +'</td>';
+                              }
+                              else{
+                                const entitiesStr = entities.join(",");
+                                modalstring += '<td>' + portLocation +'<br><b>('+entitiesStr+ ')</b></td>';
+                              }
                               modalstring += '<td>' + port.id + '</td>';
                               modalstring += '<td>' + port.name + '</td>';
                               modalstring += '<td>' + port.node.replace("urn:sdx:node:",""); + '</td>';
@@ -750,6 +759,7 @@
       
     var tooltip = L.tooltip({permanent:true}).setContent(locations);
     marker.bindTooltip(tooltip).on('click', function(e) {
+
       var i = e.target.myID;
       $('#wrapper').empty();
       var modalstring = '<div id="myModal" class="modal fade" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">' + key + '</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body">';
@@ -762,8 +772,15 @@
 
           for (var k = 0; k < value.sub_nodes[j].ports.length; k++) {
               var port = value.sub_nodes[j].ports[k];
+              var entities=value.sub_nodes[j].ports[k].entities;
               modalstring += '<tr>';
-              modalstring += '<td>' + portLocation + '</td>';
+              if(entities.length===0){
+                modalstring += '<td>' + portLocation +'</td>';
+              }
+              else{
+                const entitiesStr = entities.join(",");
+                modalstring += '<td>' + portLocation +'<br><b>('+entitiesStr+ ')</b></td>';
+              }
               modalstring += '<td>' + port.id + '</td>';
               modalstring += '<td>' + port.name + '</td>';
               modalstring += '<td>' + port.node.replace("urn:sdx:node:",""); + '</td>';
@@ -892,6 +909,7 @@
     var id = generate_uuidv4();
     var name = $('#name').val();
     var meican_url = "<?php echo $meican_url; ?>";
+    var ownership = "<?php echo $ownership; ?>";
     var description = $('#description').val();
     var start_time = $('#start_time').val();
     var end_time = $('#end_time').val();
@@ -946,7 +964,8 @@
 
     var request = {
       "name": name,
-      "endpoints": results
+      "endpoints": results,
+      "ownership": ownership
     };
 
     if (description) {
