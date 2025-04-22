@@ -308,6 +308,10 @@ class NodesController extends RbacController {
 
         $request = Yii::$app->request->getRawBody(); // getting the JSON request body from the create connection form through MEICAN dashboard
         $request=stripslashes($request);
+        $data=json_decode($request,true);
+        $bearerToken=$data['bearerToken'];
+        $l2vpnPayload=$data['request'];
+        $l2vpnPayload=json_encode($l2vpnPayload);
         $api_url=API_URL;
         $curl = curl_init();
 
@@ -322,9 +326,10 @@ class NodesController extends RbacController {
           CURLOPT_FOLLOWLOCATION => true,
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => 'POST',
-          CURLOPT_POSTFIELDS =>$request,
+          CURLOPT_POSTFIELDS =>$l2vpnPayload,
           CURLOPT_HTTPHEADER => array(
-            'Content-Type: application/json'
+            'Content-Type: application/json',
+            'Authorization: Bearer '.$bearerToken.''
           ),
         ));
 
@@ -558,7 +563,7 @@ class NodesController extends RbacController {
       
     }
         
-        return $this->render('nodes/nodes',['nodes_array'=>$nodes_array,'latlng_array'=>$latlng_array,'links_array'=>$links_array,'meican_url'=>$meican_url,'ownership'=>$trimmedOutput]);
+        return $this->render('nodes/nodes',['nodes_array'=>$nodes_array,'latlng_array'=>$latlng_array,'links_array'=>$links_array,'meican_url'=>$meican_url,'bearerToken'=>$access_token,'ownership'=>$trimmedOutput]);
     }
 
 

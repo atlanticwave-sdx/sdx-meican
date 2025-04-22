@@ -910,6 +910,7 @@
     var name = $('#name').val();
     var meican_url = "<?php echo $meican_url; ?>";
     var ownership = "<?php echo $ownership; ?>";
+    var bearerToken = "<?php echo $bearerToken; ?>";
     var description = $('#description').val();
     var start_time = $('#start_time').val();
     var end_time = $('#end_time').val();
@@ -1054,7 +1055,10 @@
         $.ajax({
         type: "POST",
         url: "https://"+meican_url+"/circuits/nodes/create",
-        data: JSON.stringify(request),
+        data: JSON.stringify({
+        request:request,
+        bearerToken:bearerToken
+        }),
         contentType: "application/json; charset=utf-8",
         success: function(data){alert(data);},
         error: function(errMsg) {
