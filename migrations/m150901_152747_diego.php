@@ -94,7 +94,7 @@ class m150901_152747_diego extends Migration
     	 
     	$this->execute("
 			INSERT INTO `meican_group` (`id`, `name`, `role_name`, `type`) VALUES
-			(1, 'Root', 'g1', 'SYSTEM'),
+			(1, 'Super Admin', 'g1', 'SYSTEM'),
     		(2, 'Admin', 'g2', 'DOMAIN'),
 			(3, 'Requester', 'g3', 'DOMAIN'),
 			(4, 'Requester with Waypoints', 'g4', 'DOMAIN'),
@@ -103,7 +103,7 @@ class m150901_152747_diego extends Migration
 			(7, 'Topology Editor', 'g7', 'DOMAIN'),
 			(8, 'Automated Tests Editor', 'g8', 'DOMAIN'),
 			(9, 'Roles Editor', 'g9', 'DOMAIN'),
-			(10, 'SDX Circuit', 'g10', 'DOMAIN');
+			(10, 'Researcher', 'g10', 'DOMAIN');
 		");
     	
     	$this->execute("

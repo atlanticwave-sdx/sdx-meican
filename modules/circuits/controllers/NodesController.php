@@ -67,6 +67,7 @@ class NodesController extends RbacController {
     public function actionRefreshtopology() {   // this function manages the mapping of SDX-topology and displays on the MEICAN UI
       
       $api_url=API_URL;
+      $id_token = Yii::$app->session->get('id_token');
       $curl = curl_init();
       curl_setopt_array($curl, array(
         CURLOPT_URL => $api_url.'topology',
@@ -77,6 +78,9 @@ class NodesController extends RbacController {
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'GET',
+        CURLOPT_HTTPHEADER => array(
+          'Content-Type: application/json',
+          'Authorization: Bearer '.$id_token.''),
       ));
 
       $response = curl_exec($curl);
@@ -197,9 +201,129 @@ class NodesController extends RbacController {
       ]);
   }
 
-    public function actionList() {
+    public function actionList() { // this function shows all the l2vpns created by the user logged in
 
-      $api_url = API_URL;
+      $api_url=API_URL;
+      $meican_url=MEICAN_URL;
+      $enableCILogonPage = defined('ENABLE_CILOGON_PAGE') ? ENABLE_CILOGON_PAGE : false; // Cilogon environment variable
+      $CILogonClientID=CILOGON_CLIENT_ID;
+      $CILogonClientSecret=CILOGON_CLIENT_SECRET;
+
+            if ($enableCILogonPage) { // Cilogon environment variable is enabled
+              $userId = Yii::$app->user->id;
+              $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+              if (strpos($actual_link,'code') !== false) {
+                  $code=$_GET['code'];
+      
+                $curl = curl_init();
+      
+                curl_setopt_array($curl, array(
+                  CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=authorization_code&client_id=cilogon%3A%2Fclient_id%2F'.$CILogonClientID.'&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Flist&client_secret='.$CILogonClientSecret.'&code='.$code.'&token_format=jwt',
+                  CURLOPT_RETURNTRANSFER => true,
+                  CURLOPT_ENCODING => '',
+                  CURLOPT_MAXREDIRS => 10,
+                  CURLOPT_TIMEOUT => 0,
+                  CURLOPT_FOLLOWLOCATION => true,
+                  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                  CURLOPT_CUSTOMREQUEST => 'GET',
+                ));
+      
+                $response = curl_exec($curl);
+      
+                curl_close($curl);
+                $response_arr=json_decode($response,true);
+                
+                if(array_key_exists('access_token',$response_arr)){
+                  $access_token=$response_arr['access_token'];
+                  $refresh_token=$response_arr['refresh_token'];
+                  $id_token=$response_arr['id_token'];
+                  
+                  $session = Yii::$app->session;
+                  if (!$session->isActive) {
+                        $session->open();
+                  }
+                  Yii::$app->session->set('access_token', $access_token);
+                  Yii::$app->session->set('id_token', $id_token);
+                  Yii::$app->session->set('refresh_token', $refresh_token);
+                  Yii::$app->session->set('login_time', time());
+
+                
+                }
+              }
+                else{
+                  $access_token = Yii::$app->session->get('access_token');
+                  $id_token = Yii::$app->session->get('id_token');
+                  $refresh_token = Yii::$app->session->get('refresh_token');
+                  $loginTime = Yii::$app->session->get('login_time');
+
+                  if($access_token==null){
+                  header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/list&scope=openid+profile+email");
+                  exit();
+                }
+                
+
+                if ($loginTime !== null) {
+
+                    $elapsed = time() - $loginTime;
+                    if ($elapsed > 900) {
+                        // More than 15 minutes passed "Token expired"
+                        // refresh token using refresh_token
+                      $curl = curl_init();
+                    curl_setopt_array($curl, array(
+                  CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=refresh_token&client_id=cilogon%3A%2Fclient_id%2F'.$CILogonClientID.'&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Flist&client_secret='.$CILogonClientSecret.'&refresh_token='.$refresh_token.'&token_format=jwt',
+                  CURLOPT_RETURNTRANSFER => true,
+                  CURLOPT_ENCODING => '',
+                  CURLOPT_MAXREDIRS => 10,
+                  CURLOPT_TIMEOUT => 0,
+                  CURLOPT_FOLLOWLOCATION => true,
+                  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                  CURLOPT_CUSTOMREQUEST => 'GET',
+                ));
+      
+                $response = curl_exec($curl);
+                $response_arr=json_decode($response,true);
+                
+                if(array_key_exists('access_token',$response_arr)){
+                  $access_token=$response_arr['access_token'];
+                  $refresh_token=$response_arr['refresh_token'];
+                  $id_token=$response_arr['id_token'];
+
+                  Yii::$app->session->set('access_token', $access_token);
+                  Yii::$app->session->set('id_token', $id_token);
+                  Yii::$app->session->set('refresh_token', $refresh_token);
+                  Yii::$app->session->set('login_time', time());
+                }
+
+                curl_close($curl);
+
+                    }
+                }
+                
+                }
+                  $curl = curl_init();
+                curl_setopt_array($curl, array(
+                  CURLOPT_URL => 'https://cilogon.org/oauth2/userinfo?access_token='.$access_token.'',
+                  CURLOPT_RETURNTRANSFER => true,
+                  CURLOPT_ENCODING => '',
+                  CURLOPT_MAXREDIRS => 10,
+                  CURLOPT_TIMEOUT => 0,
+                  CURLOPT_FOLLOWLOCATION => true,
+                  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                  CURLOPT_CUSTOMREQUEST => 'GET',
+                ));
+      
+                $response = curl_exec($curl);
+      
+                curl_close($curl);
+                $response_arr=json_decode($response,true);
+                $sub=$response_arr['sub'];
+                $subExtract=str_replace('http://cilogon.org', '', $sub);
+                $hashedString = hash('sha256', $subExtract);
+                $base64Encoded = base64_encode($hashedString); // Convert to Base64
+                $trimmedOutput = substr($base64Encoded, 0, 16); // Get first 16 characters 
+                }
+
       $curl = curl_init();
 
       curl_setopt_array($curl, array(
@@ -211,6 +335,9 @@ class NodesController extends RbacController {
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'GET',
+        CURLOPT_HTTPHEADER => array(
+          'Content-Type: application/json',
+          'Authorization: Bearer '.$id_token.''),
       ));
 
       $str_response = curl_exec($curl);
@@ -222,6 +349,7 @@ class NodesController extends RbacController {
     public function actionConnection($connectionId) {
 
       $api_url = API_URL;
+      $id_token = Yii::$app->session->get('id_token');
       $curl = curl_init();
 
       curl_setopt_array($curl, array(
@@ -233,6 +361,9 @@ class NodesController extends RbacController {
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'GET',
+        CURLOPT_HTTPHEADER => array(
+          'Content-Type: application/json',
+          'Authorization: Bearer '.$id_token.''),
       ));
 
       $connection_response = curl_exec($curl);
@@ -259,6 +390,7 @@ class NodesController extends RbacController {
       }
    
       $api_url = API_URL;
+      $id_token = Yii::$app->session->get('id_token');
       $curl = curl_init();
    
       curl_setopt_array($curl, array(
@@ -273,7 +405,8 @@ class NodesController extends RbacController {
           CURLOPT_POSTFIELDS => $requestJson,
           CURLOPT_HTTPHEADER => array(
               'Content-Type: application/json',
-              'accept: application/json'
+              'accept: application/json',
+              'Authorization: Bearer '.$id_token.''
           ),
       ));
    
@@ -286,6 +419,7 @@ class NodesController extends RbacController {
     public function actionDelete($connectionId) {
 
       $api_url = API_URL;
+      $id_token = Yii::$app->session->get('id_token');
       $curl = curl_init();
 
       curl_setopt_array($curl, array(
@@ -297,6 +431,9 @@ class NodesController extends RbacController {
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'DELETE',
+        CURLOPT_HTTPHEADER => array(
+          'Content-Type: application/json',
+          'Authorization: Bearer '.$id_token.''),
       ));
 
       $connection_response = curl_exec($curl);
@@ -308,6 +445,10 @@ class NodesController extends RbacController {
 
         $request = Yii::$app->request->getRawBody(); // getting the JSON request body from the create connection form through MEICAN dashboard
         $request=stripslashes($request);
+        $data=json_decode($request,true);
+        $bearerToken=$data['bearerToken'];
+        $l2vpnPayload=$data['request'];
+        $l2vpnPayload=json_encode($l2vpnPayload);
         $api_url=API_URL;
         $curl = curl_init();
 
@@ -322,9 +463,10 @@ class NodesController extends RbacController {
           CURLOPT_FOLLOWLOCATION => true,
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => 'POST',
-          CURLOPT_POSTFIELDS =>$request,
+          CURLOPT_POSTFIELDS =>$l2vpnPayload,
           CURLOPT_HTTPHEADER => array(
-            'Content-Type: application/json'
+            'Content-Type: application/json',
+            'Authorization: Bearer '.$bearerToken.''
           ),
         ));
 
@@ -343,38 +485,7 @@ class NodesController extends RbacController {
       $CILogonClientSecret=CILOGON_CLIENT_SECRET;
 
       if ($enableCILogonPage) { // Cilogon environment variable is enabled
-        $userId = Yii::$app->user->id;
-        
-        if($userId != 1) { // Removing CILogon for Admin User
-          // Checks for the user entry in the meican_cilogon_auth table
-          $rows = (new \yii\db\Query())
-          ->select(['token', 'expiration'])
-          ->from('meican_cilogon_auth')
-          ->where(['user_id' => $userId])
-          ->all();
-
-          date_default_timezone_set('America/New_York');
-          $token_date = isset($rows[0]['expiration']) ? $rows[0]['expiration'] : null;
-          $token = isset($rows[0]['token']) ? $rows[0]['token'] : null;
-          if ($token_date !== null && $token !== null) { // If Record Present
-
-            $expiration_datetime = DateTime::createFromFormat('Y-m-d H:i:s', $token_date);
-            $curr_datetime = new DateTime();
-
-            // token expiration check (2 days)
-            if ($expiration_datetime !== null && $curr_datetime !== null) {
-                $diff = $curr_datetime->diff($expiration_datetime);
-                $total_seconds = $expiration_datetime->getTimestamp() - $curr_datetime->getTimestamp();
-
-            } else {
-                header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
-                exit();
-            }
-
-            if (!empty($rows[0]['token']) && isset($total_seconds) && in_array($total_seconds, range(1,172800))){ // token is not expired
-              header("Location: https://".$meican_url."/circuits/nodes/show");
-            }
-            else if (!empty($rows[0]['token']) && isset($total_seconds) && ($total_seconds > 172800 || $total_seconds <= 0 )) { // token expired
+              $userId = Yii::$app->user->id;
               $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
               if (strpos($actual_link,'code') !== false) {
@@ -383,7 +494,7 @@ class NodesController extends RbacController {
                 $curl = curl_init();
       
                 curl_setopt_array($curl, array(
-                  CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=authorization_code&client_id=cilogon%3A%2Fclient_id%2F'.$CILogonClientID.'&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Fshow&client_secret='.$CILogonClientSecret.'&code='.$code.'',
+                  CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=authorization_code&client_id=cilogon%3A%2Fclient_id%2F'.$CILogonClientID.'&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Fshow&client_secret='.$CILogonClientSecret.'&code='.$code.'&token_format=jwt',
                   CURLOPT_RETURNTRANSFER => true,
                   CURLOPT_ENCODING => '',
                   CURLOPT_MAXREDIRS => 10,
@@ -397,115 +508,138 @@ class NodesController extends RbacController {
       
                 curl_close($curl);
                 $response_arr=json_decode($response,true);
+                
                 if(array_key_exists('access_token',$response_arr)){
                   $access_token=$response_arr['access_token'];
+                  $refresh_token=$response_arr['refresh_token'];
+                  $id_token=$response_arr['id_token'];
                   
-                  // updating the token and expiration date in meican_cilogon_auth table for the respective user
-                  $expiration_datetime = new DateTime();
-                  $expiration_datetime->modify('+2 days');
-                  $result = Yii::$app->db->createCommand()->update(
-                    'meican_cilogon_auth',
-                    ['token' => $access_token, 'expiration' => $expiration_datetime->format('Y-m-d H:i:s')],
-                    'user_id = ' .$userId
-                  )->execute();
+                  $session = Yii::$app->session;
+                  if (!$session->isActive) {
+                        $session->open();
+                  }
+                  Yii::$app->session->set('access_token', $access_token);
+                  Yii::$app->session->set('id_token', $id_token);
+                  Yii::$app->session->set('refresh_token', $refresh_token);
+                  Yii::$app->session->set('login_time', time());
+
+                
                 }
+              }
                 else{
+                  $access_token = Yii::$app->session->get('access_token');
+                  $id_token = Yii::$app->session->get('id_token');
+                  $refresh_token = Yii::$app->session->get('refresh_token');
+                  $loginTime = Yii::$app->session->get('login_time');
+
+                  if($access_token==null){
                   header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
                   exit();
-                } 
-              }
-              else {
-                header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
-                exit();
-              }
-            }
-            else {
-              header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
-                exit();
-            }
-            
-          }
-          else { // Generate the new token and insert in meican_cilogon_auth table
-            $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+                }
+                
 
-            if (strpos($actual_link,'code') !== false) {
-                $code=$_GET['code'];
+                if ($loginTime !== null) {
 
-              $curl = curl_init();
+                    $elapsed = time() - $loginTime;
+                    if ($elapsed > 900) {
+                        // More than 15 minutes passed "Token expired"
+                        // refresh token using refresh_token
+                      $curl = curl_init();
+                    curl_setopt_array($curl, array(
+                  CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=refresh_token&client_id=cilogon%3A%2Fclient_id%2F'.$CILogonClientID.'&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Fshow&client_secret='.$CILogonClientSecret.'&refresh_token='.$refresh_token.'&token_format=jwt',
+                  CURLOPT_RETURNTRANSFER => true,
+                  CURLOPT_ENCODING => '',
+                  CURLOPT_MAXREDIRS => 10,
+                  CURLOPT_TIMEOUT => 0,
+                  CURLOPT_FOLLOWLOCATION => true,
+                  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                  CURLOPT_CUSTOMREQUEST => 'GET',
+                ));
+      
+                $response = curl_exec($curl);
+                $response_arr=json_decode($response,true);
+                
+                if(array_key_exists('access_token',$response_arr)){
+                  $access_token=$response_arr['access_token'];
+                  $refresh_token=$response_arr['refresh_token'];
+                  $id_token=$response_arr['id_token'];
 
-              curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://cilogon.org/oauth2/token?grant_type=authorization_code&client_id=cilogon%3A%2Fclient_id%2F'.$CILogonClientID.'&redirect_uri=https%3A%2F%2F'.$meican_url.'%2Fcircuits%2Fnodes%2Fshow&client_secret='.$CILogonClientSecret.'&code='.$code.'',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'GET',
-              ));
+                  Yii::$app->session->set('access_token', $access_token);
+                  Yii::$app->session->set('id_token', $id_token);
+                  Yii::$app->session->set('refresh_token', $refresh_token);
+                  Yii::$app->session->set('login_time', time());
+                }
 
-              $response = curl_exec($curl);
+                curl_close($curl);
 
-              curl_close($curl);
-              $response_arr=json_decode($response,true);
-              if(array_key_exists('access_token',$response_arr)){
-                $access_token=$response_arr['access_token'];
+                    }
+                }
+                
+                }
+                  $curl = curl_init();
+                curl_setopt_array($curl, array(
+                  CURLOPT_URL => 'https://cilogon.org/oauth2/userinfo?access_token='.$access_token.'',
+                  CURLOPT_RETURNTRANSFER => true,
+                  CURLOPT_ENCODING => '',
+                  CURLOPT_MAXREDIRS => 10,
+                  CURLOPT_TIMEOUT => 0,
+                  CURLOPT_FOLLOWLOCATION => true,
+                  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                  CURLOPT_CUSTOMREQUEST => 'GET',
+                ));
+      
+                $response = curl_exec($curl);
+      
+                curl_close($curl);
+                $response_arr=json_decode($response,true);
+                $sub=$response_arr['sub'];
+                $subExtract=str_replace('http://cilogon.org', '', $sub);
+                $hashedString = hash('sha256', $subExtract);
+                $base64Encoded = base64_encode($hashedString); // Convert to Base64
+                $trimmedOutput = substr($base64Encoded, 0, 16); // Get first 16 characters 
+                }
 
-                // setting expiration date for 2 days 
-                $expiration_datetime = new DateTime();
-                $expiration_datetime->modify('+2 days');
 
-                // Inserting the token expiration date in meican_cilogon_auth table
-                $result = Yii::$app->db->createCommand()->insert('meican_cilogon_auth', [
-                  'user_id' => $userId,
-                  'token' => $access_token,
-                  'expiration' => $expiration_datetime->format('Y-m-d H:i:s')
-                  ])->execute();
-              }
-              else{
-                header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
-                exit();
-              } 
-            }
-            else {
-              header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
-              exit();
-            }
-          }
-        }
-      }
+                
 
-    if(!self::can("sdxCircuit/create")){
-            return $this->goHome();
-        }
 
-    //calling API for topology
-    $curl = curl_init();
+                if(!self::can("sdxCircuit/create")){
+                        return $this->goHome();
+                    }
 
-    /* CURL request to SDX-Controller endpoint for getting topology and mapping on the MEICAN UI */
+                //calling API for topology
+                $curl = curl_init();
 
-    curl_setopt_array($curl, array(
-      CURLOPT_URL => $api_url.'topology',
-      CURLOPT_RETURNTRANSFER => true,
-      CURLOPT_ENCODING => '',
-      CURLOPT_MAXREDIRS => 10,
-      CURLOPT_TIMEOUT => 0,
-      CURLOPT_FOLLOWLOCATION => true,
-      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-      CURLOPT_CUSTOMREQUEST => 'GET',
-    ));
+                /* CURL request to SDX-Controller endpoint for getting topology and mapping on the MEICAN UI */
 
-    $response = curl_exec($curl);
-    curl_close($curl);
+                curl_setopt_array($curl, array(
+                  CURLOPT_URL => $api_url.'topology',
+                  CURLOPT_RETURNTRANSFER => true,
+                  CURLOPT_ENCODING => '',
+                  CURLOPT_MAXREDIRS => 10,
+                  CURLOPT_TIMEOUT => 0,
+                  CURLOPT_FOLLOWLOCATION => true,
+                  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                  CURLOPT_CUSTOMREQUEST => 'GET',
+                   CURLOPT_HTTPHEADER => array(
+                  'Content-Type: application/json',
+                  'Authorization: Bearer '.$id_token.''),
+                ));
 
-    $userId = Yii::$app->user->id; // Testing the Admin User
-    $associatedDomains = (new \yii\db\Query())
-        ->select(['domain'])
-        ->from('meican_user_topology_domain')
-        ->where(['user_id' => $userId])
-        ->scalar();
+                $response = curl_exec($curl);
+                curl_close($curl);
+
+
+                $userId = Yii::$app->user->id; // Testing the Admin User
+                $associatedDomains = (new \yii\db\Query())
+                    ->select(['domain'])
+                    ->from('meican_user_topology_domain')
+                    ->where(['user_id' => $userId])
+                    ->scalar();
+                
+                $allowedDomains = $associatedDomains ? explode(',', $associatedDomains) : [];
+
     
-    $allowedDomains = $associatedDomains ? explode(',', $associatedDomains) : [];
 
     /* Processing topology JSON */
     function find_subnode_by_id($nodes_array,$node_id){
@@ -556,6 +690,8 @@ class NodesController extends RbacController {
         });
     }
 
+    
+
     $nodes_array=array();
 
     foreach ($nodes as $key => $value) {
@@ -592,6 +728,8 @@ class NodesController extends RbacController {
     $latlng_array=array();
     $links_array=array();
 
+
+
     foreach ($links as $key => $value) {
       // code...
       $latlng=find_subnode_by_id($nodes_array,$value->ports[0]);
@@ -625,13 +763,11 @@ class NodesController extends RbacController {
       
     }
 
-    //echo"<pre>";print_r($nodes_array);echo"</pre>";
-    //echo"<pre>";print_r($latlng_array);echo"</pre>";
-    //echo"<pre>";print_r($links_array);echo"</pre>";
-
-    //exit();
+        //echo "test";exit();
+        //$id_token='dasdas';
+        //$trimmedOutput='asda';
         
-        return $this->render('nodes/nodes',['nodes_array'=>$nodes_array,'latlng_array'=>$latlng_array,'links_array'=>$links_array,'meican_url'=>$meican_url]);
+        return $this->render('nodes/nodes',['nodes_array'=>$nodes_array,'latlng_array'=>$latlng_array,'links_array'=>$links_array,'meican_url'=>$meican_url,'bearerToken'=>$id_token,'ownership'=>$trimmedOutput]);
     }
 
 

@@ -22,12 +22,21 @@ class GroupController extends RbacController {
             return $this->goHome();
         }
         
-        $dataProvider = new ActiveDataProvider([
+        $userId = Yii::$app->user->id;
+        if($userId==1){
+           $dataProvider = new ActiveDataProvider([
                 'query' => Group::find(),
+        ]); 
+        }
+        else{
+        $dataProvider = new ActiveDataProvider([
+                'query' => Group::find()->where(['in', 'id', [2, 10]]),
         ]);
-        
+        }
+      
         return $this->render('index', array(
-                   'groups' => $dataProvider
+                   'groups' => $dataProvider,
+                   'userId'=>$userId
         ));
     }
     
@@ -78,11 +87,20 @@ class GroupController extends RbacController {
                     'test'=>Yii::t("aaa", 'Automated Tests'),
                     'role'=>Yii::t("aaa", 'Roles'),
                     'SdxCircuit'=>Yii::t("aaa", 'SDX Circuit'),
+                    'group'=>Yii::t("aaa", 'Groups'),
+                    'user'=>Yii::t("aaa", 'Users'),
                 ),
                 'root' => array(
                     'configuration'=>Yii::t("aaa", 'Reservations Configuration'),
                     'synchronizer'=>Yii::t("aaa", 'Discovery'), 
                     'domain'=>Yii::t("aaa", 'Domains'),
+                    'reservation'=>Yii::t("aaa", 'Reservations'),
+                    'waypoint'=>Yii::t("aaa", 'Reservations with Waypoints'),
+                    'workflow'=>Yii::t("aaa", 'Workflows'), 
+                    'domainTopology'=>Yii::t("aaa","Domain's Topology"),
+                    'test'=>Yii::t("aaa", 'Automated Tests'),
+                    'role'=>Yii::t("aaa", 'Roles'),
+                    'SdxCircuit'=>Yii::t("aaa", 'SDX Circuit'),
                     'group'=>Yii::t("aaa", 'Groups'),
                     'user'=>Yii::t("aaa", 'Users'),
                 ),
@@ -136,9 +154,13 @@ class GroupController extends RbacController {
             
         }
     
-        return $this->render('update',array(
-                'group' => $group,
-                'apps' => array(
+        if($id==10){
+            $appsArray=array(
+                    'SdxCircuit'=>Yii::t("aaa", 'SDX Circuit'),
+                );
+        }
+        else{
+            $appsArray=array(
                     'reservation'=>Yii::t("aaa", 'Reservations'),
                     'waypoint'=>Yii::t("aaa", 'Reservations with Waypoints'),
                     'workflow'=>Yii::t("aaa", 'Workflows'), 
@@ -146,11 +168,25 @@ class GroupController extends RbacController {
                     'test'=>Yii::t("aaa", 'Automated Tests'),
                     'role'=>Yii::t("aaa", 'Roles'),
                     'SdxCircuit'=>Yii::t("aaa", 'SDX Circuit'),
-                ),
+                    'group'=>Yii::t("aaa", 'Groups'),
+                    'user'=>Yii::t("aaa", 'Users'),
+                );
+        }
+
+        return $this->render('update',array(
+                'group' => $group,
+                'apps' => $appsArray,
                 'root' => array(
                     'configuration'=>Yii::t("aaa", 'Reservations Configuration'),
                     'synchronizer'=>Yii::t("aaa", 'Discovery'), 
                     'domain'=>Yii::t("aaa", 'Domains'),
+                    'reservation'=>Yii::t("aaa", 'Reservations'),
+                    'waypoint'=>Yii::t("aaa", 'Reservations with Waypoints'),
+                    'workflow'=>Yii::t("aaa", 'Workflows'), 
+                    'domainTopology'=>Yii::t("aaa","Domain's Topology"),
+                    'test'=>Yii::t("aaa", 'Automated Tests'),
+                    'role'=>Yii::t("aaa", 'Roles'),
+                    'SdxCircuit'=>Yii::t("aaa", 'SDX Circuit'),
                     'group'=>Yii::t("aaa", 'Groups'),
                     'user'=>Yii::t("aaa", 'Users'),
                 ),

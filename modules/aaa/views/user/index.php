@@ -61,12 +61,22 @@ $this->params['header'] = ["Users", ['Home', 'Users']];
                 [
                     'label' => Yii::t('aaa', 'User'),
                     'value' => 'login',
-                    'headerOptions'=>['style'=>'width: 47%;'],
+                    'headerOptions'=>['style'=>'width: 27%;'],
                 ],
                 [
                     'label' => Yii::t('aaa', 'Name'),
                     'value' => 'name',
-                    'headerOptions'=>['style'=>'width: 47%;'],
+                    'headerOptions'=>['style'=>'width: 27%;'],
+                ],
+                [
+                    'label' => Yii::t('aaa', 'Email'),
+                    'value' => 'email',
+                    'headerOptions'=>['style'=>'width: 27%;'],
+                ],
+                [
+                    'label' => Yii::t('aaa', 'Role'),
+                    'value' => 'role_name',
+                    'headerOptions'=>['style'=>'width: 27%;'],
                 ],
             ),
         ]);  
