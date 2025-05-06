@@ -1092,39 +1092,65 @@
     }
   }
 
-  function appendFields() {
-    
-        const fieldsContainer = document.getElementById("field-container");
 
-            // Create new search field container
-            const newDiv = document.createElement("div");
-            newDiv.className = "relativeArr search-field field-group";
-            newDiv.innerHTML = `
-                <input type="hidden">
-                <input type="text" class="searchArr w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none"
-                       placeholder="Search entity..." onkeyup="filterDropdownArr(this)" onclick="showDropdownArr(this)">
-                <div class="dropdown-containerArr absolute w-full mt-1 bg-white border rounded-md shadow-lg hidden">
-                    <ul class="dropdown-listArr max-h-60 overflow-auto"></ul>
-                </div>
-            `;
+  const nodesarr = <?php echo $nodes_json; ?>;
 
-            
+  function getVlanRangeByPortId(nodesArray, portId) {
+    for (const regionKey in nodesArray) {
+        const region = nodesArray[regionKey];
 
+        if (region.sub_nodes) {
+            for (const subNode of region.sub_nodes) {
+                if (subNode.ports) {
+                    for (const port of subNode.ports) {
+                        if (port.id === portId) {
+                            return port.services?.l2vpn_ptp?.vlan_range || null;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return null; // Return null if the port ID is not found
+}
 
-    const vlanSelect = document.createElement('select');
-    vlanSelect.name = 'vlan';
-    vlanSelect.className = 'form-control';
-    vlanSelect.onchange = function() {
-      handleVlanChange(newDiv, vlanSelect.value);
-    };
-    vlanSelect.innerHTML = `
-      <option value="any" title="Any available VLAN ID chosen">any</option>
-      <option value="number" title="Specific VLAN ID, e.g., '50'">VLAN ID</option>
-      <option value="untagged" title="Transport Ethernet frames without IEEE 802.1Q Ethertype">untagged</option>
-      <option value="VLAN range" title="Range of VLANs, e.g., '50:55'">VLAN range</option>
-      <option value="all" title="Transport all Ethernet frames with and without IEEE 802.Q Ethertype">all</option>
+function appendFields() {
+    const fieldsContainer = document.getElementById("field-container");
+
+    // Create new search field container
+    const newDiv = document.createElement("div");
+    newDiv.className = "relativeArr search-field field-group";
+
+    // Inner HTML for the search field and dropdown
+    newDiv.innerHTML = `
+        <br>Port ID:</br>
+        <input type="hidden">
+        <input type="text" class="searchArr w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none"
+               placeholder="Search entity..." onkeyup="filterDropdownArr(this)" onclick="showDropdownArr(this)">
+        <div class="dropdown-containerArr absolute w-full mt-1 bg-white border rounded-md shadow-lg hidden">
+            <ul class="dropdown-listArr max-h-60 overflow-auto"></ul>
+        </div>
+        <br>VLAN:</br>
     `;
 
+    // Create VLAN selection dropdown
+    const vlanSelect = document.createElement("select");
+    vlanSelect.className = "form-control";
+    vlanSelect.name = "vlan";
+    vlanSelect.innerHTML = `
+        <option value="any">any</option>
+        <option value="number">VLAN ID</option>
+        <option value="untagged">untagged</option>
+        <option value="VLAN range">VLAN range</option>
+        <option value="all">all</option>
+    `;
+
+    // Attach onchange event to handle additional input field
+    vlanSelect.addEventListener("change", function () {
+        handleVlanChange(newDiv, vlanSelect.value);
+    });
+
+         // Create a delete button
     const deleteButton = document.createElement('button');
     deleteButton.type = 'button';
     deleteButton.innerText = 'Delete';
@@ -1132,43 +1158,57 @@
     deleteButton.id = 'deleteButton';
     deleteButton.style.backgroundColor = "red";
     deleteButton.onclick = function() {
-      container.removeChild(newDiv);
+        fieldsContainer.removeChild(newDiv);
     };
 
-    newDiv.innerHTML += '<br>VLAN:</br>';
+    // Add the VLAN select dropdown and delete button to the new field
     newDiv.appendChild(vlanSelect);
     newDiv.appendChild(deleteButton);
-    newDiv.innerHTML += '<br></br>';
-    fieldsContainer.appendChild(newDiv);
-  }
+    //newDiv.innerHTML += '<br></br>';
 
-  function handleVlanChange(container, value) {
+    // Append newDiv to the container
+    fieldsContainer.appendChild(newDiv);
+}
+
+// Function to handle VLAN selection change
+function handleVlanChange(container, value) {
+    // Remove existing input if present
     let existingInput = container.querySelector('input[name="vlan_value"]');
     if (existingInput) {
-      container.removeChild(existingInput);
+        container.removeChild(existingInput);
     }
+    let existingPort=container.querySelector("input[type=hidden]");
+    console.log(existingPort.value);
 
-    if (value === 'number' || value === 'VLAN range') {
-      const vlanInput = document.createElement('input');
-      vlanInput.type = 'text';
-      vlanInput.name = 'vlan_value';
-      vlanInput.placeholder = value === 'number' ? 'Enter VLAN ID (1-4095)' : 'Enter VLAN Range (e.g., 50:55)';
-      vlanInput.className = 'form-control';
-      vlanInput.valueType = value;
-      vlanInput.oninput = function() {
-        validateVlanInput(vlanInput);
-      };
-      temp = container.querySelector('button[id="deleteButton"]');
-      container.removeChild(temp);
-      container.appendChild(vlanInput);
-      container.appendChild(temp);
+    // If "number" or "VLAN range" is selected, add an input field
+    if (value === "number" || value === "VLAN range") {
+        const vlanRange = getVlanRangeByPortId(nodesarr, existingPort.value);
+        console.log(vlanRange);
+        const vlanRangeString = vlanRange ? vlanRange.join(", ") : "";
+        console.log(vlanRangeString); 
+        const vlanInput = document.createElement("input");
+        vlanInput.type = "text";
+        vlanInput.name = "vlan_value";
+        //vlanInput.placeholder = value === "number" ? "Enter VLAN ID (1-4095)" : "Enter VLAN Range (e.g., 50:55)";
+        vlanInput.placeholder="Availabe VLANs: "+vlanRangeString;
+        vlanInput.className = "form-control";
+        
+        // Insert input field after the dropdown
+        //container.appendChild(vlanInput);
+        temp = container.querySelector('button[id="deleteButton"]');
+        container.removeChild(temp);
+        container.appendChild(vlanInput);
+        container.appendChild(temp);
     }
-  }
+}
+
 
   const dropdown = document.getElementById('endpoint_1_vlan');
   const inputContainer = document.getElementById('endpoint_1_vlan-input-container');
   const dropdown2 = document.getElementById('endpoint_2_vlan');
   const inputContainer2 = document.getElementById('endpoint_2_vlan-input-container');
+  
+
 
   dropdown.addEventListener('change', function() {
     // Clear any existing input fields
@@ -1178,9 +1218,15 @@
     const optionsRequiringInput = ['number', 'VLAN range'];
 
     if (optionsRequiringInput.includes(dropdown.value)) {
+      const vlan1Port=$('#endpoint_1_interface_uri').val();
+      const vlan1Range = getVlanRangeByPortId(nodesarr, vlan1Port);
+      console.log(vlan1Range);
+      const vlan1RangeString = vlan1Range ? vlan1Range.join(", ") : "";
+      console.log(vlan1RangeString); 
       const inputField = document.createElement('input');
       inputField.type = 'text';
-      inputField.placeholder = dropdown.value === 'number' ? 'Enter VLAN ID (1-4095)' : 'Enter VLAN Range (e.g., 50:55)';
+      //inputField.placeholder = dropdown.value === 'number' ? 'Enter VLAN ID (1-4095)' : 'Enter VLAN Range (e.g., 50:55)';
+      inputField.placeholder = "Availabe VLANs: "+vlan1RangeString;
       inputField.name = 'endpoint_1_vlan_value';
       inputField.id = 'endpoint_1_vlan_value';
       inputField.className = 'form-control';
@@ -1200,9 +1246,15 @@
     const optionsRequiringInput = ['number', 'VLAN range'];
 
     if (optionsRequiringInput.includes(dropdown2.value)) {
+      const vlan2Port=$('#endpoint_2_interface_uri').val();
+      const vlan2Range = getVlanRangeByPortId(nodesarr, vlan2Port);
+      console.log(vlan2Range);
+      const vlan2RangeString = vlan2Range ? vlan2Range.join(", ") : "";
+      console.log(vlan2RangeString);
       const inputField = document.createElement('input');
       inputField.type = 'text';
-      inputField.placeholder = dropdown2.value === 'number' ? 'Enter VLAN ID (1-4095)' : 'Enter VLAN Range (e.g., 50:55)';
+      //inputField.placeholder = dropdown2.value === 'number' ? 'Enter VLAN ID (1-4095)' : 'Enter VLAN Range (e.g., 50:55)';
+      inputField.placeholder = "Availabe VLANs: "+vlan2RangeString;
       inputField.name = 'endpoint_2_vlan_value';
       inputField.id = 'endpoint_2_vlan_value';
       inputField.className = 'form-control';
