@@ -448,6 +448,7 @@ class NodesController extends RbacController {
         $data=json_decode($request,true);
         $bearerToken=$data['bearerToken'];
         $l2vpnPayload=$data['request'];
+        $ownership=$data['request']['ownership'];
         $l2vpnPayload=json_encode($l2vpnPayload);
         $api_url=API_URL;
         $curl = curl_init();
@@ -473,7 +474,26 @@ class NodesController extends RbacController {
         $response = curl_exec($curl);
 
         curl_close($curl);
-        echo $response;
+        $results = json_decode($response, true);
+        $service_id = $results["service_id"];
+        $userId = Yii::$app->user->id;
+
+        date_default_timezone_set('America/New_York');
+        $curr_datetime = (new DateTime())->format('Y-m-d H:i:s');
+        try {
+          $result = Yii::$app->db->createCommand()->insert('meican_sdx_connection', [
+              'user_id' => $userId,
+              'ownership' => $ownership,
+              'service_id' => $service_id,
+              'created_at' => $curr_datetime,
+              'deleted_at' => null
+          ])->execute();
+          echo $response;
+        } catch (\Exception $e) {
+            Yii::error('DB Insert Error: ' . $e->getMessage());
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        
     }
     
     public function actionShow() {   // this function manages the mapping of SDX-topology and displays on the MEICAN UI
