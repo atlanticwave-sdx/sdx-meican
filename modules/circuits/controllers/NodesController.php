@@ -208,6 +208,7 @@ class NodesController extends RbacController {
       $enableCILogonPage = defined('ENABLE_CILOGON_PAGE') ? ENABLE_CILOGON_PAGE : false; // Cilogon environment variable
       $CILogonClientID=CILOGON_CLIENT_ID;
       $CILogonClientSecret=CILOGON_CLIENT_SECRET;
+      $db = Yii::$app->db;
 
             if ($enableCILogonPage) { // Cilogon environment variable is enabled
               $userId = Yii::$app->user->id;
@@ -258,6 +259,7 @@ class NodesController extends RbacController {
                   $loginTime = Yii::$app->session->get('login_time');
 
                   if($access_token==null){
+
                   header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/list&scope=openid+profile+email");
                   exit();
                 }
@@ -282,9 +284,13 @@ class NodesController extends RbacController {
                 ));
       
                 $response = curl_exec($curl);
+                curl_close($curl);
                 $response_arr=json_decode($response,true);
+
+                if (is_array($response_arr) && json_last_error() === JSON_ERROR_NONE) {
                 
                 if(array_key_exists('access_token',$response_arr)){
+
                   $access_token=$response_arr['access_token'];
                   $refresh_token=$response_arr['refresh_token'];
                   $id_token=$response_arr['id_token'];
@@ -294,13 +300,16 @@ class NodesController extends RbacController {
                   Yii::$app->session->set('refresh_token', $refresh_token);
                   Yii::$app->session->set('login_time', time());
                 }
-
-                curl_close($curl);
-
-                    }
+              }
+              else{
+                 header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/list&scope=openid+profile+email");
+                  exit();
+            }
+              }
                 }
-                
                 }
+                  
+                  
                   $curl = curl_init();
                 curl_setopt_array($curl, array(
                   CURLOPT_URL => 'https://cilogon.org/oauth2/userinfo?access_token='.$access_token.'',
@@ -314,11 +323,12 @@ class NodesController extends RbacController {
                 ));
       
                 $response = curl_exec($curl);
-      
+
                 curl_close($curl);
                 $response_arr=json_decode($response,true);
                 $sub=$response_arr['sub'];
                 $subExtract=str_replace('http://cilogon.org', '', $sub);
+                $subExtract = preg_replace('/server[A-Z]/', 'serverX', $subExtract);
                 $hashedString = hash('sha256', $subExtract);
                 $base64Encoded = base64_encode($hashedString); // Convert to Base64
                 $trimmedOutput = substr($base64Encoded, 0, 16); // Get first 16 characters 
@@ -343,7 +353,25 @@ class NodesController extends RbacController {
       $str_response = curl_exec($curl);
       curl_close($curl);
 
-      return $this->render('nodes/list-connections', ['str_response' => $str_response]);
+      if (!empty($str_response)) {
+          $connectionsData = json_decode($str_response, true);
+          if (is_array($connectionsData) && json_last_error() === JSON_ERROR_NONE && $userId!=1) {
+            foreach ($connectionsData as $serviceId => $details) {
+              $exists = $db->createCommand(
+                  'SELECT 1 FROM meican_sdx_connection WHERE service_id = :service_id AND user_id = :user_id LIMIT 1'
+              )->bindValues([
+                  ':service_id' => $serviceId,
+                  ':user_id' => $userId,
+              ])->queryScalar();
+
+              if (!$exists) {
+                unset($connectionsData[$serviceId]);
+                  }
+                  }
+                }
+              }
+
+      return $this->render('nodes/list-connections', ['connectionsData' => $connectionsData]);
     }
 
     public function actionConnection($connectionId) {
@@ -483,6 +511,7 @@ class NodesController extends RbacController {
       $enableCILogonPage = defined('ENABLE_CILOGON_PAGE') ? ENABLE_CILOGON_PAGE : false; // Cilogon environment variable
       $CILogonClientID=CILOGON_CLIENT_ID;
       $CILogonClientSecret=CILOGON_CLIENT_SECRET;
+      $db = Yii::$app->db;
 
       if ($enableCILogonPage) { // Cilogon environment variable is enabled
               $userId = Yii::$app->user->id;
@@ -557,9 +586,13 @@ class NodesController extends RbacController {
                 ));
       
                 $response = curl_exec($curl);
+                curl_close($curl);
                 $response_arr=json_decode($response,true);
                 
+                if (is_array($response_arr) && json_last_error() === JSON_ERROR_NONE) {
+                
                 if(array_key_exists('access_token',$response_arr)){
+
                   $access_token=$response_arr['access_token'];
                   $refresh_token=$response_arr['refresh_token'];
                   $id_token=$response_arr['id_token'];
@@ -569,8 +602,13 @@ class NodesController extends RbacController {
                   Yii::$app->session->set('refresh_token', $refresh_token);
                   Yii::$app->session->set('login_time', time());
                 }
+              }
+              else{
+                 header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/list&scope=openid+profile+email");
+                  exit();
+            }
 
-                curl_close($curl);
+                
 
                     }
                 }
@@ -594,6 +632,7 @@ class NodesController extends RbacController {
                 $response_arr=json_decode($response,true);
                 $sub=$response_arr['sub'];
                 $subExtract=str_replace('http://cilogon.org', '', $sub);
+                $subExtract = preg_replace('/server[A-Z]/', 'serverX', $subExtract);
                 $hashedString = hash('sha256', $subExtract);
                 $base64Encoded = base64_encode($hashedString); // Convert to Base64
                 $trimmedOutput = substr($base64Encoded, 0, 16); // Get first 16 characters 
