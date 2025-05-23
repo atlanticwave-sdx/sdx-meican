@@ -30,6 +30,7 @@ use meican\topology\models\Port;
 use meican\topology\models\Domain;
 use meican\topology\models\Network;
 use meican\topology\models\Service;
+use meican\aaa\models\User;
 
 /**
  * @author Maurício Quatrin Guerreiros
@@ -604,7 +605,7 @@ class NodesController extends RbacController {
                 }
               }
               else{
-                 header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/list&scope=openid+profile+email");
+                 header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
                   exit();
             }
 
@@ -639,13 +640,6 @@ class NodesController extends RbacController {
                 }
 
 
-                
-
-
-                if(!self::can("sdxCircuit/create")){
-                        return $this->goHome();
-                    }
-
                 //calling API for topology
                 $curl = curl_init();
 
@@ -668,7 +662,55 @@ class NodesController extends RbacController {
                 $response = curl_exec($curl);
                 curl_close($curl);
 
+                 $user = User::findOne($userId); // $id is the primary key
+                  if ($user !== null) {
+                      if($user->is_active==0){
+                         if(array_key_exists('eppn',$response_arr) && array_key_exists('email',$response_arr)){
 
+                              try {
+                                  Yii::$app->db->createCommand()->insert('meican_user_domain', [
+                                      'id' => $userId,
+                                      'user_id' => $userId,
+                                  ])->execute();
+                              } catch (\yii\db\Exception $e) {
+                                  echo "Insert failed: " . $e->getMessage();
+                              }
+                              try {
+                                  Yii::$app->db->createCommand()->insert('meican_auth_assignment', [
+                                      'item_name' => 'g10',
+                                      'user_id' => $userId,
+                                  ])->execute();
+                              } catch (\yii\db\Exception $e) {
+                                  echo "Insert failed: " . $e->getMessage();
+                              }
+                              try {
+                                    Yii::$app->db->createCommand()->insert('meican_user_topology_domain', [
+                                        'id' => $userId,
+                                        'user_id' => $userId,
+                                        'domain' => 'ampath.net,sax.net,tenet.ac.za',
+                                    ])->execute();
+                                } catch (\yii\db\Exception $e) {
+                                    echo "Insert failed: " . $e->getMessage();
+                                }
+
+                              $user->email = $response_arr['email'];
+                              $user->is_active=1;
+                              $user->save(); // saves changes
+                }
+                else{
+
+                  header("Location: https://$meican_url/aaa/login/sendemail?id=$userId");
+                  exit();
+                }
+                      }
+
+                      if(!self::can("sdxCircuit/create")){
+                        return $this->goHome();
+                    }
+                      
+                  }
+
+               
                 $userId = Yii::$app->user->id; // Testing the Admin User
                 $associatedDomains = (new \yii\db\Query())
                     ->select(['domain'])
