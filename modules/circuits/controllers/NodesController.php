@@ -30,6 +30,8 @@ use meican\topology\models\Port;
 use meican\topology\models\Domain;
 use meican\topology\models\Network;
 use meican\topology\models\Service;
+use meican\aaa\models\User;
+use yii\web\ServerErrorHttpException;
 
 /**
  * @author Maurício Quatrin Guerreiros
@@ -38,7 +40,29 @@ use meican\topology\models\Service;
 /* This is the controller for handling SDX-topology and creating connection requests to SDX-Controller */
 class NodesController extends RbacController {
 
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+
+        // Disable Bearer auth or similar authenticator for specific actions
+        if (isset($behaviors['authenticator'])) {
+            $behaviors['authenticator']['except'] = ['public','show','list'];
+        }
+
+        // Disable AccessControl or RBAC for specific actions
+        if (isset($behaviors['access'])) {
+            $behaviors['access']['except'] = ['public','show','list'];
+        }
+
+        return $behaviors;
+    }
+
     public $enableCsrfValidation = false;
+
+    public function actionPublic()
+    {
+        echo "hello";
+    }
 
     public function actionFeedbackform(){
 
@@ -208,6 +232,12 @@ class NodesController extends RbacController {
       $enableCILogonPage = defined('ENABLE_CILOGON_PAGE') ? ENABLE_CILOGON_PAGE : false; // Cilogon environment variable
       $CILogonClientID=CILOGON_CLIENT_ID;
       $CILogonClientSecret=CILOGON_CLIENT_SECRET;
+      $db = Yii::$app->db;
+
+       if (Yii::$app->user->isGuest) {
+        header("Location: https://$meican_url/circuits/nodes/show");
+        exit();
+        }
 
             if ($enableCILogonPage) { // Cilogon environment variable is enabled
               $userId = Yii::$app->user->id;
@@ -258,6 +288,7 @@ class NodesController extends RbacController {
                   $loginTime = Yii::$app->session->get('login_time');
 
                   if($access_token==null){
+
                   header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/list&scope=openid+profile+email");
                   exit();
                 }
@@ -282,9 +313,13 @@ class NodesController extends RbacController {
                 ));
       
                 $response = curl_exec($curl);
+                curl_close($curl);
                 $response_arr=json_decode($response,true);
+
+                if (is_array($response_arr) && json_last_error() === JSON_ERROR_NONE) {
                 
                 if(array_key_exists('access_token',$response_arr)){
+
                   $access_token=$response_arr['access_token'];
                   $refresh_token=$response_arr['refresh_token'];
                   $id_token=$response_arr['id_token'];
@@ -294,13 +329,16 @@ class NodesController extends RbacController {
                   Yii::$app->session->set('refresh_token', $refresh_token);
                   Yii::$app->session->set('login_time', time());
                 }
-
-                curl_close($curl);
-
-                    }
+              }
+              else{
+                 header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/list&scope=openid+profile+email");
+                  exit();
+            }
+              }
                 }
-                
                 }
+                  
+                  
                   $curl = curl_init();
                 curl_setopt_array($curl, array(
                   CURLOPT_URL => 'https://cilogon.org/oauth2/userinfo?access_token='.$access_token.'',
@@ -314,11 +352,12 @@ class NodesController extends RbacController {
                 ));
       
                 $response = curl_exec($curl);
-      
+
                 curl_close($curl);
                 $response_arr=json_decode($response,true);
                 $sub=$response_arr['sub'];
                 $subExtract=str_replace('http://cilogon.org', '', $sub);
+                $subExtract = preg_replace('/server[A-Z]/', 'serverX', $subExtract);
                 $hashedString = hash('sha256', $subExtract);
                 $base64Encoded = base64_encode($hashedString); // Convert to Base64
                 $trimmedOutput = substr($base64Encoded, 0, 16); // Get first 16 characters 
@@ -343,7 +382,25 @@ class NodesController extends RbacController {
       $str_response = curl_exec($curl);
       curl_close($curl);
 
-      return $this->render('nodes/list-connections', ['str_response' => $str_response]);
+      if (!empty($str_response)) {
+          $connectionsData = json_decode($str_response, true);
+          if (is_array($connectionsData) && json_last_error() === JSON_ERROR_NONE && $userId!=1) {
+            foreach ($connectionsData as $serviceId => $details) {
+              $exists = $db->createCommand(
+                  'SELECT 1 FROM meican_sdx_connection WHERE service_id = :service_id AND user_id = :user_id LIMIT 1'
+              )->bindValues([
+                  ':service_id' => $serviceId,
+                  ':user_id' => $userId,
+              ])->queryScalar();
+
+              if (!$exists) {
+                unset($connectionsData[$serviceId]);
+                  }
+                  }
+                }
+              }
+
+      return $this->render('nodes/list-connections', ['connectionsData' => $connectionsData]);
     }
 
     public function actionConnection($connectionId) {
@@ -483,9 +540,10 @@ class NodesController extends RbacController {
       $enableCILogonPage = defined('ENABLE_CILOGON_PAGE') ? ENABLE_CILOGON_PAGE : false; // Cilogon environment variable
       $CILogonClientID=CILOGON_CLIENT_ID;
       $CILogonClientSecret=CILOGON_CLIENT_SECRET;
+      $db = Yii::$app->db;
 
       if ($enableCILogonPage) { // Cilogon environment variable is enabled
-              $userId = Yii::$app->user->id;
+              //$userId = Yii::$app->user->id;
               $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
               if (strpos($actual_link,'code') !== false) {
@@ -557,9 +615,13 @@ class NodesController extends RbacController {
                 ));
       
                 $response = curl_exec($curl);
+                curl_close($curl);
                 $response_arr=json_decode($response,true);
                 
+                if (is_array($response_arr) && json_last_error() === JSON_ERROR_NONE) {
+                
                 if(array_key_exists('access_token',$response_arr)){
+
                   $access_token=$response_arr['access_token'];
                   $refresh_token=$response_arr['refresh_token'];
                   $id_token=$response_arr['id_token'];
@@ -569,8 +631,13 @@ class NodesController extends RbacController {
                   Yii::$app->session->set('refresh_token', $refresh_token);
                   Yii::$app->session->set('login_time', time());
                 }
+              }
+              else{
+                 header("Location: https://cilogon.org/authorize?response_type=code&client_id=cilogon:/client_id/".$CILogonClientID."&redirect_uri=https://".$meican_url."/circuits/nodes/show&scope=openid+profile+email");
+                  exit();
+            }
 
-                curl_close($curl);
+                
 
                     }
                 }
@@ -594,18 +661,12 @@ class NodesController extends RbacController {
                 $response_arr=json_decode($response,true);
                 $sub=$response_arr['sub'];
                 $subExtract=str_replace('http://cilogon.org', '', $sub);
+                $subExtract = preg_replace('/server[A-Z]/', 'serverX', $subExtract);
                 $hashedString = hash('sha256', $subExtract);
                 $base64Encoded = base64_encode($hashedString); // Convert to Base64
                 $trimmedOutput = substr($base64Encoded, 0, 16); // Get first 16 characters 
                 }
 
-
-                
-
-
-                if(!self::can("sdxCircuit/create")){
-                        return $this->goHome();
-                    }
 
                 //calling API for topology
                 $curl = curl_init();
@@ -629,7 +690,86 @@ class NodesController extends RbacController {
                 $response = curl_exec($curl);
                 curl_close($curl);
 
+                 $user = User::findByUsername($trimmedOutput);
+                  if ($user !== null) {
+                    $userId=$user->id; // $id is the primary key
+                      if($user->is_active==0){
+                         if(array_key_exists('eppn',$response_arr) && array_key_exists('email',$response_arr)){
 
+                              try {
+                                  Yii::$app->db->createCommand()->insert('meican_user_domain', [
+                                      'id' => $userId,
+                                      'user_id' => $userId,
+                                  ])->execute();
+                              } catch (\yii\db\Exception $e) {
+                                  echo "Insert failed: " . $e->getMessage();
+                              }
+                              try {
+                                  Yii::$app->db->createCommand()->insert('meican_auth_assignment', [
+                                      'item_name' => 'g10',
+                                      'user_id' => $userId,
+                                  ])->execute();
+                              } catch (\yii\db\Exception $e) {
+                                  echo "Insert failed: " . $e->getMessage();
+                              }
+                              try {
+                                    Yii::$app->db->createCommand()->insert('meican_user_topology_domain', [
+                                        'id' => $userId,
+                                        'user_id' => $userId,
+                                        'domain' => 'ampath.net,sax.net,tenet.ac.za',
+                                    ])->execute();
+                                } catch (\yii\db\Exception $e) {
+                                    echo "Insert failed: " . $e->getMessage();
+                                }
+
+                              $user->email = $response_arr['email'];
+                              $user->is_active=1;
+                              $user->save(); // saves changes
+                }
+                else{
+
+                  header("Location: https://$meican_url/aaa/login/sendemail?id=$userId");
+                  exit();
+                }
+                      }
+
+                      $duration = 3600*24; // one day
+                      Yii::$app->user->login($user, $duration);
+
+                if(!self::can("sdxCircuit/create")){
+                        return $this->goHome();
+                    }
+                      
+                  }
+
+                  else{
+                      $email='test@test.com';
+                      $user = new User;
+                      $user->login = $trimmedOutput;
+                      $user->authkey = Yii::$app->getSecurity()->generateRandomString();
+                      $user->password = Yii::$app->getSecurity()->generatePasswordHash('test');
+                      $user->language = 'en-US';
+                      $user->date_format = 'dd/MM/yyyy';
+                      $user->time_zone = 'HH:mm';
+                      $user->time_format = 'New_York';
+                      $user->name = $response_arr['given_name'].' '.$response_arr['family_name'];
+                      $user->email = $email;
+                      $registration_token=Yii::$app->getSecurity()->generateRandomString();
+                      $user->registration_token=$registration_token;
+                      //$user->save();
+                      if (!$user->save()){
+                        foreach ($user->getErrors() as $attribute => $errors) {
+                            foreach ($errors as $error) {
+                                echo "$attribute: $error<br>";
+                            }
+                              }
+                        exit();
+                        }
+                      header("Location: https://$meican_url/circuits/nodes/show");
+                      exit();
+                      }
+
+               
                 $userId = Yii::$app->user->id; // Testing the Admin User
                 $associatedDomains = (new \yii\db\Query())
                     ->select(['domain'])

@@ -94,9 +94,6 @@
                                  </tr>
                                  
                                  <?php
-                                    if (!empty($str_response)) {
-                                       $connectionsData = json_decode($str_response, true);
-                                       if (is_array($connectionsData) && json_last_error() === JSON_ERROR_NONE) {
                                           foreach ($connectionsData as $connectionId => $connectionInfo) {
                                              ?>
                                                 <tr id="circuits-gridcurrent-filters" class="filters">
@@ -119,9 +116,6 @@
                                                 </tr>
                                              <?php
                                           }
-                                          
-                                       }
-                                    }
                                  ?>
                                  
                               </thead>
