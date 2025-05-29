@@ -50,6 +50,7 @@ class LoginController extends BaseController {
 
     public function actionVerifyemail(){ //route for verifying emails new ORCID user signups on MEICAN
 
+        $base_url=MEICAN_URL;
         $registration_token = $_GET['token'];
     
         $user=User::findByRegistrationToken($registration_token);
@@ -91,7 +92,10 @@ class LoginController extends BaseController {
                 ->setTextBody('Plain text content')
                 ->setHtmlBody('Your email has been successfully verified.')
                 ->send();
-                $this->redirect(array('index'));
+                $duration = 3600*24; // one day
+                Yii::$app->user->login($user, $duration);
+                header("Location: https://$base_url/circuits/nodes/show");
+                exit();
                 }
             }
 
@@ -108,6 +112,8 @@ class LoginController extends BaseController {
            $email=$_GET['email'];
            $user = User::findOne($userId);
            $registration_token=$user->registration_token;
+           $user->email=$email;
+           $user->save();
             $mail=Yii::$app->mailer->compose()
            ->setFrom('meican.sdx@gmail.com')
            ->setTo($email)
@@ -129,85 +135,17 @@ class LoginController extends BaseController {
 
     }
     
-    public function actionIndex() { //redirect users to ORCID login if they are not logged in with their ORCID credentials
-
-        $model = new LoginForm;
-        $base_url=MEICAN_URL;
-    	
-        $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-      	if (strpos($actual_link,'code') !== false) {
-          $code=$_GET['code'];
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://orcid.org/oauth/token',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => 'client_id='.ORCID_CLIENT_ID.'&client_secret='.ORCID_CLIENT_SECRET.'&grant_type=authorization_code&redirect_uri=https%3A%2F%2F'.$base_url.'%2Faaa%2Flogin&code='.$code.'',
-        CURLOPT_HTTPHEADER => array(
-          'Accept: application/json',
-          'Content-Type: application/x-www-form-urlencoded',
-          'Cookie: X-Mapping-fjhppofk=C9BF87EDFB3F654BC98D87552A592F57'
-        ),
-      ));
-
-      $response = curl_exec($curl);
-
-      curl_close($curl);
-      $response_arr=json_decode($response,true);
-      $orcid_id=$response_arr['orcid'];
-      $name=$response_arr['name'];
-      $user=User::findByUsername($orcid_id);
-      if(!empty($user)){
-      $duration = 3600*24; // one day
-      Yii::$app->user->login($user, $duration);
-      header("Location: https://$base_url/circuits/nodes/show");
-        exit(); 
-        }
-        else{
-        $email='test@test.com';
-        $user = new User;
-        $user->login = $orcid_id;
-        $user->authkey = Yii::$app->getSecurity()->generateRandomString();
-        $user->password = Yii::$app->getSecurity()->generatePasswordHash('test');
-        $user->language = 'en-US';
-        $user->date_format = 'dd/MM/yyyy';
-        $user->time_zone = 'HH:mm';
-        $user->time_format = 'New_York';
-        $user->name = $name;
-        $user->email = $email;
-        $registration_token=Yii::$app->getSecurity()->generateRandomString();
-        $user->registration_token=$registration_token;
-        $user->save();
-        header("Location: https://orcid.org/oauth/authorize?client_id=".ORCID_CLIENT_ID."&response_type=code&scope=/authenticate&redirect_uri=https://$base_url/aaa/login");
+    public function actionIndex() { //redirect users to CI Logon
+       
+       $meican_url=MEICAN_URL;
+       header("Location: https://$meican_url/circuits/nodes/show");
         exit();
-
-        }
-      
-      } 
-
-      else {
-          header("Location: https://orcid.org/oauth/authorize?client_id=".ORCID_CLIENT_ID."&response_type=code&scope=/authenticate&redirect_uri=https://$base_url/aaa/login");
-          exit();
-       }
-
-        
-            
-        return $this->render('index', array(
-            'model'=>$model,
-            'federation' => AaaPreference::isFederationEnabled(),
-        ));
     }
      
     public function actionLogout() {
         Yii::$app->user->logout();
-        return $this->goHome();
+        Yii::$app->session->destroy(); // Ends the session and deletes session data
+        return $this->redirect('https://cilogon.org/logout');
     }
     
     public function actionPassword() {

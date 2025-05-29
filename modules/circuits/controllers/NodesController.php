@@ -31,6 +31,7 @@ use meican\topology\models\Domain;
 use meican\topology\models\Network;
 use meican\topology\models\Service;
 use meican\aaa\models\User;
+use yii\web\ServerErrorHttpException;
 
 /**
  * @author Maurício Quatrin Guerreiros
@@ -39,7 +40,29 @@ use meican\aaa\models\User;
 /* This is the controller for handling SDX-topology and creating connection requests to SDX-Controller */
 class NodesController extends RbacController {
 
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+
+        // Disable Bearer auth or similar authenticator for specific actions
+        if (isset($behaviors['authenticator'])) {
+            $behaviors['authenticator']['except'] = ['public','show','list'];
+        }
+
+        // Disable AccessControl or RBAC for specific actions
+        if (isset($behaviors['access'])) {
+            $behaviors['access']['except'] = ['public','show','list'];
+        }
+
+        return $behaviors;
+    }
+
     public $enableCsrfValidation = false;
+
+    public function actionPublic()
+    {
+        echo "hello";
+    }
 
     public function actionFeedbackform(){
 
@@ -210,6 +233,11 @@ class NodesController extends RbacController {
       $CILogonClientID=CILOGON_CLIENT_ID;
       $CILogonClientSecret=CILOGON_CLIENT_SECRET;
       $db = Yii::$app->db;
+
+       if (Yii::$app->user->isGuest) {
+        header("Location: https://$meican_url/circuits/nodes/show");
+        exit();
+        }
 
             if ($enableCILogonPage) { // Cilogon environment variable is enabled
               $userId = Yii::$app->user->id;
@@ -515,7 +543,7 @@ class NodesController extends RbacController {
       $db = Yii::$app->db;
 
       if ($enableCILogonPage) { // Cilogon environment variable is enabled
-              $userId = Yii::$app->user->id;
+              //$userId = Yii::$app->user->id;
               $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
               if (strpos($actual_link,'code') !== false) {
@@ -662,8 +690,9 @@ class NodesController extends RbacController {
                 $response = curl_exec($curl);
                 curl_close($curl);
 
-                 $user = User::findOne($userId); // $id is the primary key
+                 $user = User::findByUsername($trimmedOutput);
                   if ($user !== null) {
+                    $userId=$user->id; // $id is the primary key
                       if($user->is_active==0){
                          if(array_key_exists('eppn',$response_arr) && array_key_exists('email',$response_arr)){
 
@@ -704,11 +733,41 @@ class NodesController extends RbacController {
                 }
                       }
 
-                      if(!self::can("sdxCircuit/create")){
+                      $duration = 3600*24; // one day
+                      Yii::$app->user->login($user, $duration);
+
+                if(!self::can("sdxCircuit/create")){
                         return $this->goHome();
                     }
                       
                   }
+
+                  else{
+                      $email='test@test.com';
+                      $user = new User;
+                      $user->login = $trimmedOutput;
+                      $user->authkey = Yii::$app->getSecurity()->generateRandomString();
+                      $user->password = Yii::$app->getSecurity()->generatePasswordHash('test');
+                      $user->language = 'en-US';
+                      $user->date_format = 'dd/MM/yyyy';
+                      $user->time_zone = 'HH:mm';
+                      $user->time_format = 'New_York';
+                      $user->name = $response_arr['given_name'].' '.$response_arr['family_name'];
+                      $user->email = $email;
+                      $registration_token=Yii::$app->getSecurity()->generateRandomString();
+                      $user->registration_token=$registration_token;
+                      //$user->save();
+                      if (!$user->save()){
+                        foreach ($user->getErrors() as $attribute => $errors) {
+                            foreach ($errors as $error) {
+                                echo "$attribute: $error<br>";
+                            }
+                              }
+                        exit();
+                        }
+                      header("Location: https://$meican_url/circuits/nodes/show");
+                      exit();
+                      }
 
                
                 $userId = Yii::$app->user->id; // Testing the Admin User
