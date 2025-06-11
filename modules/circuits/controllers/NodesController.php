@@ -687,7 +687,6 @@ class NodesController extends RbacController {
                 $trimmedOutput = substr($base64Encoded, 0, 16); // Get first 16 characters 
                 }
 
-
                 //calling API for topology
                 $curl = curl_init();
 
@@ -772,7 +771,12 @@ class NodesController extends RbacController {
                       $user->date_format = 'dd/MM/yyyy';
                       $user->time_zone = 'HH:mm';
                       $user->time_format = 'New_York';
-                      $user->name = $response_arr['given_name'].' '.$response_arr['family_name'];
+                      if(array_key_exists('given_name',$response_arr) && array_key_exists('family_name',$response_arr)){
+                        $user->name = $response_arr['given_name'].' '.$response_arr['family_name'];
+                      }
+                      else {
+                        $user->name='userXYZ';
+                      }
                       $user->email = $email;
                       $registration_token=Yii::$app->getSecurity()->generateRandomString();
                       $user->registration_token=$registration_token;
