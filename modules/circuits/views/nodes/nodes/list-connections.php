@@ -94,6 +94,7 @@
                                  </tr>
                                  
                                  <?php
+                                          if(empty($connectionsData)){echo "No l2vpn connections";}
                                           foreach ($connectionsData as $connectionId => $connectionInfo) {
                                              ?>
                                                 <tr id="circuits-gridcurrent-filters" class="filters">

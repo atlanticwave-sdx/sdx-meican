@@ -8,6 +8,7 @@ namespace meican\aaa\controllers;
 
 use Yii;
 use yii\helpers\Url;
+use DateTime;
 
 use meican\base\BaseController;
 use meican\aaa\models\User;
@@ -139,13 +140,20 @@ class LoginController extends BaseController {
        
        $meican_url=MEICAN_URL;
        header("Location: https://$meican_url/circuits/nodes/show");
-        exit();
+       exit();
     }
      
     public function actionLogout() {
+        $enableOrcidPage = defined('ENABLE_ORCID_PAGE') ? ENABLE_ORCID_PAGE : false; // ORCID environment variable
+        $enableCILogonPage = defined('ENABLE_CILOGON_PAGE') ? ENABLE_CILOGON_PAGE : false; // Cilogon environment variable
         Yii::$app->user->logout();
         Yii::$app->session->destroy(); // Ends the session and deletes session data
-        return $this->redirect('https://cilogon.org/logout');
+        if ($enableCILogonPage){
+            return $this->redirect('https://cilogon.org/logout');
+        }
+        else if($enableOrcidPage){
+            return $this->redirect('https://orcid.org/signout');
+        }
     }
     
     public function actionPassword() {

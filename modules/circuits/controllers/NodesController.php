@@ -229,6 +229,9 @@ class NodesController extends RbacController {
 
       $api_url=API_URL;
       $meican_url=MEICAN_URL;
+      $enableOrcidPage = defined('ENABLE_ORCID_PAGE') ? ENABLE_ORCID_PAGE : false; // ORCID environment variable
+      $OrcidClientID=ORCID_CLIENT_ID;
+      $OrcidClientSecret=ORCID_CLIENT_SECRET;
       $enableCILogonPage = defined('ENABLE_CILOGON_PAGE') ? ENABLE_CILOGON_PAGE : false; // Cilogon environment variable
       $CILogonClientID=CILOGON_CLIENT_ID;
       $CILogonClientSecret=CILOGON_CLIENT_SECRET;
@@ -362,6 +365,91 @@ class NodesController extends RbacController {
                 $base64Encoded = base64_encode($hashedString); // Convert to Base64
                 $trimmedOutput = substr($base64Encoded, 0, 16); // Get first 16 characters 
                 }
+      
+          else if($enableOrcidPage){
+
+           $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+           $userId = Yii::$app->user->id;
+           if (strpos($actual_link,'code') !== false) {
+                  $code=$_GET['code'];
+                  
+                  $curl = curl_init();
+
+                  curl_setopt_array($curl, array(
+                  CURLOPT_URL => 'https://orcid.org/oauth/token',
+                  CURLOPT_RETURNTRANSFER => true,
+                  CURLOPT_ENCODING => '',
+                  CURLOPT_MAXREDIRS => 10,
+                  CURLOPT_TIMEOUT => 0,
+                  CURLOPT_FOLLOWLOCATION => true,
+                  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                  CURLOPT_CUSTOMREQUEST => 'POST',
+                  CURLOPT_POSTFIELDS => 'client_id='.$OrcidClientID.'&client_secret='.$OrcidClientSecret.'&grant_type=authorization_code&redirect_uri=https://'.$meican_url.'/circuits/nodes/show&code='.$code.'',
+                  CURLOPT_HTTPHEADER => array(
+                        'Accept: application/json',
+                        'Content-Type: application/x-www-form-urlencoded'
+                      ),
+                    ));
+
+                    $response = curl_exec($curl);
+
+                    curl_close($curl);
+                    $response_arr=json_decode($response,true);
+                
+                    if(array_key_exists('access_token',$response_arr)){
+                      $access_token=$response_arr['access_token'];
+                      $refresh_token=$response_arr['refresh_token'];
+                      $id_token=$response_arr['id_token'];
+                      
+                      $session = Yii::$app->session;
+                      if (!$session->isActive) {
+                            $session->open();
+                      }
+                      Yii::$app->session->set('access_token', $access_token);
+                      Yii::$app->session->set('id_token', $id_token);
+                      Yii::$app->session->set('refresh_token', $refresh_token);
+                      Yii::$app->session->set('login_time', time());
+
+                    
+                    }
+
+              }
+              else{ 
+                $access_token = Yii::$app->session->get('access_token');
+                $id_token = Yii::$app->session->get('id_token');
+                $refresh_token = Yii::$app->session->get('refresh_token');
+                $loginTime = Yii::$app->session->get('login_time');
+
+                if($access_token==null){
+                    header("Location: https://orcid.org/oauth/authorize?client_id=".$OrcidClientID."&response_type=code&scope=/authenticate%20openid&redirect_uri=https://".$meican_url."/circuits/nodes/show");
+                    exit();
+                }
+              }
+                
+              $curl = curl_init();
+
+              curl_setopt_array($curl, array(
+              CURLOPT_URL => 'https://orcid.org/oauth/userinfo',
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_ENCODING => '',
+              CURLOPT_MAXREDIRS => 10,
+              CURLOPT_TIMEOUT => 0,
+              CURLOPT_FOLLOWLOCATION => true,
+              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+              CURLOPT_CUSTOMREQUEST => 'GET',
+              CURLOPT_HTTPHEADER => array(
+                  'Authorization: Bearer '.$access_token.''
+                ),
+              ));
+
+              $response = curl_exec($curl);
+              curl_close($curl);
+              $response_arr=json_decode($response,true);
+              $sub=$response_arr['sub'];
+              $hashedString = hash('sha256', $sub);
+              $base64Encoded = base64_encode($hashedString); // Convert to Base64
+              $trimmedOutput = substr($base64Encoded, 0, 16); // Get first 16 characters
+        }
 
       $curl = curl_init();
 
@@ -399,7 +487,7 @@ class NodesController extends RbacController {
                   }
                 }
               }
-
+      
       return $this->render('nodes/list-connections', ['connectionsData' => $connectionsData]);
     }
 
@@ -557,6 +645,9 @@ class NodesController extends RbacController {
       
       $api_url=API_URL;
       $meican_url=MEICAN_URL;
+      $enableOrcidPage = defined('ENABLE_ORCID_PAGE') ? ENABLE_ORCID_PAGE : false; // ORCID environment variable
+      $OrcidClientID=ORCID_CLIENT_ID;
+      $OrcidClientSecret=ORCID_CLIENT_SECRET;
       $enableCILogonPage = defined('ENABLE_CILOGON_PAGE') ? ENABLE_CILOGON_PAGE : false; // Cilogon environment variable
       $CILogonClientID=CILOGON_CLIENT_ID;
       $CILogonClientSecret=CILOGON_CLIENT_SECRET;
@@ -685,7 +776,90 @@ class NodesController extends RbacController {
                 $hashedString = hash('sha256', $subExtract);
                 $base64Encoded = base64_encode($hashedString); // Convert to Base64
                 $trimmedOutput = substr($base64Encoded, 0, 16); // Get first 16 characters 
+        }
+        else if($enableOrcidPage){
+
+           $actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+           if (strpos($actual_link,'code') !== false) {
+                  $code=$_GET['code'];
+                  
+                  $curl = curl_init();
+
+                  curl_setopt_array($curl, array(
+                  CURLOPT_URL => 'https://orcid.org/oauth/token',
+                  CURLOPT_RETURNTRANSFER => true,
+                  CURLOPT_ENCODING => '',
+                  CURLOPT_MAXREDIRS => 10,
+                  CURLOPT_TIMEOUT => 0,
+                  CURLOPT_FOLLOWLOCATION => true,
+                  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                  CURLOPT_CUSTOMREQUEST => 'POST',
+                  CURLOPT_POSTFIELDS => 'client_id='.$OrcidClientID.'&client_secret='.$OrcidClientSecret.'&grant_type=authorization_code&redirect_uri=https://'.$meican_url.'/circuits/nodes/show&code='.$code.'',
+                  CURLOPT_HTTPHEADER => array(
+                        'Accept: application/json',
+                        'Content-Type: application/x-www-form-urlencoded'
+                      ),
+                    ));
+
+                    $response = curl_exec($curl);
+
+                    curl_close($curl);
+                    $response_arr=json_decode($response,true);
+                
+                    if(array_key_exists('access_token',$response_arr)){
+                      $access_token=$response_arr['access_token'];
+                      $refresh_token=$response_arr['refresh_token'];
+                      $id_token=$response_arr['id_token'];
+                      
+                      $session = Yii::$app->session;
+                      if (!$session->isActive) {
+                            $session->open();
+                      }
+                      Yii::$app->session->set('access_token', $access_token);
+                      Yii::$app->session->set('id_token', $id_token);
+                      Yii::$app->session->set('refresh_token', $refresh_token);
+                      Yii::$app->session->set('login_time', time());
+
+                    
+                    }
+
+              }
+              else{ 
+                $access_token = Yii::$app->session->get('access_token');
+                $id_token = Yii::$app->session->get('id_token');
+                $refresh_token = Yii::$app->session->get('refresh_token');
+                $loginTime = Yii::$app->session->get('login_time');
+
+                if($access_token==null){
+                    header("Location: https://orcid.org/oauth/authorize?client_id=".$OrcidClientID."&response_type=code&scope=/authenticate%20openid&redirect_uri=https://".$meican_url."/circuits/nodes/show");
+                    exit();
                 }
+              }
+                
+              $curl = curl_init();
+
+              curl_setopt_array($curl, array(
+              CURLOPT_URL => 'https://orcid.org/oauth/userinfo',
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_ENCODING => '',
+              CURLOPT_MAXREDIRS => 10,
+              CURLOPT_TIMEOUT => 0,
+              CURLOPT_FOLLOWLOCATION => true,
+              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+              CURLOPT_CUSTOMREQUEST => 'GET',
+              CURLOPT_HTTPHEADER => array(
+                  'Authorization: Bearer '.$access_token.''
+                ),
+              ));
+
+              $response = curl_exec($curl);
+              curl_close($curl);
+              $response_arr=json_decode($response,true);
+              $sub=$response_arr['sub'];
+              $hashedString = hash('sha256', $sub);
+              $base64Encoded = base64_encode($hashedString); // Convert to Base64
+              $trimmedOutput = substr($base64Encoded, 0, 16); // Get first 16 characters
+        }
 
                 //calling API for topology
                 $curl = curl_init();
@@ -926,10 +1100,6 @@ class NodesController extends RbacController {
       }
       
     }
-
-        //echo "test";exit();
-        //$id_token='dasdas';
-        //$trimmedOutput='asda';
         
         return $this->render('nodes/nodes',['nodes_array'=>$nodes_array,'latlng_array'=>$latlng_array,'links_array'=>$links_array,'meican_url'=>$meican_url,'bearerToken'=>$id_token,'ownership'=>$trimmedOutput]);
     }
