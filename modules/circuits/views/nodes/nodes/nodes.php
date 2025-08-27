@@ -348,7 +348,7 @@
         function getMatchingPorts(searchTerm) {
             if (!searchTerm) return allPorts; // Show all ports when no search term
             return allPorts.filter(port => 
-                port.entities.some(entity => entity.toLowerCase().includes(searchTerm))
+                port.entities && port.entities.some(entity => entity.toLowerCase().includes(searchTerm))
             );
         }
 
@@ -369,7 +369,7 @@
                 let shortPortId = port.id.replace("urn:sdx:port:", "");
 
                 // Format entities
-                let entitiesText = port.entities.join(", ");
+                let entitiesText = port.entities ? port.entities.join(", ") : "No entities";
 
                 // Use innerHTML to apply bold formatting
                 listItem.innerHTML = `(${shortPortId}) <strong>${entitiesText}</strong>`;
@@ -397,7 +397,7 @@
                 let shortPortId = port.id.replace("urn:sdx:port:", "");
 
         // Format entities
-                let entitiesText = port.entities.join(", ");
+                let entitiesText = port.entities ? port.entities.join(", ") : "No entities";
 
         // Use innerHTML to apply bold formatting
                 listItem.innerHTML = `(${shortPortId}) <strong>${entitiesText}</strong>`;
@@ -478,7 +478,7 @@
                 let shortPortId = port.id.replace("urn:sdx:port:", "");
 
         // Format entities
-                let entitiesText = port.entities.join(", ");
+                let entitiesText = port.entities ? port.entities.join(", ") : "No entities";
 
         // Use innerHTML to apply bold formatting
                 listItem.innerHTML = `(${shortPortId}) <strong>${entitiesText}</strong>`;
