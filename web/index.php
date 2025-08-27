@@ -9,9 +9,13 @@
 //defined('YII_ENV') or define('YII_ENV', 'dev');
 defined('MEICAN_URL') or define('MEICAN_URL', 'XXX_MEICAN_URL_XXX');
 defined('API_URL') or define('API_URL', 'XXX_SDX_CONTROLLER_URL_XXX');
+defined('ENABLE_ORCID_PAGE') or define('ENABLE_ORCID_PAGE', false); // ORCID environment variable
 defined('ORCID_CLIENT_ID') or define('ORCID_CLIENT_ID', 'XXX_ORCID_CLIENT_ID_XXX');
 defined('ORCID_CLIENT_SECRET') or define('ORCID_CLIENT_SECRET', 'XXX_ORCID_CLIENT_SECRET_XXX');
 defined('ENABLE_CILOGON_PAGE') or define('ENABLE_CILOGON_PAGE', true); // Cilogon environment variable for enabling/disabling cilogon
+defined('CILOGON_CLIENT_ID') or define('CILOGON_CLIENT_ID', 'XXX_CILOGON_CLIENT_ID_XXX'); // Cilogon environment variable for client ID
+defined('CILOGON_CLIENT_SECRET') or define('CILOGON_CLIENT_SECRET', 'XXX_CILOGON_CLIENT_SECRET_XXX'); // Cilogon environment variable for client secret
+defined('SDX_ALLOWED_DOMAINS') or define('SDX_ALLOWED_DOMAINS', 'ampath.net,sax.net,tenet.ac.za'); // List of domains to be allowed by default to all users
 
 require(__DIR__ . '/../vendor/autoload.php');
 require(__DIR__ . '/../vendor/yiisoft/yii2/Yii.php');

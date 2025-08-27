@@ -651,6 +651,7 @@ class NodesController extends RbacController {
       $enableCILogonPage = defined('ENABLE_CILOGON_PAGE') ? ENABLE_CILOGON_PAGE : false; // Cilogon environment variable
       $CILogonClientID=CILOGON_CLIENT_ID;
       $CILogonClientSecret=CILOGON_CLIENT_SECRET;
+      $SDX_ALLOWED_DOMAINS = defined('SDX_ALLOWED_DOMAINS') ? SDX_ALLOWED_DOMAINS : "ampath.net,sax.net,tenet.ac.za";
       $db = Yii::$app->db;
 
       if ($enableCILogonPage) { // Cilogon environment variable is enabled
@@ -909,7 +910,7 @@ class NodesController extends RbacController {
                                     Yii::$app->db->createCommand()->insert('meican_user_topology_domain', [
                                         'id' => $userId,
                                         'user_id' => $userId,
-                                        'domain' => 'ampath.net,sax.net,tenet.ac.za',
+                                        'domain' => $SDX_ALLOWED_DOMAINS,
                                     ])->execute();
                                 } catch (\yii\db\Exception $e) {
                                     echo "Insert failed: " . $e->getMessage();
@@ -936,7 +937,7 @@ class NodesController extends RbacController {
                   }
 
                   else{
-                      $email='test@test.com';
+                      $email="$trimmedOutput-TO-BE-CHANGED@localhost.localdomain";
                       $user = new User;
                       $user->login = $trimmedOutput;
                       $user->authkey = Yii::$app->getSecurity()->generateRandomString();
@@ -949,7 +950,7 @@ class NodesController extends RbacController {
                         $user->name = $response_arr['given_name'].' '.$response_arr['family_name'];
                       }
                       else {
-                        $user->name='userXYZ';
+                        $user->name=$response_arr['sub'];
                       }
                       $user->email = $email;
                       $registration_token=Yii::$app->getSecurity()->generateRandomString();
