@@ -8,10 +8,7 @@ ARG MEICAN_VERSION=v3.2.0
 ENV DEBIAN_FRONTEND=noninteractive \
     DEBCONF_NONINTERACTIVE_SEEN=true
 
-ENV MYSQL_DATABASE=$MYSQL_DATABASE \
-    MYSQL_USER=$MYSQL_USER \
-    MYSQL_PASSWORD=$MYSQL_PASSWORD \
-    MEICAN_DIR=/home/meican/meican-$MEICAN_VERSION
+ENV MEICAN_DIR=/home/meican/meican
 
 RUN apt-get update \
  && apt-get install -yq --no-install-recommends \
@@ -22,9 +19,7 @@ RUN apt-get update \
     zip \
     unzip \
     git \
-    # Install apache
     apache2 \
-    # Install php 7.0
     php7.0 \
     php7.0-mysql \
     php7.0-mbstring \
@@ -35,30 +30,31 @@ RUN apt-get update \
  && update-ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
+# Create user
 RUN adduser --disabled-password --gecos '' meican \
- && usermod -aG sudo meican \
- && curl -fsSL -o /tmp/meican.tgz "https://github.com/ufrgs-hyman/meican/archive/refs/tags/${MEICAN_VERSION}.tar.gz" \
- && tar -xzf /tmp/meican.tgz -C /home/meican \
- && chown -R meican:meican /home/meican \
- && rm -f /tmp/meican.tgz
+ && usermod -aG sudo meican
 
-WORKDIR $MEICAN_DIR
+# Clone MEICAN and checkout tag
+RUN git clone https://github.com/ufrgs-hyman/meican.git /home/meican/meican \
+ && cd /home/meican/meican \
+ && git checkout ${MEICAN_VERSION} \
+ && chown -R meican:meican /home/meican
 
-RUN su meican -c "curl -kO https://getcomposer.org/download/1.9.3/composer.phar" \
- && su meican -c "php composer.phar global require \"fxp/composer-asset-plugin:~1.4.4\"" \
- && ln -s $MEICAN_DIR/web /var/www/meican \
+WORKDIR /home/meican/meican
+
+# Composer
+RUN su -s /bin/bash meican -c "curl -fsSL https://getcomposer.org/download/1.9.3/composer.phar -o composer.phar" \
+ && su -s /bin/bash meican -c "php composer.phar global require \"fxp/composer-asset-plugin:~1.4.4\"" \
+ && ln -s /home/meican/meican/web /var/www/meican \
  && a2enmod rewrite
 
 COPY 000-default.conf /etc/apache2/sites-available/
 
 EXPOSE 80
 
-CMD cp $MEICAN_DIR/docker_for_build/db.php $MEICAN_DIR/config/ \
- && sed -i "s/MYSQL_DATABASE/$MYSQL_DATABASE/" $MEICAN_DIR/config/db.php \
- && sed -i "s/MYSQL_USER/$MYSQL_USER/" $MEICAN_DIR/config/db.php \
- && sed -i "s/MYSQL_PASSWORD/$MYSQL_PASSWORD/" $MEICAN_DIR/config/db.php \
- && chown meican:meican $MEICAN_DIR/config/db.php \
- && su meican -c "php composer.phar install" \
+CMD cp docker_for_build/db.php config/ \
+ && chown meican:meican config/db.php \
+ && su -s /bin/bash meican -c "php composer.phar install" \
  && service apache2 start \
  && /bin/bash
 
