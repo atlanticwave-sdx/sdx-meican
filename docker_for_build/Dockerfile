@@ -34,7 +34,7 @@ RUN apt-get update \
 
 RUN adduser --disabled-password --gecos '' meican \
  && usermod -aG sudo meican \
- && su meican -c "curl -kL https://github.com/ufrgs-hyman/meican/archive/$MEICAN_VERSION.tar.gz | tar xzC /home/meican"
+ && su meican -c "set -euo pipefail; curl -fsSL https://github.com/ufrgs-hyman/meican/archive/refs/tags/${MEICAN_VERSION}.tar.gz | tar xzC /home/meican"
 
 WORKDIR $MEICAN_DIR
 
