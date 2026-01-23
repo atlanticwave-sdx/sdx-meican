@@ -29,13 +29,12 @@ RUN apt-get update \
     libapache2-mod-php \
  && rm -rf /var/lib/apt/lists/*
 
-RUN adduser --disabled-password --gecos '' meican \
- && usermod -aG sudo meican \
- && git clone https://github.com/rnpbr/meican.git /home/meican/meican \
- && chown -R meican:meican /home/meican
+RUN adduser --disabled-password --gecos '' meican
+RUN usermod -aG sudo meican 
+RUN git clone https://github.com/rnpbr/meican.git /home/meican/meican 
+RUN chown -R meican:meican /home/meican
 
 WORKDIR $MEICAN_DIR
-
 RUN su meican -c "curl -kO https://getcomposer.org/download/1.9.3/composer.phar" \
  && su meican -c "php composer.phar install" \
  && ln -s $MEICAN_DIR/web /var/www/meican \
