@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  meican:
+    env_file:
+      - .env
+    container_name: meican-app
+    tty: true
+    ports:
+      - "${MEICAN_PORT:-80}:80"
+    depends_on:
+      - db
+    links:
+      - db
+
+  db:
+    platform: linux/x86_64
+    image: mysql:5.7
+    container_name: meican-db
+    volumes:
+      - db-meican:/var/lib/mysql
+    env_file:
+      - .env
+  
+volumes:
+  db-meican:
