@@ -3,7 +3,7 @@ FROM ubuntu:16.04
 LABEL Description="MEICAN Image" \
       Author="Leonardo Lauryel Batista dos Santos"
 
-ARG MEICAN_VERSION \ 
+ARG MEICAN_VERSION=v3.2.0 \ 
    DEBIAN_FRONTEND=noninteractive \
    DEBCONF_NONINTERACTIVE_SEEN=true
 
