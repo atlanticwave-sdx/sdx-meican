@@ -6,20 +6,22 @@ LABEL Description="MEICAN Image" \
 ARG MEICAN_VERSION=v3.2.0
 
 ENV DEBIAN_FRONTEND=noninteractive \
-   DEBCONF_NONINTERACTIVE_SEEN=true
+    DEBCONF_NONINTERACTIVE_SEEN=true
 
 ENV MYSQL_DATABASE=$MYSQL_DATABASE \
-   MYSQL_USER=$MYSQL_USER \
-   MYSQL_PASSWORD=$MYSQL_PASSWORD \
-   MEICAN_DIR=/home/meican/meican-$MEICAN_VERSION
-   
+    MYSQL_USER=$MYSQL_USER \
+    MYSQL_PASSWORD=$MYSQL_PASSWORD \
+    MEICAN_DIR=/home/meican/meican-$MEICAN_VERSION
+
 RUN apt-get update \
  && apt-get install -yq --no-install-recommends \
     apt-utils \
+    ca-certificates \
     curl \
     sudo \
     zip \
     unzip \
+    git \
     # Install apache
     apache2 \
     # Install php 7.0
@@ -30,16 +32,20 @@ RUN apt-get update \
     php7.0-soap \
     php7.0-xml \
     libapache2-mod-php \
+ && update-ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
 RUN adduser --disabled-password --gecos '' meican \
  && usermod -aG sudo meican \
- && su meican -c "set -euo pipefail; curl -fsSL https://github.com/ufrgs-hyman/meican/archive/refs/tags/${MEICAN_VERSION}.tar.gz | tar xzC /home/meican"
+ && curl -fsSL -o /tmp/meican.tgz "https://github.com/ufrgs-hyman/meican/archive/refs/tags/${MEICAN_VERSION}.tar.gz" \
+ && tar -xzf /tmp/meican.tgz -C /home/meican \
+ && chown -R meican:meican /home/meican \
+ && rm -f /tmp/meican.tgz
 
 WORKDIR $MEICAN_DIR
 
 RUN su meican -c "curl -kO https://getcomposer.org/download/1.9.3/composer.phar" \
- && su meican -c "php composer.phar global require "fxp/composer-asset-plugin:~1.4.4"" \
+ && su meican -c "php composer.phar global require \"fxp/composer-asset-plugin:~1.4.4\"" \
  && ln -s $MEICAN_DIR/web /var/www/meican \
  && a2enmod rewrite
 
@@ -51,7 +57,8 @@ CMD cp $MEICAN_DIR/docker_for_build/db.php $MEICAN_DIR/config/ \
  && sed -i "s/MYSQL_DATABASE/$MYSQL_DATABASE/" $MEICAN_DIR/config/db.php \
  && sed -i "s/MYSQL_USER/$MYSQL_USER/" $MEICAN_DIR/config/db.php \
  && sed -i "s/MYSQL_PASSWORD/$MYSQL_PASSWORD/" $MEICAN_DIR/config/db.php \
- && chown meican:meican $MEICAN_DIR/config/db.php  \
+ && chown meican:meican $MEICAN_DIR/config/db.php \
  && su meican -c "php composer.phar install" \
  && service apache2 start \
  && /bin/bash
+
