@@ -31,7 +31,10 @@ RUN apt-get update \
 
 RUN adduser --disabled-password --gecos '' meican
 RUN usermod -aG sudo meican 
-RUN git clone https://github.com/rnpbr/meican.git /home/meican/meican 
+
+COPY ./meican /home/meican/meican
+
+# RUN git clone https://github.com/rnpbr/meican.git /home/meican/meican 
 RUN chown -R meican:meican /home/meican
 
 WORKDIR $MEICAN_DIR
