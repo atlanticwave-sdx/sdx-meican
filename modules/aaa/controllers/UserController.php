@@ -70,6 +70,7 @@ class UserController extends RbacController {
         $user = User::findOne($id);
 
         $api_url=API_URL;
+        $id_token = Yii::$app->session->get('id_token');
         $curl = curl_init();
     
         curl_setopt_array($curl, array(
@@ -81,6 +82,9 @@ class UserController extends RbacController {
           CURLOPT_FOLLOWLOCATION => true,
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => 'GET',
+          CURLOPT_HTTPHEADER => array(
+          'Content-Type: application/json',
+          'Authorization: Bearer '.$id_token.''),
         ));
     
         $response = curl_exec($curl);
